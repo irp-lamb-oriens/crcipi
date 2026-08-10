@@ -32,7 +32,22 @@ function getApp() {
     return existing;
   }
 
-  const serviceAccount = JSON.parse(loadServiceAccount());
+  // Parse the service account JSON. The same single-line string is pasted
+  // into both the local .env and the Netlify dashboard, but macOS and
+  // Netlify's Linux servers can disagree on whether "\n" arrives as a literal
+  // backslash-n or as a real newline. Strategy:
+  //   1. Try JSON.parse directly. This works for the local serviceAccountKey.json
+  //      file (valid JSON, private key uses \n escapes) and for env vars that
+  //      arrive already-correct.
+  //   2. If that fails, the env var likely arrived with literal "\n" sequences
+  //      that must become real newlines before parsing. Normalize and retry.
+  const raw = loadServiceAccount();
+  let serviceAccount: Record<string, unknown>;
+  try {
+    serviceAccount = JSON.parse(raw);
+  } catch {
+    serviceAccount = JSON.parse(raw.replace(/\\n/g, "\n"));
+  }
 
   return initializeApp({
     credential: cert(serviceAccount),
