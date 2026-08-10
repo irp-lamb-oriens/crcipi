@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Root redirect is handled by app/page.tsx (redirect to /en).
+# Next.js rewrites (/es/quienes-somos -> /es/about) are handled by the runtime.

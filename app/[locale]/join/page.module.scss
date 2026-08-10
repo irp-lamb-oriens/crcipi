@@ -1,0 +1,28 @@
+.formSection {
+  padding: clamp(3rem, 7vw, 5.5rem) 0;
+  background: var(--navy-soft, #eef1f7);
+  border-top: 1px solid var(--line, #e5e5e5);
+}
+
+.formInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.formHeading {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--navy, #00205b);
+}
+
+.formIntro {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink-soft, #4b4b4b);
+  max-width: 56ch;
+  margin-bottom: 2rem;
+}

@@ -1,0 +1,55 @@
+import Link from "next/link";
+import type { Locale, PageContent } from "@/content/types";
+import LanguageSwitcher from "./LanguageSwitcher";
+import styles from "./SiteHeader.module.scss";
+
+interface Props {
+  locale: Locale;
+  content: PageContent;
+}
+
+export default function SiteHeader({ locale, content }: Props) {
+  const joinPath = locale === "en" ? "/en/join" : "/es/unete";
+
+  return (
+    <header className={styles.header}>
+      <div className={styles.inner}>
+        <Link href={locale === "en" ? "/en" : "/es"} className={styles.logo} aria-label="CR-CIPI home">
+          <span className={styles.logoMark} aria-hidden="true">
+            CR
+          </span>
+          <span className={styles.logoText}>
+            <span className={styles.logoName}>CR-CIPI</span>
+            <span className={styles.logoSub}>
+              {locale === "en"
+                ? "Costa Rican Chamber of International Private Investment"
+                : "Cámara Costarricense de Inversión Privada Internacional"}
+            </span>
+          </span>
+        </Link>
+
+        <nav className={styles.nav} aria-label="Main">
+          <Link href={locale === "en" ? "/en" : "/es"} className={styles.navLink}>
+            {content.nav.home}
+          </Link>
+          <Link
+            href={locale === "en" ? "/en/about" : "/es/quienes-somos"}
+            className={styles.navLink}
+          >
+            {content.nav.about}
+          </Link>
+          <Link href={joinPath} className={styles.navLink}>
+            {content.nav.join}
+          </Link>
+        </nav>
+
+        <div className={styles.actions}>
+          <LanguageSwitcher currentLocale={locale} />
+          <Link href={`${joinPath}#form`} className={styles.cta}>
+            {content.nav.volunteer}
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
