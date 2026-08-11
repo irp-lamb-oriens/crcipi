@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Locale, PageContent } from "@/content/types";
 import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./SiteHeader.module.scss";
+import logo from "@/app/logo.jpeg";
 
 interface Props {
   locale: Locale;
@@ -15,17 +17,12 @@ export default function SiteHeader({ locale, content }: Props) {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href={locale === "en" ? "/en" : "/es"} className={styles.logo} aria-label="CR-CIPI home">
-          <span className={styles.logoMark} aria-hidden="true">
-            CR
-          </span>
-          <span className={styles.logoText}>
-            <span className={styles.logoName}>CR-CIPI</span>
-            <span className={styles.logoSub}>
-              {locale === "en"
-                ? "Costa Rican Chamber of International Private Investment"
-                : "Cámara Costarricense de Inversión Privada Internacional"}
-            </span>
-          </span>
+          <Image
+            src={logo}
+            alt="CR-CIPI"
+            className={styles.logoImage}
+            priority
+          />
         </Link>
 
         <nav className={styles.nav} aria-label="Main">

@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Locale, PageContent } from "@/content/types";
 import { site } from "@/content/site";
 import styles from "./SiteFooter.module.scss";
+import logo from "@/app/logo.jpeg";
 
 interface Props {
   locale: Locale;
@@ -20,7 +22,11 @@ export default function SiteFooter({ locale, content }: Props) {
       <div className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
-            <span className={styles.name}>{site.name}</span>
+            <Image
+              src={logo}
+              alt={site.name}
+              className={styles.logoImage}
+            />
             <p className={styles.purpose}>
               {locale === "en" ? site.fullName : site.fullNameEs}
             </p>
