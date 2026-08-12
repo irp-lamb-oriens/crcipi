@@ -1466,9 +1466,9 @@ Spanish error, and the favicon wasn't showing.
 
 **Favicon root cause.** `app/icon.svg` was auto-detected by Next.js and generated
 its own `<link rel="icon" href="/icon.svg">`, which overrode the metadata
-`icons: { icon: "/favicon.png" }` I had added. File-based icons take precedence
+`icons: { icon: "/favicon.ico" }` I had added. File-based icons take precedence
 over metadata. Fix: deleted `app/icon.svg`; the metadata now renders
-`<link rel="icon" href="/favicon.png">`. Verified in the served HTML.
+`<link rel="icon" href="/favicon.ico">`. Verified in the served HTML.
 
 **Form root cause.** The API returned `storage_failed` (500). The server log
 showed the real error: `Value for argument "data" is not a valid Firestore
