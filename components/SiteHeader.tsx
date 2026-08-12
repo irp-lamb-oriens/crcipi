@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Locale, PageContent } from "@/content/types";
 import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./SiteHeader.module.scss";
-import logo from "@/app/logo.jpeg";
+import logo from "@/app/logo.png";
 
 interface Props {
   locale: Locale;
