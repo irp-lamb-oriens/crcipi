@@ -1456,3 +1456,39 @@ addition to HTML.
 1. The first `tail -30` on the registry test hid the failing assertion names (they were above the cutoff). Use `grep -E "✘|FAIL"` immediately for pass/fail lines.
 2. I don't have a live env var / index check for the composite query; the safe fallback means quota savings silently don't kick in until the index is created. Add a one-line log line (already present) and verify it flips to "Due-only query" after index creation.
 3. The registry test and `renderEmail.ts` disagree on whether `ai_custom_followup_*` belongs in `EMAIL_LABELS`. One of them is wrong — the test's "queue-only exclusion" contract was never updated when the manual-send feature shipped. Worth a decision + test update so the suite goes green.
+
+---
+
+## 2026-08-11 — CR-CIPI form: "Algo salió mal" + favicon not applied
+
+**Task.** Two reports on the crcipi site: the interest form failed with the generic
+Spanish error, and the favicon wasn't showing.
+
+**Favicon root cause.** `app/icon.svg` was auto-detected by Next.js and generated
+its own `<link rel="icon" href="/icon.svg">`, which overrode the metadata
+`icons: { icon: "/favicon.png" }` I had added. File-based icons take precedence
+over metadata. Fix: deleted `app/icon.svg`; the metadata now renders
+`<link rel="icon" href="/favicon.png">`. Verified in the served HTML.
+
+**Form root cause.** The API returned `storage_failed` (500). The server log
+showed the real error: `Value for argument "data" is not a valid Firestore
+document. Cannot use "undefined" as a Firestore value (found in field "company")`.
+The validator returns `undefined` for empty optional fields (company, phone,
+linkedin, sourcePage, language, utm), and Firestore rejects `undefined` values.
+Fix: strip `undefined` entries from the data object before writing. Verified with
+a direct POST returning `{"ok":true,"id":"..."}` and a clean build.
+
+**Do better next time.**
+1. **The favicon fix was a two-step miss.** I added the metadata reference and
+   declared done without checking the rendered HTML. The auto-detected
+   `app/icon.svg` was silently winning. Lesson: when a metadata change "doesn't
+   take," inspect the actual served `<head>` before assuming the config is wrong.
+2. **The form bug was a validator/DB contract mismatch.** The validator's
+   `undefined`-for-empty-optional convention is fine for JSON, but Firestore
+   treats `undefined` as invalid. The two layers disagreed on what "empty" means.
+   A shared "strip undefined before Firestore write" helper (or
+   `ignoreUndefinedProperties: true` on the Firestore settings) would prevent this
+   class of bug across every future write path.
+3. **I reproduced the API error with a direct curl before fixing** — that was the
+   right move and surfaced the exact Firestore error immediately. Keep doing that
+   instead of guessing from the generic client message.

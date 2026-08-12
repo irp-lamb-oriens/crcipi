@@ -39,12 +39,19 @@ export async function POST(request: NextRequest) {
 
   const data = result.data;
 
+  // Firestore rejects `undefined` values. The validator returns `undefined`
+  // for empty optional fields (company, phone, linkedin, sourcePage, language,
+  // utm), so strip them before writing.
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined)
+  );
+
   try {
     const docRef = db.collection("submissions").doc();
 
     await db.runTransaction(async (transaction) => {
       transaction.set(docRef, {
-        ...data,
+        ...cleanData,
         consent: data.consent,
         createdAt: FieldValue.serverTimestamp(),
         submissionId: docRef.id,
