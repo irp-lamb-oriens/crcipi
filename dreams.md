@@ -1492,3 +1492,56 @@ a direct POST returning `{"ok":true,"id":"..."}` and a clean build.
 3. **I reproduced the API error with a direct curl before fixing** — that was the
    right move and surfaced the exact Firestore error immediately. Keep doing that
    instead of guessing from the generic client message.
+
+---
+
+## 2026-08-12 — CR-CIPI form: volunteer confirmation email
+
+**Task.** When the interest form is submitted, send the volunteer a branded
+confirmation email. User provided Gmail app-password credentials for
+`luisarmando@internationalrelocationpartner.com`; the branded contact is
+`info@crcipi.org`.
+
+**Implementation.** New `app/api/submit/email.ts` using Nodemailer over Gmail
+SMTP (465, secure), credentials from `SMTP_USER`/`SMTP_PASS` env vars (in
+`.env.local` style `.env` locally, documented in `.env.example`). The submit
+route now sends two best-effort emails after the Firestore write: a
+confirmation to the volunteer (localized greeting/subject via
+`preferredLanguage`) and an internal notification to `site.notifyEmails`.
+Volunteer email uses a branded HTML shell (navy header, red summary band,
+inline-styled table for email-client safety). Both sends fail silently in the
+logs so a mail outage never breaks an accepted submission.
+
+**Key decision: From vs reply-to.** Gmail SMTP requires the From header to
+match the authenticated account, so mail is sent from
+`luisarmando@internationalrelocationpartner.com <luisarmando@...>` with
+`replyTo: info@crcipi.org`. Alternative "send as" aliases in Gmail only work
+for addresses owned by the same account; we did not assume `info@crcipi.org`
+can be spoofed in From, and the user should confirm whether that inbox exists.
+
+**Gotchas hit.**
+1. The `"` entity in the escape map got XML-decoded into a literal quote
+   on write, producing `""";` and a syntax error. Fix: build entities from
+   `String.fromCharCode` so no tooling layer can corrupt them. The same risk
+   applies to any file written via the agent harness containing `&` entities.
+2. Nodemailer needed `@types/nodemailer` (dev) to satisfy TS strict mode.
+3. `site.notifyEmails` is a readonly tuple; spreading `[...site.notifyEmails]`
+   satisfies Nodemailer's mutable array type.
+
+**Verification.** `npm run build` clean. SMTP verified with a live
+`transporter.verify()` + test send to the sender account. Production setup:
+paste `SMTP_PASS` into Netlify env vars; deploy will then send the real
+confirmation.
+
+**Do better next time.**
+1. The `from` + `replyTo` split is a Gmail constraint, but a proper branded
+   send (From: `info@crcipi.org`) would need an actual mailbox at that domain
+   or an SES/Resend domain verification. Decide the production sender before
+   the domain's MX is live.
+2. The internal notification currently goes to `info@crcipi.org`, which is the
+   same address as the reply-to — if that mailbox doesn't exist yet, the
+   notification silently disappears. Point `site.notifyEmails` at a real
+   inbox (the sender's Gmail) until the domain mailbox is ready.
+3. HTML email is inline-styled tables by necessity; if email content grows,
+   consider MJML or the `email-templates` conventions instead of hand-maintained
+   strings.

@@ -2,27 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateSubmission } from "@/lib/validators";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { site } from "@/content/site";
+import { sendInternalNotification, sendVolunteerConfirmation } from "./email";
 
 // POST /api/submit
 // Validates the volunteer/interest form server-side, stores it in Firestore
-// (collection: submissions), and sends an internal notification email.
+// (collection: submissions), and sends an email confirmation to the volunteer
+// plus an internal notification to the team.
 //
-// Email notifications are a PLACEHOLDER:
-// TODO: implement sendNotificationEmail() with the team's chosen provider
-// (e.g. Resend). Read credentials from env vars, never hardcode them.
-async function sendNotificationEmail(submission: Record<string, unknown>): Promise<void> {
-  // Placeholder. Wire to an email provider before launch.
-  // Example with Resend:
-  //   const resend = new Resend(process.env.RESEND_API_KEY);
-  //   await resend.emails.send({
-  //     from: "CR-CIPI <no-reply@crcipi.org>",
-  //     to: site.notifyEmails,
-  //     subject: "New CR-CIPI volunteer application",
-  //     html: buildNotificationHtml(submission),
-  //   });
-  void submission;
-}
+// Email sending is best-effort: a failure never fails the request, since the
+// submission is already stored. Credentials come from env vars (SMTP_USER /
+// SMTP_PASS), never hardcoded.
 
 export async function POST(request: NextRequest) {
   let raw: Record<string, unknown>;
@@ -59,12 +48,17 @@ export async function POST(request: NextRequest) {
       });
     });
 
-    // Best-effort notification; never fail the request if email fails.
+    // Best-effort emails; never fail the request if sending fails.
     try {
-      await sendNotificationEmail({ ...data, submissionId: docRef.id });
-    } catch {
-      // Log server-side; submission is already stored.
-      console.error("CR-CIPI notification email failed for", docRef.id);
+      await sendVolunteerConfirmation(data);
+    } catch (error) {
+      console.error("CR-CIPI volunteer confirmation email failed for", docRef.id, error);
+    }
+
+    try {
+      await sendInternalNotification(data);
+    } catch (error) {
+      console.error("CR-CIPI internal notification email failed for", docRef.id, error);
     }
 
     return NextResponse.json({ ok: true, id: docRef.id }, { status: 201 });
