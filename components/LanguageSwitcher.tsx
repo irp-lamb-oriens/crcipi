@@ -10,6 +10,11 @@ interface Props {
   currentLocale: Locale;
 }
 
+const LABELS: Record<Locale, string> = {
+  en: "English",
+  es: "Español",
+};
+
 export default function LanguageSwitcher({ currentLocale }: Props) {
   const pathname = usePathname();
   const target = getAlternateLocale(currentLocale);
@@ -17,13 +22,16 @@ export default function LanguageSwitcher({ currentLocale }: Props) {
 
   return (
     <nav className={styles.switcher} aria-label="Language">
+      <span className={`${styles.option} ${styles.current}`} aria-current="true">
+        {LABELS[currentLocale]}
+      </span>
       <Link
         href={href}
-        className={styles.link}
+        className={styles.option}
         hrefLang={target}
         aria-label={target === "en" ? "Switch to English" : "Cambiar a español"}
       >
-        {target === "en" ? "EN" : "ES"}
+        {LABELS[target]}
       </Link>
     </nav>
   );
