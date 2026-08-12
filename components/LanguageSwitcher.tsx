@@ -10,14 +10,10 @@ interface Props {
   currentLocale: Locale;
 }
 
-// Fixed display order: EN first, ES second. The active state is drawn by the
-// sliding indicator, so the items never swap positions on toggle.
+// Fixed display order: English first, Español second. The active state is drawn
+// by the sliding indicator, so the items never swap positions on toggle.
 const OPTIONS: Locale[] = ["en", "es"];
-const CODES: Record<Locale, string> = {
-  en: "EN",
-  es: "ES",
-};
-const FULL_NAMES: Record<Locale, string> = {
+const LABELS: Record<Locale, string> = {
   en: "English",
   es: "Español",
 };
@@ -44,7 +40,7 @@ export default function LanguageSwitcher({ currentLocale }: Props) {
               aria-current="true"
               lang={locale}
             >
-              {CODES[locale]}
+              {LABELS[locale]}
             </span>
           );
         }
@@ -56,10 +52,9 @@ export default function LanguageSwitcher({ currentLocale }: Props) {
             className={styles.option}
             hrefLang={locale}
             lang={locale}
-            title={FULL_NAMES[locale]}
             aria-label={locale === "en" ? "Switch to English" : "Cambiar a español"}
           >
-            {CODES[locale]}
+            {LABELS[locale]}
           </Link>
         );
       })}
