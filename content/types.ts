@@ -15,9 +15,16 @@ export interface Cta {
   href: string;
 }
 
-export interface PriorityCard {
+export interface Stat {
+  value: string;
+  label: string;
+}
+
+export interface Initiative {
   title: string;
   body: string;
+  example: string;
+  memberValue: string;
 }
 
 export interface Committee {
@@ -100,21 +107,31 @@ export interface PageContent {
       primaryCta: string;
       secondaryCta: string;
     };
-    why: {
+    stats: {
+      items: Stat[];
+    };
+    purpose: {
+      eyebrow: string;
+      heading: string;
+      body: string;
+      vision: string;
+    };
+    whyJoin: {
       eyebrow: string;
       heading: string;
       body: string;
     };
-    vision: string;
-    priorities: {
+    initiatives: {
       eyebrow: string;
       heading: string;
-      cards: PriorityCard[];
+      exampleLabel: string;
+      memberValueLabel: string;
+      items: Initiative[];
     };
-    founding: {
+    sharedPurpose: {
       eyebrow: string;
       heading: string;
-      body: string;
+      body: string[];
       cta: string;
     };
   };

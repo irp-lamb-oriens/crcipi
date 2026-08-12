@@ -19,43 +19,101 @@ export const es: PageContent = {
     hero: {
       eyebrow: "Cámara Costarricense de Inversión Privada Internacional",
       headline: "Atrayendo inversión privada internacional responsable a Costa Rica.",
-      body: "CR-CIPI es una iniciativa independiente del sector privado que reúne profesionales, empresas y líderes comprometidos con atraer, facilitar y proteger la inversión privada de personas y familias internacionales que eligen Costa Rica para vivir, retirarse, invertir y desarrollar negocios.",
+      body: "CR-CIPI reúne profesionales, empresas y organizaciones que atienden a residentes internacionales, inversionistas, pensionados, empresarios y familias que eligen Costa Rica para vivir, invertir y construir su futuro.",
       primaryCta: "Ser Voluntario Fundador",
       secondaryCta: "Únete a la Iniciativa",
     },
-    why: {
-      eyebrow: "Por qué es importante",
-      heading: "Complementando la inversión corporativa con capital privado",
-      body: "Costa Rica ha desarrollado importantes mecanismos para atraer inversión corporativa internacional. CR-CIPI busca complementar ese esfuerzo poniendo atención en otra fuente relevante de inversión: personas, familias, retirados, pensionados, emprendedores e inversionistas privados que escogen Costa Rica como destino de largo plazo.",
+    stats: {
+      items: [
+        { value: "5", label: "Voluntarios Fundadores" },
+        { value: "8", label: "Iniciativas Iniciales" },
+        { value: "1", label: "Propósito Compartido" },
+      ],
     },
-    vision: "Atraer Personas. Atraer Capital. Crear Oportunidades. Fortalecer Costa Rica.",
-    priorities: {
-      eyebrow: "Nuestras prioridades",
-      heading: "Cuatro prioridades guían nuestro trabajo",
-      cards: [
+    purpose: {
+      eyebrow: "Nuestro propósito",
+      heading: "Convertir a Costa Rica en uno de los destinos más atractivos, confiables y competitivos del mundo para la inversión privada internacional.",
+      body: "Estamos construyendo un ecosistema profesional que genere valor para nuestros miembros, mejores recursos para nuestros clientes y beneficios económicos de largo plazo para Costa Rica.",
+      vision: "Conectar Profesionales. Atraer Inversión. Crear Oportunidades. Fortalecer Costa Rica.",
+    },
+    whyJoin: {
+      eyebrow: "¿Por qué formar parte de CR-CIPI?",
+      heading: "Iniciativas diseñadas para generar valor desde el inicio",
+      body: "Los miembros tendrán acceso a una creciente red de profesionales de alta reputación, oportunidades de negocio, marketing colaborativo, programas educativos y una voz colectiva sobre temas relacionados con la inversión privada internacional. A medida que la Cámara crezca, estas iniciativas también ayudarán a mejorar el posicionamiento internacional, el clima de inversión y las políticas públicas de Costa Rica.",
+    },
+    initiatives: {
+      eyebrow: "Nuestras 8 iniciativas",
+      heading: "Ocho iniciativas, un solo propósito",
+      exampleLabel: "Ejemplo",
+      memberValueLabel: "Valor para el miembro",
+      items: [
         {
-          title: "Atraer Inversión",
-          body: "Promover Costa Rica internacionalmente como destino para vivir, invertir y establecer raíces económicas de largo plazo.",
+          title: "Red de Miembros de Alta Reputación",
+          body: "CR-CIPI está creando una red confiable de profesionales y empresas comprometidos con altos estándares de servicio, transparencia y ética profesional. Entre nuestros miembros podrán participar abogados, profesionales migratorios, contadores, bancos, empresas inmobiliarias, desarrolladores, compañías de relocation, aseguradoras, proveedores de salud, asesores de inversión y otras organizaciones que atienden clientes internacionales.",
+          example:
+            "Un corredor de bienes raíces atendiendo a un comprador extranjero puede necesitar un abogado, banco, aseguradora o empresa de relocation confiable. CR-CIPI facilita estas conexiones.",
+          memberValue: "Reputación, credibilidad, referencias y visibilidad profesional.",
         },
         {
-          title: "Mejorar el Entorno de Inversión",
-          body: "Identificar barreras y promover procesos más simples, claros y competitivos.",
+          title: "Networking y Oportunidades de Negocio",
+          body: "CR-CIPI creará espacios para desarrollar relaciones profesionales que puedan generar colaboración y nuevos negocios. Las actividades podrán incluir reuniones de miembros, desayunos empresariales, mesas redondas, videoconferencias, comités de trabajo, eventos sectoriales y presentaciones entre miembros.",
+          example:
+            "Una empresa de relocation puede conocer a un abogado migratorio, realtor y aseguradora dentro de CR-CIPI y desarrollar una red coordinada para futuros clientes.",
+          memberValue: "Networking que produce oportunidades, no solo presentaciones.",
         },
         {
-          title: "Proteger la Confianza del Inversionista",
-          body: "Promover transparencia, estándares profesionales y prácticas responsables.",
+          title: "Marketing Colaborativo y Mercadeo Cruzado",
+          body: "Trabajando juntos podemos tener una presencia internacional mucho mayor. CR-CIPI promoverá simultáneamente Costa Rica como destino, CR-CIPI como organización confiable y los servicios de nuestros miembros. Las campañas podrán incluir publicidad digital, redes sociales, videos educativos, entrevistas con miembros, webinars internacionales, relaciones con medios, artículos, eventos internacionales y directorio de miembros.",
+          example:
+            "En lugar de que cinco empresas promocionen Costa Rica individualmente en Florida, CR-CIPI puede organizar una sola campaña conjunta dirigida a potenciales inversionistas y retirados.",
+          memberValue: "Mayor exposición, costos compartidos y mayor alcance internacional.",
         },
         {
-          title: "Política Pública",
-          body: "Desarrollar propuestas de legislación y política pública que mejoren la competitividad de Costa Rica.",
+          title: "Seminarios para Clientes",
+          body: "Las personas que consideran mudarse o invertir en Costa Rica normalmente necesitan información de varios profesionales. CR-CIPI reunirá esos especialistas. Algunos seminarios podrán ser Cómo Vivir e Invertir en Costa Rica, Retirarse en Costa Rica, Comprar Propiedad en Costa Rica y Crear una Empresa en Costa Rica. Los seminarios podrán realizarse en línea, en Costa Rica o internacionalmente.",
+          example:
+            "Un solo seminario puede guiar a un cliente potencial a través de residencia, bienes raíces, impuestos, banca y relocation en un entorno confiable.",
+          memberValue: "Una oportunidad de demostrar conocimiento directamente frente a clientes potenciales.",
+        },
+        {
+          title: "Guías Prácticas para Clientes",
+          body: "CR-CIPI desarrollará recursos educativos para ayudar a los clientes internacionales a entender Costa Rica antes de tomar decisiones importantes. Podrán incluir Invertir en Costa Rica, Retirarse en Costa Rica, Comprar Propiedad, Residencia e Inmigración, Banca e Impuestos, Crear una Empresa, Salud y Seguros y Mudarse a Costa Rica.",
+          example:
+            "Una persona considerando retirarse puede recibir una guía que explique residencia, banca, vivienda, seguros, salud, impuestos y relocation, y luego identificar miembros calificados de CR-CIPI para cada etapa.",
+          memberValue: "Posicionar a los miembros como los expertos de confianza a los que los clientes acuden primero.",
+        },
+        {
+          title: "Promoción Internacional de Costa Rica",
+          body: "Costa Rica ha sido exitosa atrayendo turismo e inversión multinacional. Creemos que existe otra gran oportunidad: atraer directamente a personas y familias con capital privado. Esto incluye retirados, empresarios, inversionistas inmobiliarios, dueños de empresas, inversionistas independientes, familias internacionales y personas de alto patrimonio.",
+          example:
+            "CR-CIPI podría organizar un Seminario de Inversión y Retiro en Costa Rica en Florida, Texas o Canadá con varias empresas miembro bajo un solo mensaje unificado de Costa Rica.",
+          memberValue: "Una presencia internacional coordinada que ninguna empresa podría construir por sí sola.",
+        },
+        {
+          title: "Mejores Leyes y Políticas Públicas",
+          body: "Promocionar Costa Rica no es suficiente. También debemos hacer que invertir sea más sencillo, seguro y competitivo. CR-CIPI identificará obstáculos y desarrollará recomendaciones concretas para instituciones públicas y legisladores. Una de nuestras primeras áreas de trabajo será el marco creado por la Ley 9996 para inversionistas, rentistas y pensionados.",
+          example:
+            "El trabajo podrá incluir simplificación de residencia, reducción de atrasos administrativos, mayor seguridad jurídica y protección al inversionista, e inversión fuera del GAM.",
+          memberValue: "Una voz colectiva sobre los temas que definen el clima de inversión.",
+        },
+        {
+          title: "Medir el Impacto Económico",
+          body: "Costa Rica cuenta con amplia información sobre inversión multinacional, pero sabemos mucho menos sobre el impacto económico acumulado de las personas y familias internacionales que viven e invierten aquí. CR-CIPI quiere ayudar a medirlo. Queremos consolidar información sobre bienes raíces, construcción, empresas, empleo, servicios profesionales, salud, seguros, transporte, turismo, consumo, impuestos e inversión regional.",
+          example:
+            "Una familia internacional puede comprar una propiedad, contratar profesionales, comprar seguros, utilizar salud privada, contratar empleados, consumir localmente y continuar invirtiendo durante décadas.",
+          memberValue: "Datos confiables que demuestran el valor de este sector y respaldan futuras políticas.",
         },
       ],
     },
-    founding: {
-      eyebrow: "Etapa fundacional",
-      heading: "Ayúdenos a construir la iniciativa",
-      body: "CR-CIPI se encuentra actualmente en etapa de formación. Estamos buscando profesionales, líderes empresariales, académicos y aliados institucionales que deseen aportar su experiencia y tiempo para ayudar a construir la iniciativa.",
-      cta: "Ser Voluntario Fundador",
+    sharedPurpose: {
+      eyebrow: "Un solo propósito",
+      heading: "Costa Rica debe competir por personas, familias y capital privado",
+      body: [
+        "Costa Rica lleva décadas compitiendo exitosamente por inversión multinacional. Creemos que también debemos competir por otra valiosa forma de inversión internacional: personas, familias, empresarios, retirados, inversionistas y capital privado.",
+        "Cuando una familia internacional escoge Costa Rica, hace mucho más que comprar una propiedad. Contrata profesionales, apoya empresas, genera empleo, consume localmente, invierte, paga impuestos y se integra a comunidades. Muchas continúan contribuyendo a Costa Rica durante décadas.",
+        "CR-CIPI existe para construir la red profesional, promoción internacional, información y políticas necesarias para atraer más de esta inversión.",
+      ],
+      cta: "Únete a la Iniciativa",
     },
   },
   about: {
