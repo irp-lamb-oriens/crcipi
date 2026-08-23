@@ -1,0 +1,131 @@
+// Announcement banner styles.
+
+.banner {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 0;
+}
+
+.inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #f8fafc;
+}
+
+.body {
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.urlRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.urlLabel {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.urlHint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #0f172a;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background-color 150ms ease;
+}
+
+.link:hover {
+  background: #f8fafc;
+}
+
+.toggle {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.toggle:hover {
+  border-color: #cbd5e1;
+  color: #f8fafc;
+}
+
+@media (max-width: 640px) {
+  .inner {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .urlHint {
+    max-width: 160px;
+  }
+}

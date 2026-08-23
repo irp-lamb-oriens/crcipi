@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
-import { locales, getContent, isLocale } from "@/content";
+import { locales, isLocale } from "@/content";
+import { getLiveContent } from "@/lib/contentStore";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import HtmlLangSetter from "@/components/HtmlLangSetter";
+import CmsProvider from "@/components/cms/CmsProvider";
+import AnnouncementBanner from "@/components/cms/AnnouncementBanner";
+import AdminBar from "@/components/cms/AdminBar";
 import type { Locale } from "@/content/types";
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   children: React.ReactNode;
@@ -17,14 +23,16 @@ export async function generateStaticParams() {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const content = getContent(locale);
+  const content = await getLiveContent(locale);
 
   return (
-    <>
+    <CmsProvider locale={locale} initialContent={content}>
       <HtmlLangSetter lang={content.htmlLang} />
-      <SiteHeader locale={locale as Locale} content={content} />
+      <AnnouncementBanner />
+      <SiteHeader locale={locale as Locale} />
       <main id="main">{children}</main>
-      <SiteFooter locale={locale as Locale} content={content} />
-    </>
+      <SiteFooter locale={locale as Locale} />
+      <AdminBar />
+    </CmsProvider>
   );
 }

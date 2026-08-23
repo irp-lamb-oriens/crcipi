@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getContent, isLocale } from "@/content";
+import { isLocale } from "@/content";
+import { getLiveContent } from "@/lib/contentStore";
 import { buildPageMetadata } from "@/lib/metadata";
 import HeroSection from "@/components/HeroSection";
 import StatsStrip from "@/components/StatsStrip";
@@ -10,6 +11,8 @@ import Initiatives from "@/components/Initiatives";
 import SharedPurpose from "@/components/SharedPurpose";
 import type { Locale } from "@/content/types";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ locale: string }>;
 }
@@ -17,7 +20,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const content = getContent(locale);
+  const content = await getLiveContent(locale);
   return buildPageMetadata({
     path: locale === "en" ? "/en" : "/es",
     alternatives: { en: "/en", es: "/es" },
@@ -29,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const content = getContent(locale);
+  const content = await getLiveContent(locale);
 
   return (
     <>

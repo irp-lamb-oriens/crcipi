@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import EditableText from "@/components/cms/EditableText";
 import type { Locale } from "@/content/types";
 import styles from "./SharedPurpose.module.scss";
 
@@ -16,15 +19,26 @@ export default function SharedPurpose({ locale, eyebrow, heading, body, cta }: P
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>{eyebrow}</p>
-        <h2 className={styles.heading}>{heading}</h2>
+        <EditableText path="home.sharedPurpose.eyebrow" as="p" className={styles.eyebrow}>
+          {eyebrow}
+        </EditableText>
+        <EditableText path="home.sharedPurpose.heading" as="h2" className={styles.heading}>
+          {heading}
+        </EditableText>
         {body.map((paragraph, i) => (
-          <p key={i} className={styles.body}>
+          <EditableText
+            key={i}
+            path={`home.sharedPurpose.body.${i}`}
+            as="p"
+            className={styles.body}
+          >
             {paragraph}
-          </p>
+          </EditableText>
         ))}
         <Link href={`${joinPath}#form`} className={styles.cta}>
-          {cta}
+          <EditableText path="home.sharedPurpose.cta" as="span">
+            {cta}
+          </EditableText>
         </Link>
       </div>
     </section>

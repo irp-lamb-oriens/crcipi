@@ -15,6 +15,14 @@ export const es: PageContent = {
     join: "Únete",
     volunteer: "Voluntariado",
   },
+  announcement: {
+    enabled: true,
+    eyebrow: "Transmisión en vivo",
+    title: "CR-CIPI en vivo cada miércoles",
+    body: "Acompáñenos los miércoles a las 3:30 p.m. para una transmisión en vivo sobre el avance de la Cámara y sus próximas actividades.",
+    linkLabel: "Ver la transmisión en vivo",
+    linkUrl: "",
+  },
   home: {
     hero: {
       eyebrow: "Cámara Costarricense de Inversión Privada Internacional",
@@ -25,7 +33,7 @@ export const es: PageContent = {
     },
     stats: {
       items: [
-        { value: "5", label: "Voluntarios Fundadores" },
+        { value: "10", label: "Voluntarios Fundadores" },
         { value: "8", label: "Iniciativas Iniciales" },
         { value: "1", label: "Propósito Compartido" },
       ],

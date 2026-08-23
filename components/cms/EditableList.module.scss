@@ -1,0 +1,64 @@
+// Editable list controls.
+
+.list {
+  position: relative;
+}
+
+.item {
+  position: relative;
+}
+
+.controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem;
+  background: #0f172a;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.22);
+}
+
+.controlBtn {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 6px;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.controlBtn:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.controlBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.addBtn {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px dashed rgba(148, 163, 184, 0.5);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.04);
+  color: #0f172a;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.addBtn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  border-color: #64748b;
+}

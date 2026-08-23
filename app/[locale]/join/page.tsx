@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getContent, isLocale } from "@/content";
+import { isLocale } from "@/content";
+import { getLiveContent } from "@/lib/contentStore";
 import { buildPageMetadata } from "@/lib/metadata";
 import PageHero from "@/components/PageHero";
 import CommitteeGrid from "@/components/CommitteeGrid";
@@ -9,6 +10,8 @@ import FoundingGoals from "@/components/FoundingGoals";
 import InterestForm from "@/components/InterestForm";
 import styles from "./page.module.scss";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ locale: string }>;
 }
@@ -16,7 +19,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const content = getContent(locale);
+  const content = await getLiveContent(locale);
   return buildPageMetadata({
     path: locale === "en" ? "/en/join" : "/es/unete",
     alternatives: { en: "/en/join", es: "/es/unete" },
@@ -28,11 +31,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function JoinPage({ params }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const content = getContent(locale);
+  const content = await getLiveContent(locale);
 
   return (
     <>
       <PageHero
+        pathPrefix="join.hero"
         eyebrow={content.join.hero.eyebrow}
         heading={content.join.hero.heading}
         body={[content.join.hero.body]}

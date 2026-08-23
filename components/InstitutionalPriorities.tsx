@@ -1,3 +1,7 @@
+"use client";
+
+import EditableList from "@/components/cms/EditableList";
+import EditableText from "@/components/cms/EditableText";
 import type { InstitutionalPriority as PriorityType } from "@/content/types";
 import styles from "./InstitutionalPriorities.module.scss";
 
@@ -11,21 +15,45 @@ export default function InstitutionalPriorities({ eyebrow, heading, items }: Pro
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>{eyebrow}</p>
-        <h2 className={styles.heading}>{heading}</h2>
-        <ol className={styles.list}>
-          {items.map((item, i) => (
-            <li key={item.title} className={styles.item}>
+        <EditableText path="about.priorities.eyebrow" as="p" className={styles.eyebrow}>
+          {eyebrow}
+        </EditableText>
+        <EditableText path="about.priorities.heading" as="h2" className={styles.heading}>
+          {heading}
+        </EditableText>
+        <EditableList
+          path="about.priorities.items"
+          fields={[
+            { path: "title", as: "h3" },
+            { path: "description", as: "p" },
+          ]}
+          addTemplate={{ title: "New priority", description: "" }}
+          addLabel="Add priority"
+          className={styles.list}
+          renderItem={(item, index, controls) => (
+            <div key={index} className={styles.item}>
               <span className={styles.index} aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
+                {String(index + 1).padStart(2, "0")}
               </span>
               <div className={styles.text}>
-                <h3 className={styles.title}>{item.title}</h3>
-                <p className={styles.description}>{item.description}</p>
+                <h3 className={styles.title}>
+                  <EditableText path={`about.priorities.items.${index}.title`} as="span">
+                    {String(item.title ?? "")}
+                  </EditableText>
+                </h3>
+                <p className={styles.description}>
+                  <EditableText
+                    path={`about.priorities.items.${index}.description`}
+                    as="span"
+                  >
+                    {String(item.description ?? "")}
+                  </EditableText>
+                </p>
               </div>
-            </li>
-          ))}
-        </ol>
+              {controls}
+            </div>
+          )}
+        />
       </div>
     </section>
   );

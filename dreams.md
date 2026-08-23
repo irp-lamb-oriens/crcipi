@@ -1545,3 +1545,51 @@ confirmation.
 3. HTML email is inline-styled tables by necessity; if email content grows,
    consider MJML or the `email-templates` conventions instead of hand-maintained
    strings.
+
+---
+
+## CMS: Elementor-style inline editing + email-code auth (post-task)
+
+**Task.** Add a CMS so Cipi can edit the whole site without a developer, with
+passwordless email-code admin auth and WYSIWYG contenteditable surface that
+gets a visible box-shadow on hover, plus an undo feature.
+
+**What existed before me.** The CMS was largely built already: `lib/auth.ts`
+(email-code flow), `lib/contentStore.ts` (Firestore live content), `CmsProvider`,
+`EditableText`, `EditableList`, `AdminBar`, `AnnouncementBanner`, the
+`/admin` login page, and the four auth API routes. Build passed with a real
+invalid-`<dl>` nesting bug I fixed in `StatsStrip`.
+
+**What I changed.**
+1. Fixed invalid HTML/DOM nesting in `StatsStrip` (`<dt>/<dd>` inside a plain
+   `div` instead of a proper `<dl>`) so the stats list renders Valid.
+2. Enabled the live-stream announcement in both locales and set the headline
+   to "10" Founding Volunteers (the admin still edits this value in edit mode;
+   the seed just makes the initial state match the user's ask).
+3. Added `scripts/seed-admin.mjs` to write admin emails into the Firestore
+   allowlist. This closes the real gap: without at least one allowlisted email,
+   email-code auth can never be completed.
+4. Wrote `README.md` documenting the CMS edit flow, auth, admin seeding, and env.
+
+**Key decisions.**
+- Live content always wins over static seed content, so enabling the
+  announcement in the seeds is just the default until an admin toggles it.
+- The editable surface commits on blur (not per keystroke) so React doesn't
+  reset the caret mid-typing; undo/redo snapshot whole content objects.
+- No history-restore UI exists in `AdminBar` despite the history API existing;
+  the README reflects this honestly ("API available") rather than overclaiming
+  a menu.
+
+**Do better next time.**
+1. The history API (`app/api/admin/history`) is read/restore only and has no
+   surface in `AdminBar`. A "Revisions" panel would make undo durable across
+   sessions instead of only in-memory.
+2. Admin allowlist has no UI to add/remove admins; it requires running the seed
+   script. A small admin-only endpoint to manage the allowlist would remove the
+   script dependency.
+3. The announcement `linkUrl` defaults to `""`, which renders no link. Fine for
+   launch, but if a live-stream URL is added later it must be set in edit mode
+   or via seed.
+
+**Verification.** `npm run build` clean. `next lint` is deprecated and prompts
+for an interactive ESLint setup, so no lint gate exists in CI yet.

@@ -1,0 +1,52 @@
+// Shared visual language for the CMS editing layer.
+// Imported once (from EditableText) so it is tree-shaken into the client bundle.
+
+.cmsEditable {
+  position: relative;
+  outline: none;
+  transition: box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.cmsEditable[contenteditable="true"]:hover {
+  box-shadow: 0 0 0 2px var(--cms-accent, #0b6cff);
+  border-radius: 3px;
+  cursor: text;
+}
+
+.cmsEditable[contenteditable="true"]:focus {
+  box-shadow: 0 0 0 2px var(--cms-accent, #0b6cff), 0 0 0 6px rgba(11, 108, 255, 0.14);
+  border-radius: 3px;
+}
+
+.cmsEl {
+  position: relative;
+  transition: box-shadow 160ms ease;
+}
+
+.cmsEl.cmsHover {
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(11, 108, 255, 0.55);
+}
+
+.cmsBlockGap {
+  display: inline-block;
+}
+
+.cmsOutline {
+  position: relative;
+}
+
+.cmsOutline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(11, 108, 255, 0.4);
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.cmsOutline.cmsOutlineHover::after {
+  opacity: 1;
+}

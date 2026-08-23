@@ -10,6 +10,15 @@ export interface NavItem {
   href: string;
 }
 
+export interface Announcement {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  body: string;
+  linkLabel: string;
+  linkUrl: string;
+}
+
 export interface Cta {
   label: string;
   href: string;
@@ -99,6 +108,7 @@ export interface PageContent {
     join: string;
     volunteer: string;
   };
+  announcement: Announcement;
   home: {
     hero: {
       eyebrow: string;

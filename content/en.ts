@@ -15,6 +15,14 @@ export const en: PageContent = {
     join: "Join",
     volunteer: "Volunteer",
   },
+  announcement: {
+    enabled: true,
+    eyebrow: "Live stream",
+    title: "CR-CIPI live every Wednesday",
+    body: "Join us on Wednesdays at 3:30 p.m. for a live stream about the Chamber's progress and upcoming activities.",
+    linkLabel: "Watch the live stream",
+    linkUrl: "",
+  },
   home: {
     hero: {
       eyebrow: "Costa Rican Chamber of International Private Investment",
@@ -25,7 +33,7 @@ export const en: PageContent = {
     },
     stats: {
       items: [
-        { value: "5", label: "Founding Volunteers" },
+        { value: "10", label: "Founding Volunteers" },
         { value: "8", label: "Initial Initiatives" },
         { value: "1", label: "Shared Purpose" },
       ],
