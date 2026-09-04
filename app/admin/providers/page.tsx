@@ -71,6 +71,7 @@ export default function AdminProvidersPage() {
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<string | null>(null);
 
   const loadProviders = useCallback(async () => {
@@ -93,11 +94,18 @@ export default function AdminProvidersPage() {
 
   function set<K extends keyof ProviderForm>(key: K, value: ProviderForm[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    setFieldErrors((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
   }
 
   async function openEdit(id: string) {
     setBusy(true);
     setError(null);
+    setFieldErrors({});
     try {
       const res = await fetch(`/api/admin/providers/${id}`);
       if (!res.ok) throw new Error("load_failed");
@@ -129,6 +137,17 @@ export default function AdminProvidersPage() {
     setFormMode("create");
     setSelected(null);
     setError(null);
+    setFieldErrors({});
+  }
+
+  function fieldError(key: keyof ProviderForm): string | null {
+    const code = fieldErrors[key];
+    if (!code) return null;
+    if (code === "required") return "This field is required.";
+    if (key === "email") return "Enter a valid email address.";
+    if (key === "website" || key === "logoUrl") return "Enter a valid URL.";
+    if (code === "invalid") return "Enter a valid value.";
+    return code;
   }
 
   async function save() {
@@ -155,9 +174,19 @@ export default function AdminProvidersPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        setError("Save failed. Check the fields and try again.");
+        const body = (await res.json().catch(() => null)) as {
+          errors?: Record<string, string>;
+        } | null;
+        const errors = body?.errors;
+        if (errors && Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+          setError(null);
+        } else {
+          setError("Save failed. Check the fields and try again.");
+        }
         return;
       }
+      setFieldErrors({});
       setNotice(formMode === "create" ? "Provider created." : "Provider saved.");
       setSelected(null);
       setForm(EMPTY_FORM);
@@ -314,6 +343,9 @@ export default function AdminProvidersPage() {
                 value={form.name}
                 onChange={(e) => set("name", e.target.value)}
               />
+              {fieldError("name") ? (
+                <p className={styles.fieldError}>{fieldError("name")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -331,6 +363,9 @@ export default function AdminProvidersPage() {
                   </option>
                 ))}
               </select>
+              {fieldError("category") ? (
+                <p className={styles.fieldError}>{fieldError("category")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -344,6 +379,9 @@ export default function AdminProvidersPage() {
                 value={form.descriptionEn}
                 onChange={(e) => set("descriptionEn", e.target.value)}
               />
+              {fieldError("descriptionEn") ? (
+                <p className={styles.fieldError}>{fieldError("descriptionEn")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -357,6 +395,9 @@ export default function AdminProvidersPage() {
                 value={form.descriptionEs}
                 onChange={(e) => set("descriptionEs", e.target.value)}
               />
+              {fieldError("descriptionEs") ? (
+                <p className={styles.fieldError}>{fieldError("descriptionEs")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -368,6 +409,9 @@ export default function AdminProvidersPage() {
                 onChange={(e) => set("website", e.target.value)}
                 placeholder="https://"
               />
+              {fieldError("website") ? (
+                <p className={styles.fieldError}>{fieldError("website")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -378,6 +422,9 @@ export default function AdminProvidersPage() {
                 value={form.email}
                 onChange={(e) => set("email", e.target.value)}
               />
+              {fieldError("email") ? (
+                <p className={styles.fieldError}>{fieldError("email")}</p>
+              ) : null}
             </div>
 
             <div className={styles.field}>
@@ -409,6 +456,9 @@ export default function AdminProvidersPage() {
                 onChange={(e) => set("logoUrl", e.target.value)}
                 placeholder="https://"
               />
+              {fieldError("logoUrl") ? (
+                <p className={styles.fieldError}>{fieldError("logoUrl")}</p>
+              ) : null}
             </div>
 
             <label className={styles.check}>

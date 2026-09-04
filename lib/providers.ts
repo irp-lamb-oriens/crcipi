@@ -217,17 +217,22 @@ export type ProviderValidation =
   | { ok: true; data: ProviderInput }
   | { ok: false; errors: Record<string, string> };
 
+function normalizeUrl(value: string): string {
+  if (!value || /^https?:\/\//i.test(value)) return value;
+  return `https://${value}`;
+}
+
 export function validateProviderInput(raw: unknown): ProviderValidation {
   const body = (raw ?? {}) as Record<string, unknown>;
   const name = String(body.name ?? "").trim().slice(0, 160);
   const category = body.category as ProviderCategory;
   const descriptionEn = String(body.descriptionEn ?? "").trim().slice(0, 4000);
   const descriptionEs = String(body.descriptionEs ?? "").trim().slice(0, 4000);
-  const website = String(body.website ?? "").trim().slice(0, 500);
+  const website = normalizeUrl(String(body.website ?? "").trim().slice(0, 500));
   const email = String(body.email ?? "").trim().slice(0, 254);
   const phone = String(body.phone ?? "").trim().slice(0, 60);
   const location = String(body.location ?? "").trim().slice(0, 160);
-  const logoUrl = String(body.logoUrl ?? "").trim().slice(0, 500);
+  const logoUrl = normalizeUrl(String(body.logoUrl ?? "").trim().slice(0, 500));
   const featured = body.featured === true;
 
   const errors: Record<string, string> = {};
