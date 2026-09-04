@@ -26,6 +26,7 @@ export function getByPath(root: unknown, path: string): unknown {
   let current = root;
   for (const part of parts) {
     if (current === null || current === undefined) return undefined;
+    if (typeof current !== "object") return undefined;
     current = (current as UnknownRecord)[part];
   }
   return current;
