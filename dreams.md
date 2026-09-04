@@ -1593,3 +1593,51 @@ invalid-`<dl>` nesting bug I fixed in `StatsStrip`.
 
 **Verification.** `npm run build` clean. `next lint` is deprecated and prompts
 for an interactive ESLint setup, so no lint gate exists in CI yet.
+
+---
+
+## 2026-09-04 — Member provider directory with moderated ratings
+
+**Task.** Add a member-provider directory ("directorio de proveedores miembros
+con ratings") to the public crcipi site, with admin management.
+
+**What shipped.**
+- `lib/providers.ts` (server-only) + `lib/providerCategories.ts` (client-safe):
+  the Firestore data layer for `providers/{id}` + `providers/{id}/ratings/{id}`.
+  Ratings are moderated: a review lands with `approved:false`, and only counts
+  toward the aggregate once an admin approves it (transactional `approveRating`
+  bumps `ratingsCount`/`ratingsSum` idempotently; `rejectRating` deletes).
+- Bilingual content schema (`DirectoryContent`) + EN/ES copy, a `nav.directory`
+  label, header/footer links, `/es/directorio` rewrite, sitemap + i18n routes.
+- Public `/en/directory` + `/es/directorio` page: server component loads approved
+  providers, passes a plain `DirectoryProvider` array into a `DirectoryClient`
+  island (search + category filter + inline star-rating review form).
+- `POST /api/providers/:id/rating` (IP rate-limited, spam-moderated).
+- Admin surface at `/admin/providers` + APIs `/api/admin/providers`,
+  `/api/admin/providers/[id]`, `/api/admin/providers/[id]/ratings/[ratingId]`,
+  gated by the existing `requireAdmin` cookie session; an `AdminBar` "Providers"
+  entry links to it.
+
+**What could have been better.**
+1. **First big `write_to_file` produced invalid TS** (imports and type aliases in
+   the middle of the page file, plus an unused `ProviderCard` import). I rewrote
+   the file wholesale immediately instead of patching the broken sections. Lesson
+   reinforced: a near-perfect build on the *second* try is still on me to catch
+   before emitting; for a new page, keep the server entry thin and push all
+   interactivity into a dedicated client island from the start.
+2. **The server data-layer taxonomy was duplicated client-side first.** I split
+   `providerCategories.ts` out only after realizing `server-only` would crash the
+   review form. A cleaner first pass would put shared pure constants in a
+   client-safe module from the beginning so both sides import one source.
+3. **`getProvider` originally faked a `QueryDocumentSnapshot` to reuse `toProvider`.** 
+   The cast was ugly and type-unsafe; refactored `toProvider(id, data)` to take
+   the id and a plain record so both the list and single-get paths share it.
+4. No executable proof of the aggregate invariant (approve → count/sum bump;
+   idempotency). A tiny round-trip against a test doc would prove the transaction
+   rather than argue it. Rate-limiting on the public submit path is there, but the
+   moderation flow itself has no approval-rate guard.
+
+**Verification.** `npm run build` clean; all 25 routes resolve, including the new
+directory pages and API handlers. `next lint` remains deprecated/interactive.
+</task_progress>
+</replace_in_file>

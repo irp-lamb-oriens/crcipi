@@ -94,6 +94,47 @@ export interface FormContent {
   };
 }
 
+export interface DirectoryContent {
+  meta: {
+    title: string;
+    description: string;
+  };
+  hero: {
+    eyebrow: string;
+    heading: string;
+    body: string;
+  };
+  filters: {
+    browse: string;
+    all: string;
+    search: string;
+    searchPlaceholder: string;
+    noResults: string;
+  };
+  card: {
+    featured: string;
+    reviews: string;
+    noReviews: string;
+    visit: string;
+  };
+  rating: {
+    heading: string;
+    intro: string;
+    ratingLabel: string;
+    nameLabel: string;
+    commentLabel: string;
+    submit: string;
+    submitting: string;
+    success: string;
+    pending: string;
+    errors: {
+      rating: string;
+      name: string;
+      generic: string;
+    };
+  };
+}
+
 export interface PageContent {
   locale: Locale;
   lang: string;
@@ -106,6 +147,7 @@ export interface PageContent {
     home: string;
     about: string;
     join: string;
+    directory: string;
     volunteer: string;
   };
   announcement: Announcement;
@@ -191,6 +233,7 @@ export interface PageContent {
     };
     form: FormContent;
   };
+  directory: DirectoryContent;
   footer: {
     purpose: string;
     contact: string;

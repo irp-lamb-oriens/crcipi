@@ -14,6 +14,7 @@ interface Props {
 
 export default function SiteHeader({ locale }: Props) {
   const joinPath = locale === "en" ? "/en/join" : "/es/unete";
+  const directoryPath = locale === "en" ? "/en/directory" : "/es/directorio";
   const homePath = locale === "en" ? "/en" : "/es";
 
   return (
@@ -40,6 +41,9 @@ export default function SiteHeader({ locale }: Props) {
           </Link>
           <Link href={joinPath} className={styles.navLink}>
             <EditableText path="nav.join" as="span" />
+          </Link>
+          <Link href={directoryPath} className={styles.navLink}>
+            <EditableText path="nav.directory" as="span" />
           </Link>
         </nav>
 

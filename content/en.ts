@@ -13,6 +13,7 @@ export const en: PageContent = {
     home: "Home",
     about: "About",
     join: "Join",
+    directory: "Member Directory",
     volunteer: "Volunteer",
   },
   announcement: {
@@ -305,6 +306,47 @@ export const en: PageContent = {
       success: {
         title: "Thank you for your interest",
         body: "Your application has been received. We will be in touch about next steps.",
+      },
+    },
+  },
+  directory: {
+    meta: {
+      title: "Member Directory | CR-CIPI",
+      description:
+        "Find trusted CR-CIPI member providers serving international residents, investors and families in Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Member directory",
+      heading: "Trusted member providers",
+      body: "A directory of CR-CIPI member professionals and companies committed to high standards of service, transparency and responsible practice.",
+    },
+    filters: {
+      browse: "Browse providers",
+      all: "All",
+      search: "Search",
+      searchPlaceholder: "Search by name or category",
+      noResults: "No providers match your search.",
+    },
+    card: {
+      featured: "Featured",
+      reviews: "reviews",
+      noReviews: "No reviews yet",
+      visit: "Visit",
+    },
+    rating: {
+      heading: "Leave a review",
+      intro: "Your feedback helps others choose trusted providers.",
+      ratingLabel: "Rating",
+      nameLabel: "Your name",
+      commentLabel: "Comment (optional)",
+      submit: "Submit review",
+      submitting: "Submitting...",
+      success: "Thank you. Your review has been submitted for moderation.",
+      pending: "Your review will appear once it is approved.",
+      errors: {
+        rating: "Please select a rating from 1 to 5.",
+        name: "Please enter your name.",
+        generic: "Something went wrong. Please try again.",
       },
     },
   },

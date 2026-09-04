@@ -46,12 +46,20 @@ export default function AdminBar() {
     );
   }
 
+  const providersLink = (
+    <a className={styles.link} href="/admin/providers">
+      Providers
+    </a>
+  );
+
   return (
     <div className={styles.bar}>
       <span className={styles.brand}>
         CR-CIPI CMS
         {email ? <span className={styles.email}>{email}</span> : null}
       </span>
+
+      {providersLink}
 
       {!editMode ? (
         <button

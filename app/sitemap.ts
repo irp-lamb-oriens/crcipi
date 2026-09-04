@@ -9,6 +9,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/es/quienes-somos", priority: 0.8 },
     { path: "/en/join", priority: 0.9 },
     { path: "/es/unete", priority: 0.9 },
+    { path: "/en/directory", priority: 0.7 },
+    { path: "/es/directorio", priority: 0.7 },
   ];
 
   return routes.map((route) => ({

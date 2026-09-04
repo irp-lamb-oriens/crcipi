@@ -13,6 +13,7 @@ export const es: PageContent = {
     home: "Inicio",
     about: "Quiénes Somos",
     join: "Únete",
+    directory: "Directorio de Miembros",
     volunteer: "Voluntariado",
   },
   announcement: {
@@ -305,6 +306,47 @@ export const es: PageContent = {
       success: {
         title: "Gracias por su interés",
         body: "Hemos recibido su solicitud. Nos pondremos en contacto sobre los próximos pasos.",
+      },
+    },
+  },
+  directory: {
+    meta: {
+      title: "Directorio de Miembros | CR-CIPI",
+      description:
+        "Encuentre proveedores miembros de CR-CIPI de confianza que atienden a residentes, inversionistas y familias internacionales en Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Directorio de miembros",
+      heading: "Proveedores miembros de confianza",
+      body: "Un directorio de profesionales y empresas miembros de CR-CIPI comprometidos con altos estándares de servicio, transparencia y práctica responsable.",
+    },
+    filters: {
+      browse: "Explorar proveedores",
+      all: "Todos",
+      search: "Buscar",
+      searchPlaceholder: "Buscar por nombre o categoría",
+      noResults: "Ningún proveedor coincide con su búsqueda.",
+    },
+    card: {
+      featured: "Destacado",
+      reviews: "reseñas",
+      noReviews: "Sin reseñas todavía",
+      visit: "Visitar",
+    },
+    rating: {
+      heading: "Dejar una reseña",
+      intro: "Su opinión ayuda a otros a elegir proveedores de confianza.",
+      ratingLabel: "Calificación",
+      nameLabel: "Su nombre",
+      commentLabel: "Comentario (opcional)",
+      submit: "Enviar reseña",
+      submitting: "Enviando...",
+      success: "Gracias. Su reseña fue enviada para moderación.",
+      pending: "Su reseña aparecerá una vez aprobada.",
+      errors: {
+        rating: "Seleccione una calificación de 1 a 5.",
+        name: "Ingrese su nombre.",
+        generic: "Algo salió mal. Inténtelo de nuevo.",
       },
     },
   },

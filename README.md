@@ -16,7 +16,9 @@ Bilingual institutional website for the Costa Rica Chamber of International Priv
 | Home | `/en` | `/es` |
 | About | `/en/about` | `/es/quienes-somos` |
 | Join | `/en/join` | `/es/unete` |
+| Member directory | `/en/directory` | `/es/directorio` |
 | Admin sign-in | `/admin` | `/admin` |
+| Provider management | `/admin/providers` | `/admin/providers` |
 
 ## Editing content (CMS)
 
@@ -36,6 +38,27 @@ The live-stream announcement is enabled and editable from the banner at the top 
 - Static content lives in `content/en.ts` and `content/es.ts`.
 - Live edits are stored in Firestore under `sites/crcipi/content/{locale}` and win over static content.
 - Previous snapshots are kept in `sites/crcipi/history/{locale}/entries` (history read/restore API available in `app/api/admin/history`).
+
+## Member provider directory
+
+A public directory of member providers with moderated ratings.
+
+- Visitors browse, search, and filter providers on `/en/directory` (or `/es/directorio`).
+- Each provider shows a star average, review count, contact details, and an inline review form.
+- New reviews land as **pending** and only count after an admin approves them in `/admin/providers`.
+
+Data lives in Firestore:
+
+```
+providers/{providerId}                -> provider fields + ratingsCount/ratingsSum
+providers/{providerId}/ratings/{id}   -> { rating, reviewerName, comment, approved }
+```
+
+Seed example providers (idempotent; build the real directory from the admin UI):
+
+```bash
+node scripts/seed-providers.mjs   # or: npm run seed:providers
+```
 
 ## Auth
 

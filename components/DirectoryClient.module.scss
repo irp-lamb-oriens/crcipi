@@ -1,0 +1,414 @@
+.section {
+  padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(4rem, 9vw, 7rem);
+  background: var(--paper, #ffffff);
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Eyebrow above the directory controls, matching the site's red uppercase
+// section-label pattern. Kept subtle (not a full heading) so it doesn't repeat
+// the page hero.
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red, #a7302f);
+  margin-bottom: 0.75rem;
+}
+
+// --- Toolbar -------------------------------------------------------
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.searchLabel {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--ink-faint, #bebebe);
+  pointer-events: none;
+}
+
+.search {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border: 1px solid var(--line, #e5e5e5);
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--ink, #101010);
+  background: #fff;
+
+  &::placeholder {
+    color: var(--ink-faint, #bebebe);
+  }
+
+  &:focus {
+    outline: 2px solid var(--navy, #00205b);
+    outline-offset: 2px;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--line, #e5e5e5);
+  background: #fff;
+  color: var(--ink, #101010);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--navy, #00205b);
+    color: var(--navy, #00205b);
+  }
+}
+
+.pillActive {
+  background: var(--red, #a7302f);
+  color: #fff;
+  border-color: var(--red, #a7302f);
+
+  &:hover {
+    background: #8f2a29;
+    border-color: #8f2a29;
+    color: #fff;
+  }
+}
+
+.empty {
+  padding: 4rem 0;
+  text-align: center;
+  color: var(--ink-soft, #7e7e7e);
+}
+
+// --- Grid & cards --------------------------------------------------
+// Hairline-divided grid (gap + background trick) so cards share the site's
+// sharp, institutional table aesthetic instead of soft floating shadows.
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line, #e5e5e5);
+  border: 1px solid var(--line, #e5e5e5);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.item {
+  display: flex;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1.75rem 1.5rem;
+  background: #fff;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--paper-soft, #f7f7f5);
+  }
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: var(--navy-soft, #eef1f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.monogram {
+  font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--navy, #00205b);
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--ink, #101010);
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.category {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #7e7e7e);
+}
+
+.featured {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--red, #a7302f);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill-md, 32px);
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--red, #a7302f);
+}
+
+.reviews {
+  font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
+  font-size: 0.78rem;
+  color: var(--ink-soft, #7e7e7e);
+}
+
+.description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink-soft, #4b4b4b);
+  margin-bottom: 1.25rem;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0 0 1.25rem;
+}
+
+.contactRow {
+  font-size: 0.9rem;
+  color: var(--ink, #101010);
+
+  dd {
+    margin: 0;
+  }
+
+  a {
+    font-weight: 600;
+    color: var(--navy, #00205b);
+
+    &:hover {
+      color: var(--red, #a7302f);
+    }
+  }
+}
+
+.reviewToggle {
+  margin-top: auto;
+}
+
+.reviewButton {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--navy, #00205b);
+  background: none;
+  border: none;
+  padding: 0;
+
+  &:hover {
+    color: var(--red, #a7302f);
+  }
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--ink, #101010);
+
+  .pendingNote {
+    font-size: 0.8rem;
+    color: var(--ink-soft, #7e7e7e);
+  }
+}
+
+// --- Review form ---------------------------------------------------
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line, #e5e5e5);
+  margin-top: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink, #101010);
+}
+
+.input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line, #e5e5e5);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--ink, #101010);
+  background: #fff;
+
+  &::placeholder {
+    color: var(--ink-faint, #bebebe);
+  }
+
+  &:focus {
+    outline: 2px solid var(--navy, #00205b);
+    outline-offset: 2px;
+  }
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.starInput {
+  display: flex;
+  gap: 0.3rem;
+  color: var(--red, #a7302f);
+}
+
+.starButton {
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  color: var(--line, #e5e5e5);
+  transition: color 0.1s ease, transform 0.1s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.starOn {
+  color: var(--red, #a7302f);
+}
+
+.error {
+  font-size: 0.85rem;
+  color: var(--red, #a7302f);
+}
+
+.submit {
+  align-self: flex-start;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill, 60px);
+  background: var(--red, #a7302f);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 400;
+  border: 1px solid var(--red, #a7302f);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+
+  &:hover {
+    background: #8f2a29;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

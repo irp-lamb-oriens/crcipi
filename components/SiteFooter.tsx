@@ -16,6 +16,7 @@ export default function SiteFooter({ locale }: Props) {
   const homePath = locale === "en" ? "/en" : "/es";
   const aboutPath = locale === "en" ? "/en/about" : "/es/quienes-somos";
   const joinPath = locale === "en" ? "/en/join" : "/es/unete";
+  const directoryPath = locale === "en" ? "/en/directory" : "/es/directorio";
   const otherLocale = locale === "en" ? "es" : "en";
   const otherHome = otherLocale === "en" ? "/en" : "/es";
 
@@ -42,6 +43,9 @@ export default function SiteFooter({ locale }: Props) {
             </Link>
             <Link href={joinPath}>
               <EditableText path="nav.join" as="span" />
+            </Link>
+            <Link href={directoryPath}>
+              <EditableText path="nav.directory" as="span" />
             </Link>
           </nav>
 
