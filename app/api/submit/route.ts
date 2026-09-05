@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateSubmission } from "@/lib/validators";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { createUser, getUserByEmail } from "@/lib/auth";
 import { sendInternalNotification, sendVolunteerConfirmation } from "./email";
 
 // POST /api/submit
@@ -47,6 +48,22 @@ export async function POST(request: NextRequest) {
         site: "crcipi.org",
       });
     });
+
+    // Filling the volunteer form creates the login account (role member) so
+    // this person can sign in later. Idempotent and non-destructive: an
+    // existing account (e.g. an admin) is never overwritten or demoted.
+    try {
+      const existing = await getUserByEmail(data.email);
+      if (!existing) {
+        await createUser({
+          email: data.email,
+          name: `${data.firstName} ${data.lastName}`.trim(),
+          role: "member",
+        });
+      }
+    } catch (error) {
+      console.error("CR-CIPI volunteer account creation failed for", data.email, error);
+    }
 
     // Best-effort emails; never fail the request if sending fails.
     try {

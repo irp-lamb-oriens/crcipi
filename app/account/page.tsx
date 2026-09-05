@@ -107,7 +107,7 @@ export default function AccountPage() {
   }, [loadMe, loadProviders]);
 
   useEffect(() => {
-    if (authed === false) router.replace("/signup");
+    if (authed === false) router.replace("/admin");
   }, [authed, router]);
 
   // This dashboard is the member surface. Admins belong in the admin console.

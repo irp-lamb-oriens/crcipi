@@ -1751,6 +1751,46 @@ of thing that erodes trust in the boundary.
    than silently wiring the volunteer form to create accounts, because that
    changes who can log in and is a decision, not an implementation detail.
 
+---
+
+## 2026-09-04 — Single sign-up path + "make UX match each role" (follow-up)
+
+**Task.** After deploy, `/api/admin/providers` returned 401 on an already-signed-in
+session, and the UX still did not fit what each role should face. The user chose
+the single-sign-up option: filling the volunteer form is what creates the login.
+
+**Fixes.**
+- **401 root cause**: `getSessionUser` resolved the session `userId` via
+  `getUserById`, but pre-unified-model sessions (and admins still only in the
+  legacy allowlist) had no `users/` doc, so the session resolved as anonymous.
+  Now it resolves by the session email through `getUserByEmail`, which already
+  falls back to the legacy allowlist. This is why the "fallback" comment in the
+  code was a lie until now.
+- **Header**: `MemberMenu` guest state now reads "Sign in" and points at `/admin`
+  instead of a sign-up action; member/admin states unchanged.
+- **Single sign-up**: `/api/submit` idempotently creates a member `users` record
+  (never overwriting/demoting an existing account). `/signup` is now a redirect to
+  `/en/join#form`, and `/account` routes signed-out users to `/admin`, so there is
+  exactly one sign-up (volunteer form) and one sign-in (`/admin`).
+- **Per-role surfaces** already in place from the prior round: admin pages gate on
+  `role === "admin"`, the CMS bar is admin-only, and `/account` forwards admins to
+  the console.
+
+**Do better next time.**
+1. **The "legacy fallback" comment was aspirational, not real.** I wrote
+   "falls back to a legacy email-only session" but the code never did, and the
+   first real sign-in in production exposed it. A comment that describes
+   intended-but-unimplemented behavior is worse than none; either implement the
+   fallback or don't claim it.
+2. **Verify the actual deployed session shape.** Locally the new sessions carry
+   `userId`, so the bug was invisible until an old session hit production. A
+   seed script that writes a legacy email-only session and asserts
+   `getSessionUser` still resolves would have caught it without a deploy.
+3. **Two sign-up paths is a UX smell** that I created in Stage 3 (`/signup`) and
+   only collapsed after the user pointed at the volunteer form as the real
+   sign-up. When a product has a "sign up to volunteer" intent, the account
+   creation should live on that form from the start, not in a parallel route.
+
 </task_progress>
 </task_progress>
 </replace_in_file>

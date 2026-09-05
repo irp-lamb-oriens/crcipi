@@ -50,8 +50,8 @@ There is one sign-in page (`/admin`, neutral heading "Sign in"). It has no
 
 ## What makes sense to display vs. not
 
-- **Header `MemberMenu`:** anonymous → "Register your business", member →
-  "Manage my business", admin → "Admin".
+- **Header `MemberMenu`:** anonymous → "Sign in" (`/admin`), member →
+  "Manage my business" (`/account`), admin → "Admin" (`/admin/providers`).
 - **`CmsProvider`/`AdminBar`:** renders the CMS bar only when the session is an
   admin. Members and anonymous users never see it.
 - **Admin pages** gate on `role === "admin"`, never on `authed === true`. A
@@ -60,11 +60,11 @@ There is one sign-in page (`/admin`, neutral heading "Sign in"). It has no
 - **`/account`** is member-only. An admin visiting it is redirected to
   `/admin/providers`.
 
-## Known gap (to decide later)
+## Sign-up (decided)
 
-The volunteer/interest form at `/en/join` stores a submission and emails the
-team; it does **not** create a `users` account yet. Sign-in is therefore
-reserved for the separate member-account sign-up at `/signup`. If "signing up
-to volunteer" is meant to also create a user account, the volunteer form's
-`/api/submit` handler needs to create a `users` record (role `member`) as well —
-a one-line follow-up once that product decision is confirmed.
+Filling the volunteer/interest form is the single sign-up path. `/api/submit`
+idempotently creates a `users` record (role `member`, keyed on email) and never
+overwrites or demotes an existing account. `/signup` is a redirect to
+`/en/join#form` so old links don't 404, and `/account` sends signed-out users to
+`/admin`. Result: one sign-up (volunteer form) and one sign-in (`/admin`).
+</content>

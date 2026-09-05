@@ -389,10 +389,15 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       return null;
     }
 
-    const userId = data.userId ?? (data.email ? emailKey(data.email) : null);
-    if (!userId) return null;
-
-    const user = await getUserById(userId);
+    // Resolve by email with a legacy-allowlist fallback, so sessions created
+    // before the unified users model (and admins still only in the old
+    // allowlist) keep working instead of resolving as anonymous. userId is
+    // only a last resort for sessions that somehow lack an email.
+    const user = data.email
+      ? await getUserByEmail(data.email)
+      : data.userId
+        ? await getUserById(data.userId)
+        : null;
     if (!user || user.status !== "active") return null;
 
     return toSessionUser(user);

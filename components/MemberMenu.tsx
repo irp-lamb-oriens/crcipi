@@ -9,12 +9,12 @@ type AuthState = { loaded: boolean; role: string | null };
 
 const LABELS: Record<Locale, { guest: string; member: string; admin: string }> = {
   en: {
-    guest: "Register your business",
+    guest: "Sign in",
     member: "Manage my business",
     admin: "Admin",
   },
   es: {
-    guest: "Registra tu empresa",
+    guest: "Iniciar sesión",
     member: "Gestionar mi empresa",
     admin: "Admin",
   },
@@ -63,7 +63,7 @@ export default function MemberMenu({ locale }: { locale: Locale }) {
   }
 
   return (
-    <Link href="/signup" className={styles.link}>
+    <Link href="/admin" className={styles.link}>
       {labels.guest}
     </Link>
   );
