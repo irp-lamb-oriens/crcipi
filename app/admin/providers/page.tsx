@@ -65,7 +65,7 @@ const EMPTY_FORM: ProviderForm = {
 };
 
 export default function AdminProvidersPage() {
-  const [authed, setAuthed] = useState<boolean | null>(null);
+  const [role, setRole] = useState<string | null | undefined>(undefined);
   const [providers, setProviders] = useState<AdminProviderSummary[]>([]);
   const [selected, setSelected] = useState<AdminProviderDetail | null>(null);
   const [form, setForm] = useState<ProviderForm>(EMPTY_FORM);
@@ -85,13 +85,15 @@ export default function AdminProvidersPage() {
   useEffect(() => {
     fetch("/api/auth/me")
       .then((res) => res.json())
-      .then((data: { authed: boolean }) => setAuthed(data.authed))
-      .catch(() => setAuthed(false));
+      .then((data: { authed: boolean; role: string | null }) =>
+        setRole(data.authed ? data.role : null)
+      )
+      .catch(() => setRole(null));
   }, []);
 
   useEffect(() => {
-    if (authed) void loadProviders();
-  }, [authed, loadProviders]);
+    if (role === "admin") void loadProviders();
+  }, [role, loadProviders]);
 
   function set<K extends keyof ProviderForm>(key: K, value: ProviderForm[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -228,7 +230,7 @@ export default function AdminProvidersPage() {
     if (selected) void openEdit(providerId);
   }
 
-  if (authed === null) {
+  if (role === undefined) {
     return (
       <main className={styles.main}>
         <p className={styles.hint}>Loading…</p>
@@ -236,14 +238,23 @@ export default function AdminProvidersPage() {
     );
   }
 
-  if (authed === false) {
+  // Members and anonymous visitors never see the admin console.
+  if (role !== "admin") {
     return (
       <main className={styles.main}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Provider directory admin</h1>
+          <h1 className={styles.title}>Sign in</h1>
           <p className={styles.hint}>
-            You must be signed in to manage providers.{" "}
-            <a href="/admin">Sign in</a>.
+            {role === null ? (
+              <>
+                You need to sign in first. <a href="/admin">Sign in</a>.
+              </>
+            ) : (
+              <>
+                This area is for administrators.{" "}
+                <a href="/account">Go to my business</a>.
+              </>
+            )}
           </p>
         </div>
       </main>

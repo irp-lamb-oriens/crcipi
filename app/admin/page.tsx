@@ -6,8 +6,10 @@ import styles from "./page.module.scss";
 
 type Stage = "email" | "code";
 
-// Admin sign-in page: email-code (passwordless) auth.
-export default function AdminPage() {
+// Single sign-in page used by both members and admins. The heading is neutral
+// ("Sign in"); an email without an account redirects to the volunteer page, and
+// the post-verify landing depends on the account role.
+export default function SignInPage() {
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("email");
   const [email, setEmail] = useState("");
@@ -16,12 +18,13 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [sentNotice, setSentNotice] = useState(false);
 
-  // If already authed, go straight to the site.
+  // If already signed in, route to the right home for the current role.
   useEffect(() => {
     fetch("/api/auth/me")
       .then((res) => res.json())
-      .then((data: { authed: boolean }) => {
-        if (data.authed) router.push("/en");
+      .then((data: { authed: boolean; role: string | null }) => {
+        if (!data.authed) return;
+        router.replace(data.role === "admin" ? "/admin/providers" : "/account");
       })
       .catch(() => {});
   }, [router]);
@@ -40,6 +43,11 @@ export default function AdminPage() {
       if (!data.ok) {
         setError(data.error === "invalid_email" ? "Enter a valid email." : "Something went wrong.");
         setBusy(false);
+        return;
+      }
+      // No account for this email: send them to the volunteer page.
+      if (data.needsSignup) {
+        router.push("/en/join");
         return;
       }
       setSentNotice(true);
@@ -73,7 +81,7 @@ export default function AdminPage() {
         setBusy(false);
         return;
       }
-      router.push("/en");
+      router.replace(data.role === "admin" ? "/admin/providers" : "/account");
     } catch {
       setError("Network error. Try again.");
       setBusy(false);
@@ -90,12 +98,12 @@ export default function AdminPage() {
   return (
     <main className={styles.main}>
       <div className={styles.card}>
-        <h1 className={styles.title}>CR-CIPI admin</h1>
+        <h1 className={styles.title}>Sign in</h1>
 
         {stage === "email" ? (
           <form onSubmit={requestCode} className={styles.form}>
             <label className={styles.label} htmlFor="email">
-              Admin email
+              Email
             </label>
             <input
               id="email"
@@ -134,7 +142,7 @@ export default function AdminPage() {
             />
             {sentNotice ? (
               <p className={styles.notice} role="status">
-                If that email is authorized, a code is on its way.
+                If an account exists for that email, a code is on its way.
               </p>
             ) : null}
             {error ? <p className={styles.error}>{error}</p> : null}

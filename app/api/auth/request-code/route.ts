@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
 
   const user = await getUserByEmail(email);
   if (!user) {
-    // Do not reveal that the email has no account.
-    return NextResponse.json({ ok: true });
+    // No account: signal the client to redirect to the volunteer page rather
+    // than pretend a code will arrive.
+    return NextResponse.json({ ok: true, needsSignup: true });
   }
 
   try {

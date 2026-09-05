@@ -71,5 +71,5 @@ export async function POST(request: NextRequest) {
   });
   await setSessionCookie(token);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, role: user.role });
 }

@@ -7,9 +7,17 @@ import styles from "./MemberMenu.module.scss";
 
 type AuthState = { loaded: boolean; role: string | null };
 
-const LABELS: Record<Locale, { guest: string; member: string }> = {
-  en: { guest: "Register your business", member: "Manage my business" },
-  es: { guest: "Registra tu empresa", member: "Gestionar mi empresa" },
+const LABELS: Record<Locale, { guest: string; member: string; admin: string }> = {
+  en: {
+    guest: "Register your business",
+    member: "Manage my business",
+    admin: "Admin",
+  },
+  es: {
+    guest: "Registra tu empresa",
+    member: "Gestionar mi empresa",
+    admin: "Admin",
+  },
 };
 
 // Reflects the member session in the header: signed-out visitors see a member
@@ -37,6 +45,14 @@ export default function MemberMenu({ locale }: { locale: Locale }) {
   if (!state.loaded) return null;
 
   const labels = LABELS[locale];
+
+  if (state.role === "admin") {
+    return (
+      <Link href="/admin/providers" className={styles.link}>
+        {labels.admin}
+      </Link>
+    );
+  }
 
   if (state.role === "member") {
     return (

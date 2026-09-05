@@ -1702,6 +1702,55 @@ including `/account`, `/admin/users`, `/signup`, and the member/admin users APIs
    provider they don't own. The security-relevant property deserves a round-trip
    proof, matching the recurring dreams.md note.
 
+---
+
+## 2026-09-04 — "A random person could open the admin panel" (role gating)
+
+**Symptom.** After the member-accounts work, a freshly signed-up member could
+load `/admin/providers` and `/admin/users` and see the admin console shell.
+
+**Root cause, and it was mine.** Stage 1 widened `/api/auth/me` so that ANY
+account (member or admin) returns `authed: true` — correct for a shared login —
+but the two admin pages still gated on `authed === true`, which had previously
+been synonymous with "is an admin" because admins were the only accounts that
+existed. The moment a second role appeared, every `authed` check silently became
+a hole. The APIs were safe the whole time (`requirePermission` blocks the data),
+so this was a UI-shell leak rather than a data leak, but it is exactly the kind
+of thing that erodes trust in the boundary.
+
+**Fixes.**
+- `docs/access-control.md` now states, per actor, what is visible and what is
+  not, so the server and the pages have one place to agree.
+- Both admin pages gate on `role === "admin"`. A member sees "This area is for
+  administrators" with a link to `/account`; an anonymous visitor sees sign-in.
+- `/account` is the member surface and now redirects an admin to the console.
+- `/api/auth/verify-code` returns the role, so sign-in lands each actor on the
+  right home instead of always `/en`.
+- The sign-in page heading is neutral ("Sign in"), with no "admin" wording, and
+  an email with no account is routed to the volunteer page via a `needsSignup`
+  flag from `request-code`.
+- `AdminBar` renders nothing unless the session is an admin (it previously
+  showed a "Sign in" chip to everyone, including members).
+- `MemberMenu` is now three-state: guest / member / admin.
+
+**Do better next time.**
+1. **A boolean that means "is authorized" is a landmine the day a second role
+   appears.** When I introduced roles I should have grepped every `authed`
+   consumer in the same commit rather than only the API layer. "The API is
+   safe" is not the same as "the UI tells the truth about who you are."
+2. **I built `components/useSession.ts` and then never used it**, inlining the
+   same fetch in each page instead. I caught and deleted the orphan, but the
+   better move is to either adopt the helper everywhere or not write it; three
+   copies of the same `/api/auth/me` fetch is a DRY violation waiting to drift.
+3. **Still no executable proof.** A member-session request to `/admin/users`
+   asserting 401/403, plus a render assertion that the console shell is absent,
+   would prove the boundary instead of arguing it. Same recurring note.
+4. **Open product question, documented not guessed.** The volunteer form does
+   not create a `users` account, so "sign up to volunteer then sign in" does not
+   yet work end-to-end. I wrote that gap down in `docs/access-control.md` rather
+   than silently wiring the volunteer form to create accounts, because that
+   changes who can log in and is a decision, not an implementation detail.
+
 </task_progress>
 </task_progress>
 </replace_in_file>

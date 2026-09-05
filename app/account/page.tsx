@@ -88,11 +88,14 @@ export default function AccountPage() {
     setProviders((data.providers as OwnProvider[]) ?? []);
   }, []);
 
+  const [role, setRole] = useState<string | null>(null);
+
   const loadMe = useCallback(async () => {
     const res = await fetch("/api/auth/me");
     const data = await res.json();
     setAuthed(data.authed === true);
     setEmail(data.email ?? null);
+    setRole(data.authed ? (data.role ?? null) : null);
     return data.authed === true;
   }, []);
 
@@ -106,6 +109,11 @@ export default function AccountPage() {
   useEffect(() => {
     if (authed === false) router.replace("/signup");
   }, [authed, router]);
+
+  // This dashboard is the member surface. Admins belong in the admin console.
+  useEffect(() => {
+    if (authed && role === "admin") router.replace("/admin/providers");
+  }, [authed, role, router]);
 
   function set<K extends keyof ProviderForm>(key: K, value: ProviderForm[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));

@@ -36,15 +36,9 @@ export default function AdminBar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [editMode, setEditMode]);
 
-  if (!authed) {
-    return (
-      <div className={styles.bar}>
-        <a className={styles.link} href="/admin">
-          Sign in
-        </a>
-      </div>
-    );
-  }
+  // `authed` is admin-only (see CmsProvider), so a member or anonymous visitor
+  // gets no CMS chrome at all. Sign-in lives in the site header instead.
+  if (!authed) return null;
 
   const providersLink = (
     <a className={styles.link} href="/admin/providers">

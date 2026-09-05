@@ -51,7 +51,7 @@ const PERMISSION_LABELS: Record<AdminPermission, string> = {
 };
 
 export default function AdminUsersPage() {
-  const [authed, setAuthed] = useState<boolean | null>(null);
+  const [role, setRole] = useState<string | null | undefined>(undefined);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [tab, setTab] = useState<"participants" | "admins">("participants");
   const [busy, setBusy] = useState(false);
@@ -68,13 +68,15 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetch("/api/auth/me")
       .then((res) => res.json())
-      .then((data: { authed: boolean }) => setAuthed(data.authed))
-      .catch(() => setAuthed(false));
+      .then((data: { authed: boolean; role: string | null }) =>
+        setRole(data.authed ? data.role : null)
+      )
+      .catch(() => setRole(null));
   }, []);
 
   useEffect(() => {
-    if (authed) void load();
-  }, [authed, load]);
+    if (role === "admin") void load();
+  }, [role, load]);
 
   async function updateUser(id: string, body: Record<string, unknown>) {
     setBusy(true);
@@ -123,7 +125,7 @@ export default function AdminUsersPage() {
     }
   }
 
-  if (authed === null) {
+  if (role === undefined) {
     return (
       <main className={styles.main}>
         <p className={styles.hint}>Loading…</p>
@@ -131,14 +133,23 @@ export default function AdminUsersPage() {
     );
   }
 
-  if (authed === false) {
+  // Members and anonymous visitors never see the admin console.
+  if (role !== "admin") {
     return (
       <main className={styles.main}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Access & permissions</h1>
+          <h1 className={styles.title}>Sign in</h1>
           <p className={styles.hint}>
-            You must be signed in.{" "}
-            <a href="/admin">Sign in</a>.
+            {role === null ? (
+              <>
+                You need to sign in first. <a href="/admin">Sign in</a>.
+              </>
+            ) : (
+              <>
+                This area is for administrators.{" "}
+                <a href="/account">Go to my business</a>.
+              </>
+            )}
           </p>
         </div>
       </main>
