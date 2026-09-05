@@ -3,24 +3,37 @@ import "server-only";
 import { createHash, randomInt, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { db } from "@/lib/firebaseAdmin";
+import {
+  ADMIN_PERMISSIONS,
+  type AdminPermission,
+  type UserRole,
+  type UserStatus,
+} from "@/lib/permissions";
 
 // ============================================================
-// CMS Auth: passwordless email-code (magic code) authentication.
+// Unified authentication and access control.
 //
-// Flow:
-//   1. Admin enters their email into the login page.
-//   2. POST /api/auth/request-code sends a 6-digit code via SMTP.
-//   3. Admin enters the code; POST /api/auth/verify-code validates it
-//      and sets a session cookie.
-//   4. The session cookie is checked on every admin API request.
+// Two roles share one user model:
+//   admin   - CMS + provider directory + user/permission management
+//   member  - read the public directory, own and edit their businesses
+//
+// Login is passwordless: email magic code. Signup creates a user; login does
+// not create one.
 //
 // Firestore structure:
-//   auth/adminEmails/{emailKey}     -> { email }
-//   auth/loginCodes/{codeHash}      -> { email, expiresAt, attempts }
-//   auth/sessions/{sessionToken}    -> { email, expiresAt }
+//   users/{userId}                          -> { email, name, role,
+//                                               permissions, status,
+//                                               createdAt, lastLoginAt }
+//   auth/loginCodes/codes/{codeHash}        -> { email, expiresAt, attempts }
+//   auth/sessions/tokens/{sessionToken}     -> { userId, email, role, expiresAt }
 //
-// Normalization: emails are lowercased and trimmed. Login codes are hashed
-// with SHA-256 before storage so a raw readable code never lives in the DB.
+// Business ownership is recorded on each provider (provider.ownerId) rather
+// than duplicated here, so a member's "accesses" are always derived from the
+// providers collection and can never drift out of sync.
+//
+// userId is the SHA-256 of the normalized email, matching the legacy admin
+// allowlist key scheme so an account is unique and signup is idempotent.
+// Login codes are hashed with SHA-256 before storage; raw codes never persist.
 // ============================================================
 
 export const SESSION_COOKIE = "crcipi_cms_session";
@@ -29,7 +42,35 @@ const CODE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const MAX_ATTEMPTS = 5;
 
-function normalizeEmail(email: string): string {
+export { ADMIN_PERMISSIONS };
+export type { AdminPermission, UserRole, UserStatus };
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  permissions: AdminPermission[];
+  status: UserStatus;
+  createdAt: number;
+  lastLoginAt?: number;
+}
+
+// A permission-reduced view of the signed-in user, safe to return to the client.
+// Business ownership lives on each provider document (provider.ownerId), not here.
+export interface SessionUser {
+  userId: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  permissions: AdminPermission[];
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
@@ -37,7 +78,7 @@ function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function emailKey(email: string): string {
+export function emailKey(email: string): string {
   return sha256(normalizeEmail(email));
 }
 
@@ -45,7 +86,11 @@ function codeHash(email: string, code: string): string {
   return sha256(`${normalizeEmail(email)}:${code}`);
 }
 
-function adminEmailsCol() {
+function usersCol() {
+  return db.collection("users");
+}
+
+function legacyAdminEmailsCol() {
   return db.collection("auth").doc("adminEmails").collection("emails");
 }
 
@@ -57,29 +102,152 @@ function sessionsCol() {
   return db.collection("auth").doc("sessions").collection("tokens");
 }
 
+function isAdminPermission(value: unknown): value is AdminPermission {
+  return (ADMIN_PERMISSIONS as readonly unknown[]).includes(value);
+}
+
+function toUser(id: string, data: Record<string, unknown>): User {
+  const rawPermissions = Array.isArray(data.permissions) ? data.permissions : [];
+  const permissions = rawPermissions.filter(isAdminPermission);
+
+  return {
+    id,
+    email: String(data.email ?? ""),
+    name: String(data.name ?? ""),
+    role: data.role === "member" ? "member" : "admin",
+    permissions,
+    status: data.status === "suspended" ? "suspended" : "active",
+    createdAt: Number(data.createdAt ?? 0),
+    lastLoginAt: data.lastLoginAt ? Number(data.lastLoginAt) : undefined,
+  };
+}
+
+function toSessionUser(user: User): SessionUser {
+  return {
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    permissions: user.permissions,
+  };
+}
+
+// A legacy admin account synthesized from the pre-users allowlist. Admin-only,
+// full permissions.
+function legacyAdminFromEmail(email: string): User {
+  return {
+    id: emailKey(email),
+    email: normalizeEmail(email),
+    name: "",
+    role: "admin",
+    permissions: [...ADMIN_PERMISSIONS],
+    status: "active",
+    createdAt: 0,
+  };
+}
+
 // ---------------------------------------------------------------------------
-// Admin email allowlist
+// User reads / writes
 // ---------------------------------------------------------------------------
 
-export async function isAdminEmail(email: string): Promise<boolean> {
+export async function getUserById(id: string): Promise<User | null> {
+  const snap = await usersCol().doc(id).get();
+  if (!snap.exists) return null;
+  return toUser(id, (snap.data() ?? {}) as Record<string, unknown>);
+}
+
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const user = await getUserById(emailKey(email));
+  if (user) return user;
+
+  // Backward compatibility: before the unified model, admins lived only in
+  // the legacy allowlist. Treat a still-allowlisted address as an admin until
+  // it is migrated into `users` by the seed script.
   try {
-    const snap = await adminEmailsCol().doc(emailKey(email)).get();
-    return snap.exists;
+    const snap = await legacyAdminEmailsCol().doc(emailKey(email)).get();
+    if (snap.exists) return legacyAdminFromEmail(email);
   } catch {
-    return false;
+    // Fall through: a legacy lookup failure should not block user resolution.
   }
+  return null;
+}
+
+export interface CreateUserInput {
+  email: string;
+  name: string;
+  role?: UserRole;
+  permissions?: AdminPermission[];
+  status?: UserStatus;
+}
+
+export async function createUser(input: CreateUserInput): Promise<User> {
+  const email = normalizeEmail(input.email);
+  const id = emailKey(email);
+  const now = Date.now();
+
+  const user: User = {
+    id,
+    email,
+    name: input.name.trim().slice(0, 120),
+    role: input.role === "member" ? "member" : "admin",
+    permissions: (input.permissions ?? []).filter(isAdminPermission),
+    status: input.status === "suspended" ? "suspended" : "active",
+    createdAt: now,
+  };
+
+  const data: Record<string, unknown> = {
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    permissions: user.permissions,
+    status: user.status,
+    createdAt: user.createdAt,
+  };
+
+  await usersCol().doc(id).set(data, { merge: true });
+  return user;
+}
+
+export async function listUsers(): Promise<User[]> {
+  const snap = await usersCol().orderBy("email", "asc").get();
+  return snap.docs.map((doc) =>
+    toUser(doc.id, (doc.data() ?? {}) as Record<string, unknown>)
+  );
+}
+
+export async function updateUser(
+  id: string,
+  patch: Partial<Omit<User, "id" | "email" | "createdAt">>
+): Promise<void> {
+  const clean: Record<string, unknown> = {};
+  if (patch.name !== undefined) clean.name = patch.name;
+  if (patch.role !== undefined) clean.role = patch.role;
+  if (patch.permissions !== undefined) {
+    clean.permissions = patch.permissions.filter(isAdminPermission);
+  }
+  if (patch.status !== undefined) clean.status = patch.status;
+  if (patch.lastLoginAt !== undefined) clean.lastLoginAt = patch.lastLoginAt;
+  await usersCol().doc(id).set(clean, { merge: true });
+}
+
+// Admin email allowlist compatibility. Prefer the unified `users` model; these
+// two helpers remain so seed tooling keeps working during the transition.
+export async function isAdminEmail(email: string): Promise<boolean> {
+  const user = await getUserByEmail(email);
+  return user?.role === "admin";
 }
 
 export async function listAdminEmails(): Promise<string[]> {
-  const snap = await adminEmailsCol().orderBy("email").get();
-  return snap.docs.map((doc) => doc.data().email as string);
+  const users = await listUsers();
+  return users.filter((user) => user.role === "admin").map((user) => user.email);
 }
 
-// Add an admin email to the allowlist (used by seed scripts).
 export async function addAdminEmail(email: string): Promise<void> {
-  await adminEmailsCol().doc(emailKey(email)).set({
-    email: normalizeEmail(email),
-    createdAt: Date.now(),
+  await createUser({
+    email,
+    name: "",
+    role: "admin",
+    permissions: [...ADMIN_PERMISSIONS],
   });
 }
 
@@ -134,20 +302,16 @@ export async function verifyLoginCode(
         return { ok: false as const, error: "too_many_attempts" as const };
       }
 
-      // Code is correct: consume it so it cannot be reused.
       await tx.delete(ref);
       return { ok: true as const };
     });
 
     return result;
   } catch {
-    // Storage failure: fail closed.
     return { ok: false, error: "invalid_code" };
   }
 }
 
-// Increments the attempt counter after a failed code entry. Callers pass the
-// raw code; we look it up by hash and bump attempts if the doc exists.
 export async function recordFailedAttempt(email: string, code: string): Promise<void> {
   const ref = loginCodesCol().doc(codeHash(normalizeEmail(email), code));
   try {
@@ -166,39 +330,20 @@ export async function recordFailedAttempt(email: string, code: string): Promise<
 // Sessions
 // ---------------------------------------------------------------------------
 
-export async function createSession(email: string): Promise<string> {
+export async function createSession(user: {
+  id: string;
+  email: string;
+  role: UserRole;
+}): Promise<string> {
   const token = randomBytes(32).toString("hex");
   await sessionsCol().doc(token).set({
-    email: normalizeEmail(email),
+    userId: user.id,
+    email: normalizeEmail(user.email),
+    role: user.role,
     expiresAt: Date.now() + SESSION_TTL_MS,
     createdAt: Date.now(),
   });
   return token;
-}
-
-export async function getSessionEmail(): Promise<string | null> {
-  const store = await cookies();
-  const token = store.get(SESSION_COOKIE)?.value;
-  if (!token) return null;
-
-  try {
-    const snap = await sessionsCol().doc(token).get();
-    if (!snap.exists) return null;
-    const data = snap.data() as { email?: string; expiresAt?: number };
-    if ((data.expiresAt ?? 0) < Date.now()) {
-      await sessionsCol().doc(token).delete().catch(() => {});
-      return null;
-    }
-    return data.email ?? null;
-  } catch {
-    return null;
-  }
-}
-
-export async function requireAdmin(): Promise<boolean> {
-  const email = await getSessionEmail();
-  if (!email) return false;
-  return isAdminEmail(email);
 }
 
 export async function deleteSession(token: string): Promise<void> {
@@ -219,6 +364,82 @@ export async function setSessionCookie(token: string): Promise<void> {
 export async function clearSessionCookie(): Promise<void> {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
+}
+
+// Returns the signed-in user with fresh permissions from the users collection.
+// Falls back to a legacy email-only session if present.
+export async function getSessionUser(): Promise<SessionUser | null> {
+  const store = await cookies();
+  const token = store.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+
+  try {
+    const snap = await sessionsCol().doc(token).get();
+    if (!snap.exists) return null;
+
+    const data = snap.data() as {
+      userId?: string;
+      email?: string;
+      role?: string;
+      expiresAt?: number;
+    };
+
+    if ((data.expiresAt ?? 0) < Date.now()) {
+      await sessionsCol().doc(token).delete().catch(() => {});
+      return null;
+    }
+
+    const userId = data.userId ?? (data.email ? emailKey(data.email) : null);
+    if (!userId) return null;
+
+    const user = await getUserById(userId);
+    if (!user || user.status !== "active") return null;
+
+    return toSessionUser(user);
+  } catch {
+    return null;
+  }
+}
+
+// Deprecated convenience: returns only the session email. Kept so existing
+// callers keep working during the transition.
+export async function getSessionEmail(): Promise<string | null> {
+  const user = await getSessionUser();
+  return user?.email ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Access-control guards
+// ---------------------------------------------------------------------------
+
+export function hasPermission(
+  user: Pick<SessionUser, "role" | "permissions"> | null,
+  permission: AdminPermission
+): boolean {
+  return !!user && user.role === "admin" && user.permissions.includes(permission);
+}
+
+export async function requireSessionUser(): Promise<SessionUser | null> {
+  return getSessionUser();
+}
+
+export async function requireMember(): Promise<SessionUser | null> {
+  const user = await getSessionUser();
+  return user?.role === "member" ? user : null;
+}
+
+// True only for an active admin session.
+export async function requireAdmin(): Promise<boolean> {
+  const user = await getSessionUser();
+  return user?.role === "admin";
+}
+
+// True when the session is an admin holding the given permission.
+export async function requirePermission(
+  permission: AdminPermission
+): Promise<boolean> {
+  const user = await getSessionUser();
+  return hasPermission(user, permission);
 }
 
 // Constant-time compare helper (used where timing safety matters). Kept for

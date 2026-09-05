@@ -69,15 +69,17 @@ export default function CmsProvider({ locale, initialContent, children }: Props)
   const dirtyRef = useRef(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Check auth status once on mount.
+  // Check auth status once on mount. Only an admin session enables CMS editing;
+  // a member session remains read-only in the public site.
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me")
       .then((res) => res.json())
-      .then((data: { authed: boolean; email: string | null }) => {
+      .then((data: { authed: boolean; role: string | null; email: string | null }) => {
         if (cancelled) return;
-        setAuthed(data.authed);
-        setEmail(data.email ?? null);
+        const isAdmin = data.authed && data.role === "admin";
+        setAuthed(isAdmin);
+        setEmail(isAdmin ? data.email ?? null : null);
       })
       .catch(() => {
         if (!cancelled) setAuthed(false);

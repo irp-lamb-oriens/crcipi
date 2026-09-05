@@ -1,0 +1,11 @@
+.link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink, #101010);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--red, #a7302f);
+  }
+}

@@ -33,6 +33,7 @@ type AdminRating = {
   id: string;
   rating: number;
   reviewerName: string;
+  reviewerEmail?: string;
   comment?: string;
   approved: boolean;
 };
@@ -514,6 +515,11 @@ export default function AdminProvidersPage() {
                         {rating.approved ? "Approved" : "Pending"}
                       </span>
                     </div>
+                    {rating.reviewerEmail ? (
+                      <p className={styles.reviewComment}>
+                        {rating.reviewerEmail}
+                      </p>
+                    ) : null}
                     {rating.comment ? (
                       <p className={styles.reviewComment}>{rating.comment}</p>
                     ) : null}

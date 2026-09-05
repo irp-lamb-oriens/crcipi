@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   createSession,
-  isAdminEmail,
+  getUserByEmail,
   recordFailedAttempt,
   setSessionCookie,
+  updateUser,
   verifyLoginCode,
 } from "@/lib/auth";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 // POST /api/auth/verify-code
-// Validates the emailed code and establishes a session cookie.
+// Validates the emailed code and establishes a session for the existing user.
+// Any role (admin or member) can sign in; signup is handled by a separate flow.
 
 // Rate limit: 10 attempts per 15 minutes per IP, then exponential backoff
 // (30s base, doubling per repeated excess). Resets after a day of inactivity.
@@ -42,7 +44,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "invalid_code" }, { status: 422 });
   }
 
-  if (!(await isAdminEmail(email))) {
+  const user = await getUserByEmail(email);
+  if (!user) {
     return NextResponse.json({ ok: false, error: "invalid_code" }, { status: 401 });
   }
 
@@ -60,7 +63,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: result.error }, { status });
   }
 
-  const token = await createSession(email);
+  await updateUser(user.id, { lastLoginAt: Date.now() });
+  const token = await createSession({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  });
   await setSessionCookie(token);
 
   return NextResponse.json({ ok: true });

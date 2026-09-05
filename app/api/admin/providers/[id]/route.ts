@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import {
   deleteProvider,
   getProvider,
@@ -16,7 +16,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("providers.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const { id } = await params;
@@ -32,7 +32,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("providers.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const { id } = await params;
@@ -48,11 +48,13 @@ export async function PATCH(
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  // Merge a full validated payload for editable fields, plus a scalar approved
-  // toggle that can be patched independently.
+  // Merge a full validated payload for editable fields, plus scalar approved
+  // and ownerId toggles that can be patched independently.
   const validation = validateProviderInput(body);
   const approved =
     body.approved === true || body.approved === false ? body.approved : undefined;
+  const ownerId =
+    typeof body.ownerId === "string" ? body.ownerId : body.ownerId === null ? null : undefined;
 
   if (validation.ok) {
     try {
@@ -65,9 +67,12 @@ export async function PATCH(
   }
 
   // Allow a toggle-only patch when no editable fields are present.
-  if (approved !== undefined && Object.keys(body).every((key) => key === "approved")) {
+  if (
+    (approved !== undefined || ownerId !== undefined) &&
+    Object.keys(body).every((key) => key === "approved" || key === "ownerId")
+  ) {
     try {
-      await updateProvider(id, { approved });
+      await updateProvider(id, { approved, ownerId });
       return NextResponse.json({ ok: true });
     } catch (error) {
       console.error("Failed to update provider:", error);
@@ -82,7 +87,7 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("providers.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const { id } = await params;

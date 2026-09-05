@@ -52,6 +52,12 @@ export default function AdminBar() {
     </a>
   );
 
+  const usersLink = (
+    <a className={styles.link} href="/admin/users">
+      Users
+    </a>
+  );
+
   return (
     <div className={styles.bar}>
       <span className={styles.brand}>
@@ -60,6 +66,7 @@ export default function AdminBar() {
       </span>
 
       {providersLink}
+      {usersLink}
 
       {!editMode ? (
         <button

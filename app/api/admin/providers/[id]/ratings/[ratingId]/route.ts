@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { approveRating, rejectRating } from "@/lib/providers";
 
 // POST /api/admin/providers/:id/ratings/:ratingId — approve a review.
@@ -9,7 +9,7 @@ export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string; ratingId: string }> }
 ) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("ratings.moderate"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const { id, ratingId } = await params;
@@ -29,7 +29,7 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string; ratingId: string }> }
 ) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("ratings.moderate"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   const { id, ratingId } = await params;

@@ -1639,5 +1639,69 @@ con ratings") to the public crcipi site, with admin management.
 
 **Verification.** `npm run build` clean; all 25 routes resolve, including the new
 directory pages and API handlers. `next lint` remains deprecated/interactive.
+
+---
+
+## 2026-09-04 — Member self-service accounts + admin access/permissions console (staged)
+
+**Task.** Each provider business should be creatable/editable only by its own
+owner, with every other participant read-only. Non-admin users get sign-up to
+create a member account, own businesses tied to that account, and edit only those.
+Admins get a separate view for pending participants, other admins, participants'
+accesses, and admins' permissions. Deliver in stages.
+
+**What shipped (5 staged slices, each verified before the next).**
+- **Stage 1 — unified user model + role-aware auth.** `lib/auth.ts` rewritten: one
+  `users/{sha256(email)}` collection (role `admin|member`, `permissions[]`,
+  `status`) replacing the admin-only allowlist; sessions store `userId/email/role`;
+  `/api/auth/request-code` + `/verify-code` accept any existing user;
+  `/api/auth/me` returns `role`/`name`/`permissions`. Legacy allowlist emails still
+  resolve as full-permission admins until migrated. `scripts/seed-admin.mjs` writes
+  admins into `users` with the full permission set.
+- **Stage 2 — provider ownership + member-scoped API.** `providers` gained
+  `ownerId`; `createProvider` accepts `ownerId`/`approved` options;
+  `listProvidersByOwner`. New owner-scoped routes `/api/member/providers` and
+  `/api/member/providers/[id]` enforce `provider.ownerId === session.userId` on
+  every mutation, reset `approved:false` on create, and never let a member
+  self-feature.
+- **Stage 3 — member signup + dashboard.** `/signup` (name+email → magic code),
+  `/account` self-service (list own businesses, add/edit/delete), and a locale-aware
+  `MemberMenu` in the header ("Register your business"/"Manage my business").
+  `CmsProvider` now only enables CMS edit chrome for admin sessions, so members see
+  zero WYSIWYG surface.
+- **Stage 4 — approval + admin console.** Member-created providers surface as
+  pending. `/admin/users` console: Participants (with business-access + suspend),
+  Admins & permissions (checkbox matrix), Provider-ownership assignment. Backing
+  routes `/api/admin/users` + `/api/admin/users/[id]`. Admin routes switched from
+  `requireAdmin()` to permission-specific `requirePermission(...)`:
+  `content.manage`, `providers.manage`, `ratings.moderate`, `users.manage`,
+  `permissions.manage`.
+- **Stage 5 — docs.** Access-control matrix + data model + route table added to
+  `docs.md`.
+
+**Verification.** `npx tsc --noEmit` clean and `npm run build` clean (31 routes),
+including `/account`, `/admin/users`, `/signup`, and the member/admin users APIs.
+
+**What could have been better.**
+1. **`server-only` auth leaked a client import.** The admin users page imported
+   `ADMIN_PERMISSIONS` from `@/lib/auth`, which would have broken the client
+   bundle. Fixed by splitting shared consts/types into `lib/permissions.ts` and
+   re-exporting from `auth.ts`. Lesson: any "server-only" module should have a
+   sibling client-safe constants module from day one, or the first client consumer
+   will blow up.
+2. **A `write_to_file` landed as the wrong filename twice.** The signup route was
+   written to `app/api/auth/signup/route` (no `.ts`) and only caught via `ls`.
+   Detectable immediately with a build, but I should verify route filenames land
+   with `.ts` before moving on.
+3. **Ownership originally modeled in two places.** I briefly put `providerIds[]`
+   on the user AND `ownerId` on the provider before settling on `provider.ownerId`
+   as the single source of truth. Two encodings of the same relation invite drift;
+   derive member "accesses" from the providers collection, don't duplicate.
+4. **No executable proof of the ownership invariant.** Verified by type-check +
+   build + tracing, not by a script asserting a second member gets 403 editing a
+   provider they don't own. The security-relevant property deserves a round-trip
+   proof, matching the recurring dreams.md note.
+
+</task_progress>
 </task_progress>
 </replace_in_file>

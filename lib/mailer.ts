@@ -25,3 +25,14 @@ export async function sendLoginCode(email: string, code: string): Promise<void> 
     html: `<p>Your ${site.name} access code is:</p><p style="font-size:28px;font-weight:700;letter-spacing:0.2em;">${code}</p><p>It expires in 10 minutes.</p>`,
   });
 }
+
+export async function sendReviewCode(email: string, code: string): Promise<void> {
+  const tx = transporter();
+  await tx.sendMail({
+    from: `"${site.name}" <${SENDER_EMAIL}>`,
+    to: email,
+    subject: `Verify your review on ${site.name}`,
+    text: `Your verification code is ${code}. It expires in 10 minutes.`,
+    html: `<p>Your verification code is:</p><p style="font-size:28px;font-weight:700;letter-spacing:0.2em;">${code}</p><p>It expires in 10 minutes.</p>`,
+  });
+}

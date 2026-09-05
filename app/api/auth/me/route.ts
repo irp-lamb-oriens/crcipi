@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail, isAdminEmail } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
 
 // GET /api/auth/me
-// Returns whether the current visitor is authenticated as an admin.
+// Returns the current session's role-safe identity.
 
 export async function GET() {
-  const email = await getSessionEmail();
-  if (!email || !(await isAdminEmail(email))) {
-    return NextResponse.json({ authed: false, email: null });
+  const user = await getSessionUser();
+  if (!user) {
+    return NextResponse.json({ authed: false, email: null, role: null });
   }
-  return NextResponse.json({ authed: true, email });
+  return NextResponse.json({
+    authed: true,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    permissions: user.permissions,
+  });
 }

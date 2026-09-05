@@ -481,6 +481,46 @@ Use the detailed page copy and specifications in this brief as the content sourc
  Test all routes and form flows in EN and ES.
  Connect analytics and conversion events.
  Deploy staging URL for founder review before production.
+## Access Control & Member Directory (post-launch)
+
+Three roles govern access:
+
+| Role | Capability |
+| --- | --- |
+| Public | Read approved providers; submit a rating (rate-limited). |
+| Member | Read the public directory read-only; create and edit only providers they own (`provider.ownerId === session.userId`). |
+| Admin | Full access, gated by explicit permissions. |
+
+### Data model
+
+- `users/{userId}` → `{ email, name, role, permissions, status, createdAt, lastLoginAt }`
+  - `userId` is the SHA-256 of the normalized email.
+  - Roles: `member`, `admin`.
+- `providers/{id}` → existing fields plus `ownerId` and `approved`.
+  - Ownership lives on the provider document, not the user, so it never drifts.
+- `auth/sessions/tokens/{token}` → `{ userId, email, role, expiresAt }`.
+- `auth/loginCodes/codes/{codeHash}` and legacy `auth/adminEmails/emails/{key}` unchanged.
+
+### Admin permissions
+
+`content.manage`, `providers.manage`, `ratings.moderate`, `users.manage`, `permissions.manage`.
+
+Every admin route enforces its permission via `requirePermission(...)`, not just `requireAdmin()`. Member routes enforce ownership with `provider.ownerId === session.userId` and never allow self-featuring or self-approval. Newly created member providers are `approved: false` until an admin publishes them.
+
+### Routes
+
+- `/signup` — member account creation (name + email → magic code → session).
+- `/account` — member self-service: add/edit/delete own businesses.
+- `/admin/users` — admin console: participants, admins, participants' accesses, admins' permissions.
+- `/api/member/providers` and `/api/member/providers/[id]` — owner-scoped member API.
+- `/api/admin/users` and `/api/admin/users/[id]` — admin user/permission API.
+
+### Migration note
+
+Re-run `node scripts/seed-admin.mjs <email>` after upgrading. It writes admins into the unified `users` collection with the full permission set. Legacy allowlist emails still resolve as full-permission admins until migrated.
+
+---
+
 CR-CIPI Website Product Brief — Launch Version
 
 what's the purpose of the web

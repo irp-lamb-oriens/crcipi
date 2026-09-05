@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { isLocale } from "@/content";
 import { getLiveContent, saveContent } from "@/lib/contentStore";
 
@@ -7,7 +7,7 @@ import { getLiveContent, saveContent } from "@/lib/contentStore";
 // Returns the live content for an admin-authorized request.
 
 export async function GET(request: NextRequest) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("content.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 // Persists a full content document for a locale.
 
 export async function POST(request: NextRequest) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("content.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

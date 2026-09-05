@@ -122,7 +122,19 @@ export interface DirectoryContent {
     intro: string;
     ratingLabel: string;
     nameLabel: string;
+    emailLabel: string;
+    emailNote: string;
     commentLabel: string;
+    sendCode: string;
+    codeLabel: string;
+    codeSent: string;
+    codePlaceholder: string;
+    verify: string;
+    alreadyTitle: string;
+    alreadyIntro: string;
+    changeReview: string;
+    newsletterPrompt: string;
+    newsletterYes: string;
     submit: string;
     submitting: string;
     success: string;
@@ -130,6 +142,8 @@ export interface DirectoryContent {
     errors: {
       rating: string;
       name: string;
+      email: string;
+      code: string;
       generic: string;
     };
   };

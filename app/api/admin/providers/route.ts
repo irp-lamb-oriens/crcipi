@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import {
   createProvider,
   listProviders,
@@ -10,7 +10,7 @@ import {
 // POST /api/admin/providers — create a provider.
 
 export async function GET() {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("providers.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
@@ -28,7 +28,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("providers.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

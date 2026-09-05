@@ -39,6 +39,7 @@ export interface Provider {
   logoUrl?: string;
   featured: boolean;
   approved: boolean;
+  ownerId: string | null;
   memberSince: number;
   ratingsCount: number;
   ratingsSum: number;
@@ -48,6 +49,7 @@ export interface ProviderRating {
   id: string;
   rating: number;
   reviewerName: string;
+  reviewerEmail?: string;
   comment?: string;
   approved: boolean;
   createdAt: number;
@@ -74,6 +76,7 @@ function toProvider(id: string, d: Record<string, unknown>): Provider {
     logoUrl: d.logoUrl ? String(d.logoUrl) : undefined,
     featured: d.featured === true,
     approved: d.approved !== false,
+    ownerId: d.ownerId ? String(d.ownerId) : null,
     memberSince: Number(d.memberSince ?? 0),
     ratingsCount: Number(d.ratingsCount ?? 0),
     ratingsSum: Number(d.ratingsSum ?? 0),
@@ -86,6 +89,7 @@ function toRating(doc: FirebaseFirestore.QueryDocumentSnapshot): ProviderRating 
     id: doc.id,
     rating: Number(d.rating ?? 0),
     reviewerName: String(d.reviewerName ?? ""),
+    reviewerEmail: d.reviewerEmail ? String(d.reviewerEmail) : undefined,
     comment: d.comment ? String(d.comment) : undefined,
     approved: d.approved !== false,
     createdAt: Number(d.createdAt ?? 0),
@@ -128,6 +132,15 @@ export async function getProvider(id: string): Promise<Provider | null> {
   const snap = await providersCol().doc(id).get();
   if (!snap.exists) return null;
   return toProvider(id, (snap.data() ?? {}) as Record<string, unknown>);
+}
+
+// Providers owned by a given member, ordered by name. Ownership lives on the
+// provider document (ownerId) so this is always in sync with the latest data.
+export async function listProvidersByOwner(ownerId: string): Promise<Provider[]> {
+  const snap = await providersCol().where("ownerId", "==", ownerId).get();
+  return snap.docs
+    .map((doc) => toProvider(doc.id, (doc.data() ?? {}) as Record<string, unknown>))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function listRatings(
@@ -211,6 +224,7 @@ export interface ProviderInput {
   location?: string;
   logoUrl?: string;
   featured: boolean;
+  ownerId?: string | null;
 }
 
 export type ProviderValidation =
@@ -271,11 +285,15 @@ export function validateProviderInput(raw: unknown): ProviderValidation {
   };
 }
 
-export async function createProvider(input: ProviderInput): Promise<Provider> {
+export async function createProvider(
+  input: ProviderInput,
+  options: { approved?: boolean; ownerId?: string | null } = {}
+): Promise<Provider> {
   const docRef = providersCol().doc();
   const provider: Omit<Provider, "id"> = {
     ...input,
-    approved: true,
+    ownerId: options.ownerId ?? input.ownerId ?? null,
+    approved: options.approved ?? true,
     memberSince: Date.now(),
     ratingsCount: 0,
     ratingsSum: 0,
@@ -286,7 +304,7 @@ export async function createProvider(input: ProviderInput): Promise<Provider> {
 
 export async function updateProvider(
   id: string,
-  patch: Partial<ProviderInput> & { approved?: boolean }
+  patch: Partial<ProviderInput> & { approved?: boolean; ownerId?: string | null }
 ): Promise<void> {
   // Strip undefined so Firestore never rejects the write.
   const clean = Object.fromEntries(

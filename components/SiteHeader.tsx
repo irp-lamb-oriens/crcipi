@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Locale } from "@/content/types";
 import EditableText from "@/components/cms/EditableText";
 import LanguageSwitcher from "./LanguageSwitcher";
+import MemberMenu from "./MemberMenu";
 import styles from "./SiteHeader.module.scss";
 import logo from "@/app/logo.png";
 
@@ -49,6 +50,7 @@ export default function SiteHeader({ locale }: Props) {
 
         <div className={styles.actions}>
           <LanguageSwitcher currentLocale={locale} />
+          <MemberMenu locale={locale} />
           <Link href={`${joinPath}#form`} className={styles.cta}>
             <EditableText path="nav.volunteer" as="span" />
           </Link>

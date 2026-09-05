@@ -1,4 +1,4 @@
-// Adds one or more admin emails to the CMS auth allowlist.
+// Adds one or more admin emails to the unified users collection.
 //
 // Usage:
 //   node scripts/seed-admin.mjs you@example.com
@@ -8,8 +8,10 @@
 //   1. FIREBASE_SERVICE_ACCOUNT env var, or
 //   2. serviceAccountKey.json in the project root.
 //
-// Admin emails are stored hashed (SHA-256) under:
-//   auth/adminEmails/emails/{sha256(normalized-email)}
+// Admins are stored under:
+//   users/{sha256(normalized-email)}
+// with role "admin" and the full permission set. Existing docs are merged so
+// re-running the seed is idempotent and preserves any prior adjustments.
 
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -19,6 +21,14 @@ import { cert, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const ADMIN_PERMISSIONS = [
+  "content.manage",
+  "providers.manage",
+  "ratings.moderate",
+  "users.manage",
+  "permissions.manage",
+];
 
 function normalizeEmail(email) {
   return email.trim().toLowerCase();
@@ -66,14 +76,22 @@ try {
 
 const app = initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore(app);
-const col = db.collection("auth").doc("adminEmails").collection("emails");
+const usersCol = db.collection("users");
 
 for (const email of emails) {
   const normalized = normalizeEmail(email);
-  await col.doc(emailKey(normalized)).set({
-    email: normalized,
-    createdAt: Date.now(),
-  });
+  const now = Date.now();
+  await usersCol.doc(emailKey(normalized)).set(
+    {
+      email: normalized,
+      name: "",
+      role: "admin",
+      permissions: ADMIN_PERMISSIONS,
+      status: "active",
+      createdAt: now,
+    },
+    { merge: true }
+  );
   console.log(`Added admin: ${normalized}`);
 }
 

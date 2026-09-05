@@ -8,6 +8,7 @@ import {
   PROVIDER_CATEGORY_LABELS,
   type ProviderCategory,
 } from "@/lib/providerCategories";
+import ReviewModal from "./ReviewModal";
 import styles from "./DirectoryClient.module.scss";
 
 export interface DirectoryProvider {
@@ -148,46 +149,14 @@ function ProviderCard({
   copy: DirectoryContent;
 }) {
   const [showReview, setShowReview] = useState(false);
-  const [name, setName] = useState("");
-  const [rating, setRating] = useState(0);
-  const [hovered, setHovered] = useState(0);
-  const [comment, setComment] = useState("");
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
-    "idle"
-  );
-  const [error, setError] = useState("");
+  const [reviews, setReviews] = useState(provider.reviews);
+  const [average, setAverage] = useState<number | null>(provider.rating);
 
   const categoryLabel = PROVIDER_CATEGORY_LABELS[provider.category][locale];
 
-  async function submitReview(event: React.FormEvent) {
-    event.preventDefault();
-    if (rating < 1) {
-      setError(copy.rating.errors.rating);
-      return;
-    }
-    if (!name.trim()) {
-      setError(copy.rating.errors.name);
-      return;
-    }
-
-    setStatus("submitting");
-    setError("");
-    try {
-      const res = await fetch(`/api/providers/${provider.id}/rating`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, reviewerName: name.trim(), comment }),
-      });
-      if (res.ok) {
-        setStatus("success");
-      } else {
-        setStatus("error");
-        setError(copy.rating.errors.generic);
-      }
-    } catch {
-      setStatus("error");
-      setError(copy.rating.errors.generic);
-    }
+  function handleSubmitted(nextAverage: number | null, nextCount: number) {
+    setAverage(nextAverage);
+    setReviews(nextCount);
   }
 
   return (
@@ -220,10 +189,10 @@ function ProviderCard({
       </div>
 
       <div className={styles.ratingRow}>
-        <Stars value={provider.rating ?? 0} />
-        {provider.reviews > 0 ? (
+        <Stars value={average ?? 0} />
+        {reviews > 0 ? (
           <span className={styles.reviews}>
-            {provider.rating?.toFixed(1)} · {provider.reviews} {copy.card.reviews}
+            {average?.toFixed(1)} · {reviews} {copy.card.reviews}
           </span>
         ) : (
           <span className={styles.reviews}>{copy.card.noReviews}</span>
@@ -273,100 +242,23 @@ function ProviderCard({
       )}
 
       <div className={styles.reviewToggle}>
-        {status === "success" ? (
-          <div className={styles.success} role="status" aria-live="polite">
-            <span>{copy.rating.success}</span>
-            <span className={styles.pendingNote}>{copy.rating.pending}</span>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className={styles.reviewButton}
-            onClick={() => setShowReview((value) => !value)}
-            aria-expanded={showReview}
-          >
-            {copy.rating.heading}
-          </button>
-        )}
+        <button
+          type="button"
+          className={styles.reviewButton}
+          onClick={() => setShowReview(true)}
+        >
+          {copy.rating.heading}
+        </button>
       </div>
 
-      {showReview && status !== "success" ? (
-        <form className={styles.form} onSubmit={submitReview} noValidate>
-          <div className={styles.field}>
-            <span className={styles.label}>{copy.rating.ratingLabel}</span>
-            <div className={styles.starInput} role="radiogroup" aria-label={copy.rating.ratingLabel}>
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`${styles.starButton} ${
-                    value <= (hovered || rating) ? styles.starOn : ""
-                  }`}
-                  role="radio"
-                  aria-checked={rating === value}
-                  aria-label={`${value}`}
-                  onMouseEnter={() => setHovered(value)}
-                  onMouseLeave={() => setHovered(0)}
-                  onClick={() => setRating(value)}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill={value <= (hovered || rating) ? "currentColor" : "none"}
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 3.5 14.6 9l6 .8-4.4 4.2 1.1 5.9L12 17l-5.3 2.9 1.1-5.9L3.4 9.8l6-.8L12 3.5z" />
-                  </svg>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor={`name-${provider.id}`}>
-              {copy.rating.nameLabel}
-            </label>
-            <input
-              id={`name-${provider.id}`}
-              type="text"
-              className={styles.input}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor={`comment-${provider.id}`}>
-              {copy.rating.commentLabel}
-            </label>
-            <textarea
-              id={`comment-${provider.id}`}
-              className={`${styles.input} ${styles.textarea}`}
-              rows={3}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          </div>
-
-          {error ? (
-            <p className={styles.error} role="alert">
-              {error}
-            </p>
-          ) : null}
-
-          <button
-            type="submit"
-            className={styles.submit}
-            disabled={status === "submitting"}
-          >
-            {status === "submitting" ? copy.rating.submitting : copy.rating.submit}
-          </button>
-        </form>
+      {showReview ? (
+        <ReviewModal
+          providerId={provider.id}
+          providerName={provider.name}
+          copy={copy.rating}
+          onClose={() => setShowReview(false)}
+          onSubmitted={handleSubmitted}
+        />
       ) : null}
     </article>
   );

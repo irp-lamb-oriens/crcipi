@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createLoginCode, isAdminEmail } from "@/lib/auth";
+import { createLoginCode, getUserByEmail } from "@/lib/auth";
 import { sendLoginCode } from "@/lib/mailer";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 // POST /api/auth/request-code
-// Starts passwordless login for an allowed admin email. Always returns a
-// generic "sent" response so the endpoint does not reveal which emails are
-// admins. Email delivery is best-effort: if SMTP is not configured, the
-// request still returns "sent" but logs the failure.
+// Starts passwordless login for an existing user (admin or member). Always
+// returns a generic "sent" response so the endpoint does not reveal which
+// emails have accounts. Email delivery is best-effort: if SMTP is not
+// configured, the request still returns "sent" but logs the failure.
 
 // Rate limit: 5 requests per 15 minutes per IP, then exponential backoff
 // (30s base, doubling per repeated excess). Resets after a day of inactivity.
@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "invalid_email" }, { status: 422 });
   }
 
-  if (!(await isAdminEmail(email))) {
+  const user = await getUserByEmail(email);
+  if (!user) {
+    // Do not reveal that the email has no account.
     return NextResponse.json({ ok: true });
   }
 

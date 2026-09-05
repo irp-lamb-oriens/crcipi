@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { isLocale } from "@/content";
 import { getHistory, restoreContent } from "@/lib/contentStore";
 
@@ -7,7 +7,7 @@ import { getHistory, restoreContent } from "@/lib/contentStore";
 // Lists the last 25 saved snapshots for a locale (newest first).
 
 export async function GET(request: NextRequest) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("content.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 // Restores a persisted snapshot as the live content.
 
 export async function POST(request: NextRequest) {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("content.manage"))) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
