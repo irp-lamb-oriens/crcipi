@@ -1791,6 +1791,45 @@ the single-sign-up option: filling the volunteer form is what creates the login.
    sign-up. When a product has a "sign up to volunteer" intent, the account
    creation should live on that form from the start, not in a parallel route.
 
-</task_progress>
-</task_progress>
-</replace_in_file>
+---
+
+## 2026-09-04 — Review system: capture reviewer email regardless of newsletter opt-in
+
+**Task.** The six-point review spec was already implemented end-to-end (verified
+step, plus-alias dedupe via `normalizeReviewerEmail`, incremental `ratingsCount`/
+`ratingsSum`, edit-existing-review surface, newsletter CTA, instant aggregate in
+the directory). The one genuine gap: the spec said "save them in this collection
+regardless," but email capture only happened when the user clicked the "Yes"
+newsletter button.
+
+**Choices made (asked to pick the sound ones).**
+1. Capture the verified email server-side at review submit time (`submitReview`
+   fires `captureReviewerEmail`), so every reviewer lands in the `newsletter`
+   ledger whether or not they opt in. The "Yes" button now merely flips
+   `subscribed: true` via `subscribeNewsletter`, keeping capture and marketing
+   consent as separate field states.
+2. Left the legacy moderated path (`lib/providers.ts` `submitRating` +
+   `/api/providers/[id]/rating` + admin approve/reject) intact for backward
+   compatibility, since no existing data was migrated off it.
+3. Kept single `ownerId` + `role === "admin"` for reviewer-email visibility.
+
+**Do better next time.**
+1. Two rating write paths coexist (`verified instant` vs `moderated pending`), and
+   they disagree on the review's lifecycle (`approved: true` immediate vs
+   `approved: false` + admin gate). Non-destructive today, but a future
+   unification should pick one and migrate the other's docs, or the two systems
+   will keep drifting on what "a review" means.
+2. `captureReviewerEmail` is fire-and-forget (`void` + `.catch`), so a capture
+   failure is logged but never surfaced. Correct for not failing the review, but
+   it means a transient outage silently skips the "save regardless" guarantee for
+   that window. A queued-retry or writing capture inside the same write batch
+   would close the gap at the cost of coupling review success to capture success.
+3. The `newsletter` collection now has two shapes depending on path: review-capture
+   writes `{ source:"review", capturedAt }` with no `subscribed` flag, opt-in
+   writes `{ subscribed:true }`. Both merge into one doc, but a reader has to
+   remember `subscribed !== true` means "captured, not opted in." A single
+   explicit `subscribedAt: null | number` marker (write `null` on capture) would
+   make the state machine unambiguous.
+4. `dreams.md` itself had leaked `</task_progress>` / `</replace_in_file>` tags at
+   the tail from a prior interrupted edit. Guarded against again: verified the
+   file's final bytes before appending this entry.

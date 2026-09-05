@@ -290,6 +290,15 @@ export async function submitReview(
       };
     });
 
+    if (result.ok) {
+      // Save the verified email to the platform's newsletter/email ledger
+      // regardless of whether they later opt into marketing. Best effort: a
+      // capture failure must not fail the review.
+      void captureReviewerEmail(email).catch((error) => {
+        console.error("Failed to capture reviewer email:", error);
+      });
+    }
+
     return result;
   } catch {
     return { ok: false, error: "invalid_token" };
@@ -300,6 +309,17 @@ export async function submitReview(
 // Newsletter
 // ---------------------------------------------------------------------------
 
+export async function captureReviewerEmail(email: string): Promise<void> {
+  const normalized = normalizeReviewerEmail(email);
+  await db
+    .collection("newsletter")
+    .doc(sha256(normalized))
+    .set(
+      { email: normalized, source: "review", capturedAt: Date.now() },
+      { merge: true }
+    );
+}
+
 export async function subscribeNewsletter(
   email: string,
   source = "review"
@@ -308,5 +328,13 @@ export async function subscribeNewsletter(
   await db
     .collection("newsletter")
     .doc(sha256(normalized))
-    .set({ email: normalized, source, subscribedAt: Date.now() }, { merge: true });
+    .set(
+      {
+        email: normalized,
+        source,
+        subscribed: true,
+        subscribedAt: Date.now(),
+      },
+      { merge: true }
+    );
 }
