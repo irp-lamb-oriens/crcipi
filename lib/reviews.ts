@@ -315,7 +315,12 @@ export async function captureReviewerEmail(email: string): Promise<void> {
     .collection("newsletter")
     .doc(sha256(normalized))
     .set(
-      { email: normalized, source: "review", capturedAt: Date.now() },
+      {
+        email: normalized,
+        source: "review",
+        subscribed: false,
+        capturedAt: Date.now(),
+      },
       { merge: true }
     );
 }
