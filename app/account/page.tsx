@@ -197,7 +197,7 @@ export default function AccountPage() {
         return;
       }
       setFieldErrors({});
-      setNotice(editingId === null ? "Your business was submitted for review." : "Your business was saved.");
+      setNotice(editingId === null ? "Your business is live." : "Your business was saved.");
       startNew();
       void loadProviders();
     } catch {

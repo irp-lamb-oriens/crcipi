@@ -10,7 +10,8 @@ import {
 // POST /api/member/providers — create a provider owned by the member.
 //
 // Members may only read and mutate their own businesses. Newly created
-// providers are unapproved until an admin reviews and publishes them.
+// providers are published immediately; admins can hide them later from the
+// admin console if needed.
 
 export async function GET() {
   const user = await getSessionUser();
@@ -56,14 +57,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 422 });
   }
 
-  // Members cannot self-publish or self-feature. Ownership is pinned to the
-  // session user; approval is always reset to pending.
+  // Members cannot self-feature. Ownership is pinned to the session user;
+  // new submissions go live right away.
   const data = { ...result.data, featured: false };
 
   try {
     const provider = await createProvider(data, {
       ownerId: user.userId,
-      approved: false,
+      approved: true,
     });
     return NextResponse.json({ ok: true, provider }, { status: 201 });
   } catch (error) {

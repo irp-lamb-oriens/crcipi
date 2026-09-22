@@ -311,16 +311,16 @@ export async function submitReview(
 
 export async function captureReviewerEmail(email: string): Promise<void> {
   const normalized = normalizeReviewerEmail(email);
+  // Capture only records the email in the platform ledger. The `subscribed`
+  // flag is intentionally left unset here so a reviewer who has not made a
+  // choice is distinct from one who explicitly declined (false) or opted in
+  // (true). Using `merge` also means re-capturing never downgrades an existing
+  // opt-in.
   await db
     .collection("newsletter")
     .doc(sha256(normalized))
     .set(
-      {
-        email: normalized,
-        source: "review",
-        subscribed: false,
-        capturedAt: Date.now(),
-      },
+      { email: normalized, source: "review", capturedAt: Date.now() },
       { merge: true }
     );
 }
