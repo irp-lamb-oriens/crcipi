@@ -87,7 +87,7 @@ Detail pages emit schema.org `JobPosting` for Google job search.
 
 ### Member articles with AI review
 
-`articles/{id}`. On submit, `lib/moderation.ts` asks Claude (Anthropic API) for a
+`articles/{id}`. On submit, `lib/moderation.ts` asks Claude (via OpenRouter or the Anthropic API) for a
 strict JSON verdict against the editorial policy (relevant to the community; no
 political, religious, anti–Costa Rica, spam or misleading content). Clear passes
 publish, clear violations come back with reasons, anything else — including any
@@ -139,7 +139,7 @@ Copy `.env.example` to `.env` and set:
 - `FIREBASE_SERVICE_ACCOUNT` — minified `serviceAccountKey.json`, or place `serviceAccountKey.json` in the project root.
 - `SMTP_USER` / `SMTP_PASS` (Gmail App Password), `SMTP_HOST`, `SMTP_PORT`.
 - `FIREBASE_STORAGE_BUCKET` — enables uploads (KYC documents, CVs, covers).
-- `ANTHROPIC_API_KEY` (and optional `ANTHROPIC_MODEL`) — enables AI article review.
+- `OPENROUTER_API_KEY` (optional `OPENROUTER_MODEL`) or `ANTHROPIC_API_KEY` (optional `ANTHROPIC_MODEL`) — enables AI article review; OpenRouter wins when both are set.
 
 ## Commands
 

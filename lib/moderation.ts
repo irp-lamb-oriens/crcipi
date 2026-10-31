@@ -11,7 +11,10 @@ import "server-only";
 //   - Timeouts, rate limits and outages also fall back to human review, so
 //     an AI failure can delay an article but never publish one by mistake.
 //
-// Config: ANTHROPIC_API_KEY (required to enable), ANTHROPIC_MODEL (optional).
+// Config (first one set wins):
+//   OPENROUTER_API_KEY (+ optional OPENROUTER_MODEL) -> OpenRouter
+//   ANTHROPIC_API_KEY  (+ optional ANTHROPIC_MODEL)  -> Anthropic API directly
+// Neither set: every article goes to the human editor queue.
 // ============================================================
 
 export type ModerationDecision = "approve" | "reject" | "review";
@@ -46,8 +49,85 @@ export interface ModerationInput {
   category: string;
 }
 
-const API_URL = "https://api.anthropic.com/v1/messages";
-const DEFAULT_MODEL = "claude-haiku-5-5";
+// One request shape per provider; everything else (policy, fencing, parsing,
+// fallbacks) is shared so switching providers cannot weaken the guardrails.
+interface Provider {
+  name: "openrouter" | "anthropic";
+  model: string;
+  request(system: string, user: string): { url: string; init: RequestInit };
+  extractText(data: unknown): string;
+}
+
+function resolveProvider(): Provider | null {
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (openRouterKey) {
+    const model = process.env.OPENROUTER_MODEL || "anthropic/claude-haiku-5.5";
+    return {
+      name: "openrouter",
+      model,
+      request: (system, user) => ({
+        url: "https://openrouter.ai/api/v1/chat/completions",
+        init: {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${openRouterKey}`,
+            // Optional attribution headers OpenRouter shows in its dashboard.
+            "HTTP-Referer": "https://crcipi.org",
+            "X-Title": "CR-CIPI editorial review",
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 600,
+            temperature: 0,
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: user },
+            ],
+          }),
+        },
+      }),
+      extractText: (data) => {
+        const choices = (data as { choices?: { message?: { content?: unknown } }[] }).choices;
+        const content = choices?.[0]?.message?.content;
+        return typeof content === "string" ? content : "";
+      },
+    };
+  }
+
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey) {
+    const model = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
+    return {
+      name: "anthropic",
+      model,
+      request: (system, user) => ({
+        url: "https://api.anthropic.com/v1/messages",
+        init: {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": anthropicKey,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 600,
+            system,
+            messages: [{ role: "user", content: user }],
+          }),
+        },
+      }),
+      extractText: (data) =>
+        ((data as { content?: { type: string; text?: string }[] }).content ?? [])
+          .filter((block) => block.type === "text" && typeof block.text === "string")
+          .map((block) => block.text)
+          .join(""),
+    };
+  }
+
+  return null;
+}
 // Serverless functions (Netlify) time out at ~10s, so one bounded attempt;
 // a failure simply routes the article to a human editor.
 const TIMEOUT_MS = 8_000;
@@ -140,15 +220,15 @@ function sleep(ms: number) {
 }
 
 export function moderationEnabled(): boolean {
-  return !!process.env.ANTHROPIC_API_KEY;
+  return resolveProvider() !== null;
 }
 
 export async function moderateArticle(input: ModerationInput): Promise<ModerationResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
+  const provider = resolveProvider();
+  if (!provider) {
     return fallback("unavailable", "Automatic review is not configured; an editor will review it.");
   }
-  const model = process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
+  const model = `${provider.name}:${provider.model}`;
 
   // Escape the closing tag so the article cannot break out of its fence.
   const fence = (value: string) => value.replace(/<\/?article>/gi, "");
@@ -165,21 +245,8 @@ ${fence(input.body)}
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        signal: controller.signal,
-        headers: {
-          "content-type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 600,
-          system: POLICY,
-          messages: [{ role: "user", content: userContent }],
-        }),
-      });
+      const { url, init } = provider.request(POLICY, userContent);
+      const res = await fetch(url, { ...init, signal: controller.signal });
 
       if (res.status === 429 || res.status >= 500) {
         if (attempt < MAX_ATTEMPTS) {
@@ -193,11 +260,7 @@ ${fence(input.body)}
         return fallback("error", "Automatic review failed; an editor will review it.");
       }
 
-      const data = (await res.json()) as { content?: { type: string; text?: string }[] };
-      const text = (data.content ?? [])
-        .filter((block) => block.type === "text" && typeof block.text === "string")
-        .map((block) => block.text)
-        .join("");
+      const text = provider.extractText(await res.json());
       const parsed = parseModerationOutput(text);
       if (!parsed) {
         return fallback("error", "Automatic review was inconclusive; an editor will review it.");
