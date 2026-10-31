@@ -20,6 +20,7 @@ import Seal from "@/components/brand/Seal";
 import ContactForm from "@/components/ContactForm";
 import ProfileReviewButton from "@/components/ProfileReviewButton";
 import RichText from "@/components/RichText";
+import { scoreProvider } from "@/lib/trustScore";
 import styles from "./page.module.scss";
 
 export const dynamic = "force-dynamic";
@@ -90,11 +91,12 @@ export default async function ProviderProfilePage({ params }: Props) {
   const provider = await loadProvider(id);
   if (!provider) notFound();
 
-  const [content, ratings, jobs, articles] = await Promise.all([
+  const [content, ratings, jobs, articles, trust] = await Promise.all([
     getLiveContent(locale),
     listRatings(provider.id, { approvedOnly: true }),
     listLiveJobs().then((all) => all.filter((job) => job.providerId === provider.id)),
     listPublished().then((all) => all.filter((a) => a.providerId === provider.id).slice(0, 4)),
+    scoreProvider(provider).catch(() => null),
   ]);
 
   const copy = PROFILE_COPY[locale];
@@ -115,6 +117,9 @@ export default async function ProviderProfilePage({ params }: Props) {
   const ld = JSON.stringify(localBusinessLd(provider, locale)).replace(/</g, "\\u003c");
 
   const fields: [string, string][] = [
+    ...(provider.verified && trust
+      ? ([[locale === "en" ? "Trust score" : "Puntaje de confianza", `${trust.total} / 100`]] as [string, string][])
+      : []),
     [copy.rating, average ? `${average.toFixed(1)} / 5 · ${copy.verifiedReviews(provider.ratingsCount)}` : copy.noReviews],
     [
       copy.replies,

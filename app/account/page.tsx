@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import StatusBadge from "@/components/console/StatusBadge";
 import { useSession } from "@/components/console/useSession";
 import { kycTone, KYC_STATUS_LABELS } from "@/components/console/labels";
@@ -62,6 +63,7 @@ export default function MemberDashboard() {
             <h1 className={styles.title}>Welcome{session.name ? `, ${session.name.split(" ")[0]}` : ""}</h1>
             <p className={styles.subtitle}>Your presence in the CR-CIPI community at a glance.</p>
           </div>
+          <ModuleGuide area="member" id="home" />
         </header>
 
         {!data ? (

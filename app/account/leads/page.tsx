@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import { useSession } from "@/components/console/useSession";
 import styles from "@/components/console/Console.module.scss";
 import inbox from "./page.module.scss";
@@ -147,6 +148,7 @@ export default function LeadsPage() {
               {TARGET_HOURS} hours: your reply time is shown to investors.
             </p>
           </div>
+          <ModuleGuide area="member" id="leads" />
         </header>
 
         {businesses.length > 0 ? (

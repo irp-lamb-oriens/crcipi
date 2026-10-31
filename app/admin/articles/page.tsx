@@ -45,6 +45,12 @@ export default function AdminArticlesPage() {
   const [articles, setArticles] = useState<Article[] | null>(null);
   const [filter, setFilter] = useState<ArticleStatus>("in_review");
   const [selected, setSelected] = useState<string | null>(null);
+
+  // Deep link from the review inbox: ?article=<id> opens that item.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("article");
+    if (id) setSelected(id);
+  }, []);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "notice" | "error"; text: string } | null>(null);

@@ -728,3 +728,39 @@ textarea.input {
   background: var(--paper-soft, #f2f2f2);
   border-radius: var(--radius, 6px);
 }
+
+.sideFoot .helpLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  color: var(--on-dark);
+  text-decoration: none;
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+  }
+
+  &[aria-current="page"] {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}
+
+// The manual prints without the console chrome.
+@media print {
+  .side {
+    display: none;
+  }
+
+  .frame {
+    display: block;
+  }
+}

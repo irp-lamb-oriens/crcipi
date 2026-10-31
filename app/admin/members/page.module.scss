@@ -1,0 +1,142 @@
+// Members: a ledger; each row is a company with a five-bar score glyph
+// (legal, profile, replies, reviews, activity) beside the number.
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.search {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--step-small);
+  color: var(--ink-2);
+  white-space: nowrap;
+
+  select {
+    width: auto;
+  }
+}
+
+.list {
+  list-style: none;
+  border-top: 1px solid var(--ink);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) 7.5rem minmax(0, 1.6fr);
+  align-items: center;
+  gap: 0.75rem 2rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    .facts {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.who {
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1.15;
+  color: var(--ink);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.meta {
+  margin-top: 0.2rem;
+  font-size: var(--step-small);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.sealed {
+  color: var(--trust);
+  font-weight: 500;
+}
+
+.score {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+  }
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 2rem;
+
+  > span {
+    position: relative;
+    width: 6px;
+    height: 100%;
+    background: var(--line);
+
+    span {
+      position: absolute;
+      inset: 0;
+      background: var(--trust);
+      transform-origin: bottom;
+    }
+  }
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+
+  dt {
+    font-size: var(--step-micro);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  dd {
+    margin-top: 0.15rem;
+    font-size: var(--step-small);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.late {
+  color: var(--accent);
+  font-weight: 500;
+}

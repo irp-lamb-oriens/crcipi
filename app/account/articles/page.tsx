@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import FileUpload from "@/components/console/FileUpload";
 import StatusBadge, { type BadgeTone } from "@/components/console/StatusBadge";
 import { useSession } from "@/components/console/useSession";
@@ -151,7 +152,10 @@ export default function MemberArticlesPage() {
               ads); anything borderline goes to a human editor.
             </p>
           </div>
-          <button type="button" className={styles.primary} onClick={() => open("new")}>+ New article</button>
+          <div className={styles.actions}>
+            <ModuleGuide area="member" id="articles" />
+            <button type="button" className={styles.primary} onClick={() => open("new")}>+ New article</button>
+          </div>
         </header>
 
         {message ? <p className={styles[message.kind]}>{message.text}</p> : null}

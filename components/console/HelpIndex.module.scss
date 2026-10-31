@@ -1,0 +1,185 @@
+.shell {
+  gap: 2rem;
+}
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  a {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    min-height: 40px;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--ink);
+
+    span {
+      font-size: var(--step-micro);
+      color: var(--ink-3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    &:hover {
+      border-color: var(--ink);
+    }
+  }
+}
+
+.guide {
+  padding-top: 2rem;
+  border-top: 1px solid var(--ink);
+  scroll-margin-top: 1rem;
+}
+
+.guideHead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.5rem 1.5rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: auto minmax(0, 1fr);
+
+    .open {
+      grid-column: 2;
+    }
+  }
+}
+
+.num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--ink-3);
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.summary {
+  margin-top: 0.5rem;
+  max-width: 60ch;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.open {
+  font-size: var(--step-small);
+  white-space: nowrap;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 2rem 3rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.h3 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+
+  span {
+    font-family: var(--font-text);
+    font-size: var(--step-micro);
+    color: var(--ink-3);
+  }
+}
+
+.checks {
+  list-style: none;
+  margin-bottom: 1.75rem;
+
+  li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--line);
+
+    > span:first-child {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 1.4rem;
+      height: 1.4rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      font-size: 0.75rem;
+    }
+  }
+
+  .ok {
+    color: var(--ink-2);
+
+    > span:first-child {
+      background: var(--trust);
+      border-color: var(--trust);
+      color: var(--on-dark);
+    }
+  }
+}
+
+.faq {
+  div {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    font-weight: 500;
+  }
+
+  dd {
+    margin-top: 0.3rem;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+}
+
+.howto {
+  margin-bottom: 1.75rem;
+
+  ol {
+    padding-left: 1.25rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  li + li {
+    margin-top: 0.4rem;
+  }
+}
+
+// --- Print: the manual ----------------------------------------------------------
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+
+  .guide {
+    break-inside: avoid-page;
+    break-before: page;
+  }
+
+  .guide:first-of-type {
+    break-before: auto;
+  }
+}

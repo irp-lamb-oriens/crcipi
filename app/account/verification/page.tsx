@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
+import TrustPanel from "@/components/console/TrustPanel";
 import FileUpload, { type UploadedFile } from "@/components/console/FileUpload";
 import StatusBadge from "@/components/console/StatusBadge";
 import { useSession } from "@/components/console/useSession";
@@ -155,14 +157,15 @@ export default function VerificationPage() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Trusted provider</p>
-            <h1 className={styles.title}>Business verification</h1>
+            <p className={styles.eyebrow}>Sello de confianza</p>
+            <h1 className={styles.title}>Trust seal</h1>
             <p className={styles.subtitle}>
               Verified businesses get a badge in the public directory. We check legal
               existence, who represents the business and, for regulated trades, the
               license. Documents are private: only CR-CIPI reviewers can open them.
             </p>
           </div>
+          <ModuleGuide area="member" id="verification" />
         </header>
 
         {providers === null ? (
@@ -189,6 +192,8 @@ export default function VerificationPage() {
                 </button>
               ))}
             </div>
+
+            {selected ? <TrustPanel providerId={selected} refreshKey={record?.status} /> : null}
 
             {record ? (
               <div className={styles.card}>

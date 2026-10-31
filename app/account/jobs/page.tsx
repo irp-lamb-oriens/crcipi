@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import StatusBadge, { type BadgeTone } from "@/components/console/StatusBadge";
 import { useSession } from "@/components/console/useSession";
 import { formatDate } from "@/components/console/labels";
@@ -247,10 +248,13 @@ export default function MemberJobsPage() {
               Applications arrive by email and are collected here.
             </p>
           </div>
-          <button type="button" className={styles.primary} onClick={startNew}
-            disabled={providers.filter((p) => p.approved).length === 0}>
-            + New job
-          </button>
+          <div className={styles.actions}>
+            <ModuleGuide area="member" id="jobs" />
+            <button type="button" className={styles.primary} onClick={startNew}
+              disabled={providers.filter((p) => p.approved).length === 0}>
+              + New job
+            </button>
+          </div>
         </header>
 
         {message ? <p className={styles[message.kind]}>{message.text}</p> : null}

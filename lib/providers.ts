@@ -53,6 +53,8 @@ export interface Provider {
   responseSample: number;
   // Languages the business serves clients in (ISO 639-1), set at onboarding.
   languages: string[];
+  // Last computed trust score (lib/trustScore.ts), for sorting; null until scored.
+  trustScore: number | null;
 }
 
 export interface ProviderRating {
@@ -98,6 +100,7 @@ function toProvider(id: string, d: Record<string, unknown>): Provider {
       typeof d.responseHoursMedian === "number" ? d.responseHoursMedian : null,
     responseSample: Number(d.responseSample ?? 0),
     languages: Array.isArray(d.languages) ? (d.languages as unknown[]).map(String).slice(0, 10) : [],
+    trustScore: typeof d.trustScore === "number" ? d.trustScore : null,
   };
 }
 
@@ -320,6 +323,7 @@ export async function createProvider(
     responseHoursMedian: null,
     responseSample: 0,
     languages: [],
+    trustScore: null,
   };
   await docRef.set(provider);
   return { id: docRef.id, ...provider };

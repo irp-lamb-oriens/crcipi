@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ConsoleGate from "@/components/console/ConsoleGate";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import Funnel from "@/components/console/Funnel";
 import TrendBars from "@/components/console/TrendBars";
 import { useSession } from "@/components/console/useSession";
@@ -81,13 +82,16 @@ export default function AdminDashboard() {
             <h1 className={styles.title}>CR-CIPI at a glance</h1>
             <p className={styles.subtitle}>Growth, engagement and what needs your attention.</p>
           </div>
-          <div className={styles.tabs}>
-            {RANGES.map((range) => (
-              <button key={range} type="button" onClick={() => setDays(range)}
-                className={`${styles.tab} ${days === range ? styles.tabActive : ""}`}>
-                {range} days
-              </button>
-            ))}
+          <div className={styles.actions}>
+            <ModuleGuide area="admin" id="routine" />
+            <div className={styles.tabs}>
+              {RANGES.map((range) => (
+                <button key={range} type="button" onClick={() => setDays(range)}
+                  className={`${styles.tab} ${days === range ? styles.tabActive : ""}`}>
+                  {range} days
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 

@@ -7,11 +7,13 @@ import styles from "./Console.module.scss";
 
 type Area = "admin" | "member";
 
-const LINKS: Record<Area, { href: string; label: string }[]> = {
+// Six items at most per area. Older admin screens stay reachable from the
+// module that owns them (`also` keeps the right item highlighted).
+const LINKS: Record<Area, { href: string; label: string; also?: string[] }[]> = {
   admin: [
     { href: "/admin/dashboard", label: "Overview" },
-    { href: "/admin/providers", label: "Providers" },
-    { href: "/admin/verification", label: "Verification" },
+    { href: "/admin/reviews", label: "Reviews", also: ["/admin/verification"] },
+    { href: "/admin/members", label: "Members", also: ["/admin/providers"] },
     { href: "/admin/jobs", label: "Jobs" },
     { href: "/admin/articles", label: "Articles" },
     { href: "/admin/users", label: "Users" },
@@ -20,7 +22,7 @@ const LINKS: Record<Area, { href: string; label: string }[]> = {
     { href: "/account", label: "Overview" },
     { href: "/account/businesses", label: "My businesses" },
     { href: "/account/leads", label: "Leads" },
-    { href: "/account/verification", label: "Verification" },
+    { href: "/account/verification", label: "Trust seal" },
     { href: "/account/jobs", label: "Jobs" },
     { href: "/account/articles", label: "Articles" },
   ],
@@ -53,7 +55,9 @@ export default function ConsoleNav({ area }: { area: Area }) {
             const active =
               link.href === "/account"
                 ? pathname === "/account"
-                : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                : [link.href, ...(link.also ?? [])].some(
+                    (href) => pathname === href || pathname.startsWith(`${href}/`)
+                  );
             return (
               <Link
                 key={link.href}
@@ -71,6 +75,13 @@ export default function ConsoleNav({ area }: { area: Area }) {
         </nav>
       </div>
       <div className={styles.sideFoot}>
+        <Link
+          href={area === "admin" ? "/admin/help" : "/account/help"}
+          className={styles.helpLink}
+          aria-current={pathname.endsWith("/help") ? "page" : undefined}
+        >
+          <span aria-hidden="true">?</span> Guides
+        </Link>
         {session.email ? <span className={styles.who}>{session.email}</span> : null}
         <Link href="/en">View site</Link>
         <button type="button" onClick={() => void signOut()}>

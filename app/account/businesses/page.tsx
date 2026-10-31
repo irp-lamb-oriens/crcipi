@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ModuleGuide from "@/components/console/ModuleGuide";
 import { useRouter } from "next/navigation";
 import {
   PROVIDER_CATEGORIES,
@@ -239,6 +240,7 @@ export default function AccountPage() {
             </p>
           </div>
           <div className={styles.headerActions}>
+            <ModuleGuide area="member" id="businesses" />
             <a className={styles.back} href="/en/directory">
               View directory
             </a>

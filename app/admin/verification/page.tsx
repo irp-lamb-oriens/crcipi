@@ -43,6 +43,12 @@ export default function AdminVerificationPage() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [filter, setFilter] = useState<KycStatus>("submitted");
   const [selected, setSelected] = useState<string | null>(null);
+
+  // Deep link from the review inbox: ?provider=<id> opens that item.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("provider");
+    if (id) setSelected(id);
+  }, []);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
