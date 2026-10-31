@@ -41,13 +41,14 @@ export default function ConsoleNav({ area }: { area: Area }) {
   }
 
   return (
-    <div className={styles.bar}>
-      <div className={styles.barInner}>
-        <span className={styles.brand}>
-          CR-CIPI<span>{area === "admin" ? "Admin" : "Members"}</span>
-        </span>
-        <nav className={styles.navLinks} aria-label="Console">
-          {LINKS[area].map((link) => {
+    <aside className={styles.side}>
+      <div className={styles.sideTop}>
+        <Link href={area === "admin" ? "/admin/dashboard" : "/account"} className={styles.brand}>
+          CR-CIPI
+          <span>{area === "admin" ? "Cámara" : "Miembros"}</span>
+        </Link>
+        <nav aria-label="Console" className={styles.navLinks}>
+          {LINKS[area].map((link, i) => {
             const active =
               link.href === "/account"
                 ? pathname === "/account"
@@ -59,18 +60,22 @@ export default function ConsoleNav({ area }: { area: Area }) {
                 className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
                 aria-current={active ? "page" : undefined}
               >
+                <span className={styles.navIndex} aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {link.label}
               </Link>
             );
           })}
         </nav>
-        <div className={styles.barActions}>
-          <Link href="/en">View site</Link>
-          <button type="button" onClick={() => void signOut()}>
-            Sign out
-          </button>
-        </div>
       </div>
-    </div>
+      <div className={styles.sideFoot}>
+        {session.email ? <span className={styles.who}>{session.email}</span> : null}
+        <Link href="/en">View site</Link>
+        <button type="button" onClick={() => void signOut()}>
+          Sign out
+        </button>
+      </div>
+    </aside>
   );
 }

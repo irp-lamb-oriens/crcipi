@@ -1,10 +1,11 @@
 import ConsoleNav from "@/components/console/ConsoleNav";
+import styles from "@/components/console/Console.module.scss";
 
-export default function AccountLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className={styles.frame}>
       <ConsoleNav area="member" />
-      {children}
-    </>
+      <div className={styles.content}>{children}</div>
+    </div>
   );
 }

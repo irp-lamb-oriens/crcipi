@@ -1,101 +1,183 @@
 // ============================================================
-// Console kit: shared primitives for the member and admin dashboards.
-// Uses the global brand tokens (ink / paper / red / navy) so the private
-// area reads as the same institution as the public site.
+// Console kit: member and admin dashboards in the "El sello" language.
+// Calm by design: paper-2 ground, paper cards on hairlines, serif titles
+// and numerals, ink for selection, red only for the primary action, and
+// a left rail modelled on the esencial COSTA RICA portal.
 // ============================================================
 
-.page {
-  min-height: 100dvh;
-  background: var(--paper-soft, #f2f2f2);
-  color: var(--ink, #101010);
-}
-
-.shell {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem clamp(1rem, 4vw, 2rem) 4rem;
+// --- Frame & rail --------------------------------------------------------------
+.frame {
+  min-height: 100svh;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: var(--paper-2);
 }
 
-// --- Top bar -----------------------------------------------------------
-.bar {
+.content {
+  flex: 999 1 560px;
+  min-width: 0;
+}
+
+.side {
   position: sticky;
   top: 0;
-  z-index: 20;
-  background: var(--ink, #101010);
-  color: #fff;
+  flex: 1 1 248px;
+  max-width: 280px;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.75rem 1rem 1.25rem;
+  background: var(--ink);
+  color: var(--on-dark);
+
+  @media (max-width: 860px) {
+    position: static;
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+    height: auto;
+    flex-basis: 100%;
+    padding: 1rem;
+    gap: 1rem;
+  }
 }
 
-.barInner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 2rem);
+.sideTop {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  min-height: 56px;
-  overflow-x: auto;
+  flex-direction: column;
+  gap: 1.75rem;
+
+  @media (max-width: 860px) {
+    gap: 0.75rem;
+  }
 }
 
 .brand {
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: #fff;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--on-dark);
+  text-decoration: none;
 
   span {
-    color: var(--red, #a7302f);
-    margin-left: 0.4rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
+    font-family: var(--font-text);
+    font-size: var(--step-micro);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--on-dark-2);
   }
 }
 
 .navLinks {
   display: flex;
-  gap: 0.25rem;
-  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+
+  @media (max-width: 860px) {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.875rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius-pill-md, 32px);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  color: var(--on-dark-2);
+  text-decoration: none;
   white-space: nowrap;
+  transition: background-color var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 
   &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--on-dark);
+    background: color-mix(in oklch, var(--on-dark) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline-color: var(--on-dark);
   }
 }
 
 .navLinkActive {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+  background: var(--paper);
+
+  .navIndex {
+    color: var(--ink-3);
+  }
+
+  &:hover {
+    color: var(--ink);
+    background: var(--paper);
+  }
 }
 
-.barActions {
+.navIndex {
+  font-size: var(--step-micro);
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--on-dark) 45%, transparent);
+}
+
+.sideFoot {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  white-space: nowrap;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 0.75rem 0;
+  border-top: 1px solid color-mix(in oklch, var(--on-dark) 15%, transparent);
+  font-size: var(--step-small);
 
   a,
   button {
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 0.85rem;
-    background: none;
-    border: none;
+    align-self: flex-start;
+    min-height: 32px;
     padding: 0;
+    border: none;
+    background: none;
+    color: var(--on-dark-2);
+    text-decoration: none;
 
     &:hover {
-      color: #fff;
+      color: var(--on-dark);
     }
   }
+
+  @media (max-width: 860px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.25rem;
+    padding-top: 0.75rem;
+  }
+}
+
+.who {
+  margin-bottom: 0.4rem;
+  color: var(--on-dark);
+  overflow-wrap: anywhere;
+}
+
+.page {
+  min-height: 100svh;
+  color: var(--ink);
+}
+
+.shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 // --- Page header -------------------------------------------------------
@@ -108,19 +190,20 @@
 }
 
 .eyebrow {
-  font-size: 0.75rem;
-  font-weight: 700;
+  margin-bottom: 0.6rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 0.35rem;
+  color: var(--ink-3);
 }
 
 .title {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 0.98;
 }
 
 .subtitle {
@@ -144,8 +227,9 @@
 .card {
   background: var(--paper, #fff);
   border: 1px solid var(--line, #e5e5e5);
-  border-radius: var(--radius, 6px);
-  padding: 1.25rem;
+  border-color: var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
   min-width: 0;
 }
 
@@ -158,8 +242,10 @@
 }
 
 .cardTitle {
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 // --- Stat tiles --------------------------------------------------------
@@ -171,25 +257,26 @@
 
 .stat {
   background: var(--paper, #fff);
-  border: 1px solid var(--line, #e5e5e5);
-  border-radius: var(--radius, 6px);
-  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
 .statLabel {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft, #7e7e7e);
 }
 
 .statValue {
-  font-size: 1.9rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  font-weight: 400;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
@@ -281,7 +368,7 @@ a.stat:hover {
 }
 
 .rowTitle {
-  font-weight: 700;
+  font-weight: 500;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -344,13 +431,13 @@ a.stat:hover {
 }
 
 .badgeGood {
-  background: #e7f4ec;
-  color: #1d6b3a;
+  background: var(--good-soft);
+  color: var(--good);
 }
 
 .badgeWarn {
-  background: #fff4e0;
-  color: #8a5300;
+  background: oklch(95% 0.04 80);
+  color: oklch(45% 0.1 70);
 }
 
 .badgeBad {
@@ -371,12 +458,13 @@ a.stat:hover {
 }
 
 .tab {
-  border: 1px solid var(--line, #e5e5e5);
-  background: var(--paper, #fff);
-  color: var(--ink, #101010);
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-pill-md, 32px);
-  font-size: 0.85rem;
+  min-height: 40px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-2);
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
 
   span {
     margin-left: 0.35rem;
@@ -501,7 +589,7 @@ textarea.input {
   color: #fff;
 
   &:hover:not(:disabled) {
-    background: #8f2a29;
+    background: var(--ink);
     color: #fff;
   }
 }
@@ -549,8 +637,8 @@ textarea.input {
 }
 
 .notice {
-  background: #e7f4ec;
-  color: #1d6b3a;
+  background: var(--good-soft);
+  color: var(--good);
 }
 
 .error {
@@ -559,8 +647,8 @@ textarea.input {
 }
 
 .warn {
-  background: #fff4e0;
-  color: #8a5300;
+  background: oklch(95% 0.04 80);
+  color: oklch(45% 0.1 70);
 }
 
 .hint {
