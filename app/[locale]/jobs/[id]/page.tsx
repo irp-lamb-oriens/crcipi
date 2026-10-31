@@ -9,6 +9,7 @@ import { EMPLOYMENT_TYPE_LABELS, WORK_MODE_LABELS, formatSalary } from "@/lib/jo
 import { getJob, isLive, recordJobView, type Job } from "@/lib/jobs";
 import { getProvider } from "@/lib/providers";
 import { recordEvent } from "@/lib/stats";
+import { recordProviderStat } from "@/lib/providerStats";
 import JobApplyForm from "@/components/JobApplyForm";
 import RichText from "@/components/RichText";
 import styles from "./page.module.scss";
@@ -93,6 +94,7 @@ export default async function JobDetailPage({ params }: Props) {
   const copy = content.jobs;
 
   recordJobView(job.id);
+  recordProviderStat(job.providerId, "jobViews");
   recordEvent("job_view");
 
   const salary = formatSalary(job, locale);

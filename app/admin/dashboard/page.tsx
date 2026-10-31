@@ -24,7 +24,8 @@ type Counts = Record<
   | "article_view"
   | "lead_created"
   | "lead_responded"
-  | "lead_won",
+  | "lead_won"
+  | "profile_view",
   number
 >;
 
@@ -80,7 +81,9 @@ export default function AdminDashboard() {
           <div>
             <p className={styles.eyebrow}>Admin dashboard</p>
             <h1 className={styles.title}>CR-CIPI at a glance</h1>
-            <p className={styles.subtitle}>Growth, engagement and what needs your attention.</p>
+            <p className={styles.subtitle}>
+              Growth, engagement and what needs your attention. <Link href="/admin/report">Monthly report for the Board →</Link>
+            </p>
           </div>
           <div className={styles.actions}>
             <ModuleGuide area="admin" id="routine" />

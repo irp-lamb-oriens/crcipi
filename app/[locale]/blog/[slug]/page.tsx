@@ -7,6 +7,8 @@ import { getLiveContent } from "@/lib/contentStore";
 import { buildPageMetadata } from "@/lib/metadata";
 import { ARTICLE_CATEGORY_LABELS } from "@/lib/articleOptions";
 import { getPublishedBySlug, recordArticleView } from "@/lib/articles";
+import { recordProviderStat } from "@/lib/providerStats";
+import ShareBar from "@/components/ShareBar";
 import { recordEvent } from "@/lib/stats";
 import RichText from "@/components/RichText";
 import styles from "./page.module.scss";
@@ -46,6 +48,7 @@ export default async function ArticlePage({ params }: Props) {
   const copy = content.blog.article;
 
   recordArticleView(article.id);
+  recordProviderStat(article.providerId, "articleReads");
   recordEvent("article_view");
 
   const published = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-CR", { dateStyle: "long" }).format(
@@ -104,6 +107,7 @@ export default async function ArticlePage({ params }: Props) {
       )}
       <RichText text={article.body} className={styles.prose} />
       <footer className={styles.foot}>
+        <ShareBar url={`${site.domain}/${article.language}/blog/${article.slug}`} title={article.title} locale={locale} />
         <p className={styles.disclaimer}>{copy.disclaimer}</p>
         <Link href={`/${locale}/blog`} className="btn btn--ghost">
           ← {copy.back}

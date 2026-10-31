@@ -32,6 +32,7 @@ export const STAT_EVENTS = [
   "lead_created",
   "lead_responded",
   "lead_won",
+  "profile_view",
 ] as const;
 
 export type StatEvent = (typeof STAT_EVENTS)[number];
@@ -96,5 +97,19 @@ export function sumStats(series: DailyStats[]): Record<StatEvent, number> {
   for (const entry of series) {
     for (const event of STAT_EVENTS) totals[event] += entry.counts[event];
   }
+  return totals;
+}
+
+// Sum of every event between two UTC day keys, inclusive (monthly reports).
+export async function getStatsBetween(fromDay: string, toDay: string): Promise<Record<StatEvent, number>> {
+  const snap = await daysCol().where("day", ">=", fromDay).where("day", "<=", toDay).get();
+  const totals = emptyCounts();
+  snap.docs.forEach((doc) => {
+    const raw = doc.data() as Record<string, unknown>;
+    for (const event of STAT_EVENTS) {
+      const value = Number(raw[event] ?? 0);
+      if (Number.isFinite(value)) totals[event] += value;
+    }
+  });
   return totals;
 }

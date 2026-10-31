@@ -4,6 +4,7 @@ import { addApplication, getJob, isLive, validateApplication } from "@/lib/jobs"
 import { notify } from "@/lib/mailer";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 import { recordEvent } from "@/lib/stats";
+import { recordProviderStat } from "@/lib/providerStats";
 import { storeUpload, type StoredFile } from "@/lib/storage";
 
 // POST /api/jobs/:id/apply  (multipart)
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   recordEvent("job_apply");
+  recordProviderStat(job.providerId, "applications");
   notify({
     to: job.applyEmail,
     replyTo: result.data.email,

@@ -18,9 +18,12 @@ import {
 import { site } from "@/content/site";
 import Seal from "@/components/brand/Seal";
 import ContactForm from "@/components/ContactForm";
+import ShareBar from "@/components/ShareBar";
 import ProfileReviewButton from "@/components/ProfileReviewButton";
 import RichText from "@/components/RichText";
 import { scoreProvider } from "@/lib/trustScore";
+import { recordProviderStat } from "@/lib/providerStats";
+import { recordEvent } from "@/lib/stats";
 import styles from "./page.module.scss";
 
 export const dynamic = "force-dynamic";
@@ -98,6 +101,9 @@ export default async function ProviderProfilePage({ params }: Props) {
     listPublished().then((all) => all.filter((a) => a.providerId === provider.id).slice(0, 4)),
     scoreProvider(provider).catch(() => null),
   ]);
+
+  recordProviderStat(provider.id, "profileViews");
+  recordEvent("profile_view");
 
   const copy = PROFILE_COPY[locale];
   const average = averageRating(provider);
@@ -290,6 +296,11 @@ export default async function ProviderProfilePage({ params }: Props) {
             providerName={provider.name}
             locale={locale}
             privacyHref={locale === "en" ? "/en/privacy" : "/es/privacidad"}
+          />
+          <ShareBar
+            url={`${site.domain}${directoryPath}/${provider.id}`}
+            title={`${provider.name} · CR-CIPI`}
+            locale={locale}
           />
           <a className={styles.report} href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(`Member report: ${provider.name}`)}`}>
             {copy.report}

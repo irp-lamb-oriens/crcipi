@@ -61,7 +61,9 @@ export default function MemberDashboard() {
           <div>
             <p className={styles.eyebrow}>Member dashboard</p>
             <h1 className={styles.title}>Welcome{session.name ? `, ${session.name.split(" ")[0]}` : ""}</h1>
-            <p className={styles.subtitle}>Your presence in the CR-CIPI community at a glance.</p>
+            <p className={styles.subtitle}>
+              Your presence in the CR-CIPI community at a glance. <Link href="/account/report">This month&apos;s report →</Link>
+            </p>
           </div>
           <ModuleGuide area="member" id="home" />
         </header>

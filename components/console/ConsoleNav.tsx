@@ -11,7 +11,7 @@ type Area = "admin" | "member";
 // module that owns them (`also` keeps the right item highlighted).
 const LINKS: Record<Area, { href: string; label: string; also?: string[] }[]> = {
   admin: [
-    { href: "/admin/dashboard", label: "Overview" },
+    { href: "/admin/dashboard", label: "Overview", also: ["/admin/report"] },
     { href: "/admin/reviews", label: "Reviews", also: ["/admin/verification"] },
     { href: "/admin/members", label: "Members", also: ["/admin/providers"] },
     { href: "/admin/jobs", label: "Jobs" },
@@ -19,7 +19,7 @@ const LINKS: Record<Area, { href: string; label: string; also?: string[] }[]> = 
     { href: "/admin/users", label: "Users" },
   ],
   member: [
-    { href: "/account", label: "Overview" },
+    { href: "/account", label: "Overview", also: ["/account/report"] },
     { href: "/account/businesses", label: "My businesses" },
     { href: "/account/leads", label: "Leads" },
     { href: "/account/verification", label: "Trust seal" },
@@ -54,7 +54,7 @@ export default function ConsoleNav({ area }: { area: Area }) {
           {LINKS[area].map((link, i) => {
             const active =
               link.href === "/account"
-                ? pathname === "/account"
+                ? pathname === "/account" || (link.also ?? []).some((href) => pathname.startsWith(href))
                 : [link.href, ...(link.also ?? [])].some(
                     (href) => pathname === href || pathname.startsWith(`${href}/`)
                   );
