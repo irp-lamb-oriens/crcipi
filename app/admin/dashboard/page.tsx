@@ -20,7 +20,10 @@ type Counts = Record<
   | "job_apply"
   | "article_submitted"
   | "article_published"
-  | "article_view",
+  | "article_view"
+  | "lead_created"
+  | "lead_responded"
+  | "lead_won",
   number
 >;
 
@@ -159,6 +162,18 @@ export default function AdminDashboard() {
                 ]} />
                 <p className={styles.hint} style={{ margin: "0.75rem 0" }}>{data.period.job_posted} job(s) published in the period.</p>
                 <TrendBars title="Daily applications" values={series("job_apply")} labels={labels} />
+              </section>
+
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>Investor demand</h2>
+                <p className={styles.help} style={{ margin: "0.25rem 0 1rem" }}>Last {data.days} days · Contactos</p>
+                <Funnel steps={[
+                  { label: "Directory visits", value: data.period.directory_view },
+                  { label: "Consultation requests", value: data.period.lead_created },
+                  { label: "Answered by members", value: data.period.lead_responded },
+                  { label: "Won", value: data.period.lead_won },
+                ]} />
+                <TrendBars title="Daily consultation requests" values={series("lead_created")} labels={labels} />
               </section>
 
               <section className={styles.card}>

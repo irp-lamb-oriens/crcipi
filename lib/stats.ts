@@ -29,6 +29,9 @@ export const STAT_EVENTS = [
   "article_submitted",
   "article_published",
   "article_view",
+  "lead_created",
+  "lead_responded",
+  "lead_won",
 ] as const;
 
 export type StatEvent = (typeof STAT_EVENTS)[number];

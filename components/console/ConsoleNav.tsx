@@ -19,6 +19,7 @@ const LINKS: Record<Area, { href: string; label: string }[]> = {
   member: [
     { href: "/account", label: "Overview" },
     { href: "/account/businesses", label: "My businesses" },
+    { href: "/account/leads", label: "Leads" },
     { href: "/account/verification", label: "Verification" },
     { href: "/account/jobs", label: "Jobs" },
     { href: "/account/articles", label: "Articles" },

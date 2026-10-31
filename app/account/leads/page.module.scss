@@ -1,0 +1,203 @@
+// Contactos inbox: reply-time clocks on top, then a list / letter split.
+
+.clocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 1rem;
+}
+
+.clock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  min-width: 0;
+}
+
+.clockLate {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.clockLabel {
+  font-size: var(--step-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clockValue {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.clockHint {
+  font-size: var(--step-small);
+  color: var(--ink-3);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.list {
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  overflow: hidden;
+
+  li + li {
+    border-top: 1px solid var(--line);
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.95rem 1.1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  transition: background-color var(--dur-s) var(--ease-out);
+
+  &:hover {
+    background: var(--paper-2);
+  }
+}
+
+.itemActive,
+.itemActive:hover {
+  background: var(--ink);
+  color: var(--on-dark);
+
+  .itemNeed,
+  .itemTime,
+  .itemName span {
+    color: var(--on-dark-2);
+  }
+}
+
+.itemName {
+  font-weight: 500;
+
+  span {
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+}
+
+.itemNeed {
+  font-size: var(--step-small);
+  color: var(--ink-2);
+}
+
+.itemTime {
+  font-size: var(--step-micro);
+  color: var(--ink-3);
+}
+
+.late {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.itemActive .late {
+  color: var(--on-dark);
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: clamp(1.1rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  min-width: 0;
+}
+
+.detailHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.status {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--step-small);
+  font-weight: 500;
+  background: var(--paper-2);
+  color: var(--ink-2);
+
+  &[data-status="new"] {
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+  }
+
+  &[data-status="talking"] {
+    background: var(--trust-soft);
+    color: var(--trust);
+  }
+
+  &[data-status="won"] {
+    background: var(--good-soft);
+    color: var(--good);
+  }
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.5rem 1.5rem;
+
+  dt {
+    font-size: var(--step-small);
+    color: var(--ink-3);
+  }
+}
+
+.message {
+  padding: 1.1rem 1.25rem;
+  border-left: 2px solid var(--ink);
+  background: var(--paper-2);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.lost {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+
+  select {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 200px;
+  }
+}

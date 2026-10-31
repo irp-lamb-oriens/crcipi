@@ -23,6 +23,7 @@ type Overview = {
   reviews: { count: number; average: number | null };
   jobs: { live: number; total: number; views: number; applications: number };
   articles: { published: number; inReview: number; needsChanges: number; views: number };
+  leads: { new: number; overdue: number; won: number; total: number };
 };
 
 // Member home: what's working, and the single next thing that adds leverage.
@@ -68,6 +69,15 @@ export default function MemberDashboard() {
         ) : (
           <>
             <div className={styles.stats}>
+              <Link href="/account/leads" className={styles.stat}>
+                <span className={styles.statLabel}>New leads</span>
+                <span className={styles.statValue}>{data.leads.new}</span>
+                <span className={styles.statHint}>
+                  {data.leads.overdue > 0
+                    ? `${data.leads.overdue} waiting over 24 h`
+                    : `${data.leads.total} all-time · ${data.leads.won} won`}
+                </span>
+              </Link>
               <Link href="/account/businesses" className={styles.stat}>
                 <span className={styles.statLabel}>Businesses</span>
                 <span className={styles.statValue}>{data.businesses.length}</span>

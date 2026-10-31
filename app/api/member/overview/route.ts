@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import { listByAuthor } from "@/lib/articles";
 import { fail, ok } from "@/lib/http";
 import { isLive, listJobsByOwner } from "@/lib/jobs";
+import { listLeadsByOwner } from "@/lib/leads";
 import { listProvidersByOwner } from "@/lib/providers";
 
 // GET /api/member/overview — everything the member dashboard home needs in
@@ -10,11 +11,14 @@ export async function GET() {
   const user = await getSessionUser();
   if (!user) return fail("unauthorized", 401);
 
-  const [providers, jobs, articles] = await Promise.all([
+  const [providers, jobs, articles, leads] = await Promise.all([
     listProvidersByOwner(user.userId),
     listJobsByOwner(user.userId),
     listByAuthor(user.userId),
+    listLeadsByOwner(user.userId),
   ]);
+  const ownedIds = new Set(providers.map((p) => p.id));
+  const myLeads = leads.filter((lead) => ownedIds.has(lead.providerId));
 
   const ratingsCount = providers.reduce((n, p) => n + p.ratingsCount, 0);
   const ratingsSum = providers.reduce((n, p) => n + p.ratingsSum, 0);
@@ -39,6 +43,12 @@ export async function GET() {
       total: jobs.length,
       views: jobs.reduce((n, j) => n + j.viewsCount, 0),
       applications: jobs.reduce((n, j) => n + j.applicationsCount, 0),
+    },
+    leads: {
+      new: myLeads.filter((l) => l.status === "new").length,
+      overdue: myLeads.filter((l) => l.status === "new" && Date.now() - l.createdAt > 24 * 3600_000).length,
+      won: myLeads.filter((l) => l.status === "won").length,
+      total: myLeads.length,
     },
     articles: {
       published: articles.filter((a) => a.status === "published").length,

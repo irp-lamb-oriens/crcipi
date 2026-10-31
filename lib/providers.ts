@@ -47,6 +47,10 @@ export interface Provider {
   // Public outcome of the KYC review (details live in lib/kyc.ts).
   verified: boolean;
   kycStatus: KycStatus;
+  // Median hours to first reply on Contactos leads (lib/leads.ts); null
+  // until the provider has answered at least one.
+  responseHoursMedian: number | null;
+  responseSample: number;
 }
 
 export interface ProviderRating {
@@ -88,6 +92,9 @@ function toProvider(id: string, d: Record<string, unknown>): Provider {
     kycStatus: (KYC_STATUSES as readonly unknown[]).includes(d.kycStatus)
       ? (d.kycStatus as KycStatus)
       : "none",
+    responseHoursMedian:
+      typeof d.responseHoursMedian === "number" ? d.responseHoursMedian : null,
+    responseSample: Number(d.responseSample ?? 0),
   };
 }
 
@@ -307,6 +314,8 @@ export async function createProvider(
     ratingsSum: 0,
     verified: false,
     kycStatus: "none",
+    responseHoursMedian: null,
+    responseSample: 0,
   };
   await docRef.set(provider);
   return { id: docRef.id, ...provider };

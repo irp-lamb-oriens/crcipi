@@ -1,0 +1,260 @@
+// The consultation request as a letter of introduction: a paper sheet with
+// a "To:" line, hairline fields and chips. It folds into an envelope when sent.
+
+.letter {
+  position: relative;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 60px -45px color-mix(in oklch, var(--ink) 55%, transparent);
+
+  // Faint ruled lines, like letter paper.
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in oklch, var(--line) 55%, transparent) 31px 32px
+  );
+  background-position: 0 6.5rem;
+}
+
+.to {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+
+  span {
+    font-family: var(--font-text);
+    font-size: var(--step-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.body {
+  margin-top: 0.5rem;
+  font-size: var(--step-small);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.banner {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: var(--step-small);
+}
+
+.fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.legend {
+  margin-bottom: 0.6rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  font-size: var(--step-small);
+  color: var(--ink);
+  transition:
+    background-color var(--dur-s) var(--ease-out),
+    border-color var(--dur-s) var(--ease-out),
+    color var(--dur-s) var(--ease-out);
+
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+.chipOn,
+.chipOn:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-dark);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.float {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 1.4rem 0 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  font-size: 1.0625rem;
+  color: var(--ink);
+  transition: border-color var(--dur-s) var(--ease-out), box-shadow var(--dur-s) var(--ease-out);
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+
+  &[aria-invalid="true"] {
+    border-bottom-color: var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+  line-height: 1.55;
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  top: 1.25rem;
+  font-size: 1.0625rem;
+  color: var(--ink-3);
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
+}
+
+.input:focus + .label,
+.input:not(:placeholder-shown) + .label {
+  transform: translateY(-1.1rem) scale(0.72);
+  color: var(--ink-2);
+}
+
+.hint {
+  font-size: var(--step-micro);
+  color: var(--ink-3);
+}
+
+.error {
+  font-size: var(--step-small);
+  color: var(--accent);
+}
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: var(--step-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+
+  input {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    accent-color: var(--ink);
+  }
+}
+
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.submit {
+  align-self: stretch;
+  justify-content: center;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.ghost {
+  min-height: 40px;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: var(--step-small);
+  color: var(--ink);
+  transition: border-color var(--dur-s) var(--ease-out);
+
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+// --- Sent: the letter becomes an envelope ------------------------------------
+@keyframes fold {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-4deg) scale(0.92);
+  }
+}
+
+.done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  outline: none;
+}
+
+.envelope {
+  width: 4.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--trust);
+  animation: fold var(--dur-l) var(--ease-out) both;
+
+  svg {
+    display: block;
+    width: 100%;
+  }
+}

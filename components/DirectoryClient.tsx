@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Locale } from "@/content/types";
 import type { DirectoryContent } from "@/content/types";
@@ -48,6 +49,7 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
       if (verifiedOnly && !provider.verified) return false;
       if (!normalized) return true;
       const categoryLabel = PROVIDER_CATEGORY_LABELS[provider.category][locale];
+  const profileHref = `${locale === "en" ? "/en/directory" : "/es/directorio"}/${provider.id}`;
       return (
         provider.name.toLowerCase().includes(normalized) ||
         provider.description.toLowerCase().includes(normalized) ||
@@ -163,6 +165,7 @@ function ProviderCard({
   const [reviews, setReviews] = useState(provider.reviews);
   const [average, setAverage] = useState<number | null>(provider.rating);
   const categoryLabel = PROVIDER_CATEGORY_LABELS[provider.category][locale];
+  const profileHref = `${locale === "en" ? "/en/directory" : "/es/directorio"}/${provider.id}`;
   const monogram = provider.name
     .split(/\s+/)
     .slice(0, 2)
@@ -192,7 +195,9 @@ function ProviderCard({
 
       <div className={styles.main}>
         <h3 className={styles.name} id={`provider-${provider.id}`}>
-          {provider.name}
+          <Link href={profileHref} className={styles.nameLink}>
+            {provider.name}
+          </Link>
         </h3>
         <p className={styles.meta}>
           <span>{categoryLabel}</span>
@@ -218,6 +223,11 @@ function ProviderCard({
       </div>
 
       <div className={styles.actions}>
+        <Link href={`${profileHref}#contact`} className={styles.consult}>
+          {locale === "en" ? "Request a consultation" : "Solicitar consulta"}
+          <span aria-hidden="true"> →</span>
+          <span className="srOnly"> {provider.name}</span>
+        </Link>
         {provider.website ? (
           <a className={styles.action} href={provider.website} target="_blank" rel="noopener noreferrer">
             {copy.card.visit} <span aria-hidden="true">↗</span>

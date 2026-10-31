@@ -119,7 +119,7 @@ export default async function JobDetailPage({ params }: Props) {
             ← {copy.detail.back}
           </Link>
           <p className="eyebrow">
-            <Link href={directoryPath} className={styles.company}>
+            <Link href={`${directoryPath}/${provider.id}`} className={styles.company}>
               {provider.name}
             </Link>
             {provider.verified ? <span className={styles.verified}>✓ {copy.detail.verified}</span> : null}
