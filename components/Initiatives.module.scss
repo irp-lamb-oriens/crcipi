@@ -17,7 +17,7 @@
   margin-bottom: clamp(2.5rem, 6vw, 5rem);
 
   @media (max-width: 860px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -139,7 +139,7 @@
   padding: 0 0 2.5rem;
 
   @media (max-width: 860px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

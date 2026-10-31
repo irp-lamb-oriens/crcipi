@@ -1,28 +1,52 @@
 .formSection {
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-  background: var(--navy-soft, #eef1f7);
-  border-top: 1px solid var(--line, #e5e5e5);
+  padding: var(--section-pad) 0;
+  background: var(--paper-2);
 }
 
 .formInner {
-  max-width: 1200px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 3rem clamp(2rem, 6vw, 6rem);
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pitch {
+  position: sticky;
+  top: calc(var(--header-h) + 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (max-width: 960px) {
+    position: static;
+  }
 }
 
 .formHeading {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  line-height: 1.15;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1;
   letter-spacing: -0.015em;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  color: var(--navy, #00205b);
 }
 
 .formIntro {
-  font-size: 1rem;
-  line-height: 1.65;
-  color: var(--ink-soft, #4b4b4b);
-  max-width: 56ch;
-  margin-bottom: 2rem;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 40ch;
+  margin-bottom: 1rem;
+}
+
+.formCard {
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
 }

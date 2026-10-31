@@ -11,42 +11,38 @@ interface Props {
   items: FoundingGoal[];
 }
 
-export default function FoundingGoals({ eyebrow, heading, items }: Props) {
+// Founding goals as a compact ledger: the proof that sits right next to the
+// form, where hesitation happens.
+export default function FoundingGoals({ eyebrow, heading }: Props) {
   return (
-    <section className={styles.section}>
-      <div className={styles.inner}>
-        <EditableText path="join.goals.eyebrow" as="p" className={styles.eyebrow}>
-          {eyebrow}
-        </EditableText>
-        <EditableText path="join.goals.heading" as="h2" className={styles.heading}>
-          {heading}
-        </EditableText>
-        <EditableList
-          path="join.goals.items"
-          fields={[
-            { path: "metric", as: "dt" },
-            { path: "target", as: "dd" },
-          ]}
-          addTemplate={{ metric: "0", target: "New goal" }}
-          addLabel="Add goal"
-          className={styles.list}
-          renderItem={(item, index, controls) => (
-            <div key={index} className={styles.item}>
-              <span className={styles.metric}>
-                <EditableText path={`join.goals.items.${index}.metric`} as="span">
-                  {String(item.metric ?? "")}
-                </EditableText>
-              </span>
-              <span className={styles.target}>
-                <EditableText path={`join.goals.items.${index}.target`} as="span">
-                  {String(item.target ?? "")}
-                </EditableText>
-              </span>
-              {controls}
-            </div>
-          )}
-        />
-      </div>
-    </section>
+    <div className={styles.block}>
+      <EditableText path="join.goals.eyebrow" as="p" className="eyebrow">
+        {eyebrow}
+      </EditableText>
+      <EditableText path="join.goals.heading" as="h3" className={styles.heading}>
+        {heading}
+      </EditableText>
+      <EditableList
+        path="join.goals.items"
+        fields={[
+          { path: "metric", as: "dt" },
+          { path: "target", as: "dd" },
+        ]}
+        addTemplate={{ metric: "0", target: "New goal" }}
+        addLabel="Add goal"
+        className={styles.list}
+        renderItem={(item, index, controls) => (
+          <div key={index} className={styles.item}>
+            <EditableText path={`join.goals.items.${index}.metric`} as="span" className={styles.metric}>
+              {String(item.metric ?? "")}
+            </EditableText>
+            <EditableText path={`join.goals.items.${index}.target`} as="span" className={styles.target}>
+              {String(item.target ?? "")}
+            </EditableText>
+            {controls}
+          </div>
+        )}
+      />
+    </div>
   );
 }

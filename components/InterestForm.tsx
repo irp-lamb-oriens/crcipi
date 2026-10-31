@@ -103,14 +103,20 @@ export default function InterestForm({ form, locale, page }: Props) {
     }));
   }, [locale, page]);
 
+  // The viewport takes the height of the ACTIVE step (panels are top-aligned,
+  // so each keeps its natural height) and follows it on resize and when
+  // errors appear.
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    const panel = viewport.querySelector<HTMLElement>(`.${styles.stepPanel}`);
-    if (panel) {
-      setViewportHeight(panel.offsetHeight);
-    }
-  }, []);
+    const panel = viewport.querySelectorAll<HTMLElement>(`.${styles.stepPanel}`)[step];
+    if (!panel) return;
+    const measure = () => setViewportHeight(panel.offsetHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(panel);
+    return () => observer.disconnect();
+  }, [step]);
 
   const setField = useCallback((name: keyof FormState, value: string | boolean | string[]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -294,29 +300,6 @@ export default function InterestForm({ form, locale, page }: Props) {
         </div>
       </div>
 
-      <div className={styles.actions}>
-        {step > 0 && (
-          <button type="button" className={styles.back} onClick={goBack}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            {stepActions.back}
-          </button>
-        )}
-        {step < totalSteps - 1 ? (
-          <button type="button" className={styles.next} onClick={goNext}>
-            {stepActions.next}
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
-        ) : (
-          <button type="submit" className={styles.next} disabled={status === "submitting"}>
-            {status === "submitting" ? form.fields.submitting : stepActions.submit}
-          </button>
-        )}
-      </div>
-
       <div className={styles.viewport} ref={viewportRef} style={viewportHeight ? { height: viewportHeight } : undefined}>
         <div className={styles.track} style={{ transform: `translateX(${trackOffset}%)` }}>
           {/* Step 1 */}
@@ -342,6 +325,7 @@ export default function InterestForm({ form, locale, page }: Props) {
                 <input
                   id="firstName"
                   name="firstName"
+                  autoComplete="given-name"
                   type="text"
                   className={styles.input}
                   value={values.firstName}
@@ -366,6 +350,7 @@ export default function InterestForm({ form, locale, page }: Props) {
                 <input
                   id="lastName"
                   name="lastName"
+                  autoComplete="family-name"
                   type="text"
                   className={styles.input}
                   value={values.lastName}
@@ -390,6 +375,7 @@ export default function InterestForm({ form, locale, page }: Props) {
                 <input
                   id="company"
                   name="company"
+                  autoComplete="organization"
                   type="text"
                   className={styles.input}
                   value={values.company}
@@ -407,6 +393,7 @@ export default function InterestForm({ form, locale, page }: Props) {
                 <input
                   id="profession"
                   name="profession"
+                  autoComplete="organization-title"
                   type="text"
                   className={styles.input}
                   value={values.profession}
@@ -493,6 +480,7 @@ export default function InterestForm({ form, locale, page }: Props) {
                 <input
                   id="linkedin"
                   name="linkedin"
+                  autoComplete="url"
                   type="url"
                   className={styles.input}
                   value={values.linkedin}
@@ -635,6 +623,28 @@ export default function InterestForm({ form, locale, page }: Props) {
         </div>
       </div>
 
+      <div className={styles.actions}>
+        {step > 0 && (
+          <button type="button" className={styles.back} onClick={goBack}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            {stepActions.back}
+          </button>
+        )}
+        {step < totalSteps - 1 ? (
+          <button type="button" className={styles.next} onClick={goNext}>
+            {stepActions.next}
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        ) : (
+          <button type="submit" className={styles.next} disabled={status === "submitting"}>
+            {status === "submitting" ? form.fields.submitting : stepActions.submit}
+          </button>
+        )}
+      </div>
     </form>
   );
 }

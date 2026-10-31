@@ -11,32 +11,34 @@ interface Props {
   items: Committee[];
 }
 
-export default function CommitteeGrid({ eyebrow, heading, items }: Props) {
+// The committees as a table of contents on ink: names in display type,
+// numbers hung in the margin.
+export default function CommitteeGrid({ eyebrow, heading }: Props) {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} aria-labelledby="committees-title">
       <div className={styles.inner}>
-        <EditableText path="join.committees.eyebrow" as="p" className={styles.eyebrow}>
-          {eyebrow}
-        </EditableText>
-        <EditableText path="join.committees.heading" as="h2" className={styles.heading}>
-          {heading}
-        </EditableText>
+        <div className={styles.head}>
+          <EditableText path="join.committees.eyebrow" as="p" className="eyebrow">
+            {eyebrow}
+          </EditableText>
+          <EditableText path="join.committees.heading" as="h2" className={styles.heading} id="committees-title">
+            {heading}
+          </EditableText>
+        </div>
         <EditableList
           path="join.committees.items"
           fields={[{ path: "name", as: "span" }]}
           addTemplate={{ name: "New committee" }}
           addLabel="Add committee"
-          className={styles.grid}
+          className={styles.list}
           renderItem={(item, index, controls) => (
-            <div key={index} className={styles.item}>
+            <div key={index} className={`${styles.item} reveal`}>
               <span className={styles.index} aria-hidden="true">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className={styles.name}>
-                <EditableText path={`join.committees.items.${index}.name`} as="span">
-                  {String(item.name ?? "")}
-                </EditableText>
-              </span>
+              <EditableText path={`join.committees.items.${index}.name`} as="span" className={styles.name}>
+                {String(item.name ?? "")}
+              </EditableText>
               {controls}
             </div>
           )}

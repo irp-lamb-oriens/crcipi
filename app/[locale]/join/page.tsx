@@ -40,29 +40,41 @@ export default async function JoinPage({ params }: Props) {
         eyebrow={content.join.hero.eyebrow}
         heading={content.join.hero.heading}
         body={[content.join.hero.body]}
-      />
-      <CommitteeGrid
-        eyebrow={content.join.committees.eyebrow}
-        heading={content.join.committees.heading}
-        items={content.join.committees.items}
+        aside={
+          <a href="#form" className="btn btn--primary">
+            {content.nav.volunteer}
+            <span className="btn__arrow" aria-hidden="true">↓</span>
+          </a>
+        }
       />
       <ParticipationCards
         eyebrow={content.join.participation.eyebrow}
         heading={content.join.participation.heading}
         options={content.join.participation.options}
       />
-      <FoundingGoals
-        eyebrow={content.join.goals.eyebrow}
-        heading={content.join.goals.heading}
-        items={content.join.goals.items}
+      <CommitteeGrid
+        eyebrow={content.join.committees.eyebrow}
+        heading={content.join.committees.heading}
+        items={content.join.committees.items}
       />
+      {/* Sticky split: the pitch and the proof hold still while the form scrolls. */}
       <section id="form" className={styles.formSection} aria-labelledby="form-heading">
         <div className={styles.formInner}>
-          <h2 id="form-heading" className={styles.formHeading}>
-            {content.join.form.heading}
-          </h2>
-          <p className={styles.formIntro}>{content.join.form.intro}</p>
-          <InterestForm form={content.join.form} locale={locale} page={locale === "en" ? "/en/join" : "/es/unete"} />
+          <div className={styles.pitch}>
+            <p className="eyebrow">{locale === "en" ? "Application" : "Solicitud"}</p>
+            <h2 id="form-heading" className={styles.formHeading}>
+              {content.join.form.heading}
+            </h2>
+            <p className={styles.formIntro}>{content.join.form.intro}</p>
+            <FoundingGoals
+              eyebrow={content.join.goals.eyebrow}
+              heading={content.join.goals.heading}
+              items={content.join.goals.items}
+            />
+          </div>
+          <div className={styles.formCard}>
+            <InterestForm form={content.join.form} locale={locale} page={locale === "en" ? "/en/join" : "/es/unete"} />
+          </div>
         </div>
       </section>
     </>

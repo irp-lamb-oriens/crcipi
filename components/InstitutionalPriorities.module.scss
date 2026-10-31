@@ -43,7 +43,7 @@
   box-shadow: 0 -1px 0 var(--paper), 0 24px 48px -32px color-mix(in oklch, var(--ink) 35%, transparent);
 
   @media (max-width: 860px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     min-height: 0;
   }
 }
