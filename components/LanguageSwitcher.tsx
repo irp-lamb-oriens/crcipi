@@ -14,6 +14,10 @@ interface Props {
 // by the sliding indicator, so the items never swap positions on toggle.
 const OPTIONS: Locale[] = ["en", "es"];
 const LABELS: Record<Locale, string> = {
+  en: "EN",
+  es: "ES",
+};
+const NAMES: Record<Locale, string> = {
   en: "English",
   es: "Español",
 };
@@ -38,6 +42,7 @@ export default function LanguageSwitcher({ currentLocale }: Props) {
               key={locale}
               className={`${styles.option} ${styles.current}`}
               aria-current="true"
+              aria-label={NAMES[locale]}
               lang={locale}
             >
               {LABELS[locale]}

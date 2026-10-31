@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/globals.scss";
 import { site } from "@/content/site";
+import { displayFont, textFont } from "./fonts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.domain),
@@ -31,12 +32,16 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#f7f5f0",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${displayFont.variable} ${textFont.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

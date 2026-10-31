@@ -1,74 +1,49 @@
+// Compact "EN · ES" switch. The current language is ink with a dot under it;
+// the other is a link. Labels are short codes; aria-labels carry full names.
 .switcher {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border: 1px solid var(--line-strong, #d4d4d4);
-  border-radius: 999px;
-  background: var(--paper-soft, #f7f7f5);
+  gap: 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
-// Sliding active pill. Sits behind the options and glides between them.
-// Position is driven by the `.es` modifier on the parent, so the DOM order
-// of the options never changes. Grid cells are equal width, so the pill
-// always lands exactly on the active option.
 .indicator {
-  position: absolute;
-  top: 0.25rem;
-  left: 0.25rem;
-  width: calc(50% - 0.25rem);
-  height: calc(100% - 0.5rem);
-  border-radius: 999px;
-  background: var(--navy, #00205b);
-  box-shadow: 0 2px 8px rgba(0, 32, 91, 0.25);
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.es .indicator {
-  transform: translateX(100%);
+  display: none;
 }
 
 .option {
   position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 5.5rem;
-  padding: 0.4rem 0.9rem;
-  border: none;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink-soft, #7e7e7e);
-  background: transparent;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 0.3rem;
+  color: var(--ink-3);
   text-decoration: none;
-  white-space: nowrap;
-  transition:
-    color 0.3s ease,
-    background-color 0.3s ease;
+  border-radius: var(--radius);
+  transition: color var(--dur-s) var(--ease-out);
 
   &:hover {
-    color: var(--ink, #101010);
-    background: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
   }
 }
 
 .current {
-  color: #fff;
+  color: var(--ink);
 
-  &:hover {
-    color: #fff;
-    background: transparent;
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--ink);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .indicator {
-    transition: none;
-  }
-}

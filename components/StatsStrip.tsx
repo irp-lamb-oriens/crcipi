@@ -23,7 +23,7 @@ export default function StatsStrip({ items }: Props) {
           addLabel="Add stat"
           className={styles.list}
           renderItem={(item, index, controls) => (
-            <div key={index} className={styles.item}>
+            <div key={index} className={`${styles.item} reveal`}>
               <span className={styles.value}>
                 <EditableText path={`home.stats.items.${index}.value`} as="span">
                   {String(item.value ?? "")}

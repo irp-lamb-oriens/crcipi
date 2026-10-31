@@ -1,46 +1,103 @@
 .section {
-  padding: clamp(4rem, 9vw, 7rem) 0;
-  background: var(--paper, #ffffff);
+  position: relative;
+  background: var(--ink);
+  color: var(--on-dark);
+  padding: var(--section-pad) 0 clamp(3rem, 8vh, 6rem);
+  overflow: clip;
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2.5rem 1.5rem;
+
+  > * {
+    grid-column: 1 / -1;
+  }
 }
 
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 700;
+.kicker {
+  display: flex;
+  gap: 1rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 1.25rem;
+  color: var(--on-dark-2);
 }
 
 .heading {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.02;
   letter-spacing: -0.02em;
-  font-weight: 800;
-  color: var(--ink, #101010);
-  max-width: 24ch;
-  margin-bottom: 1.5rem;
+  max-width: 20ch;
 }
 
 .body {
-  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
-  line-height: 1.6;
-  color: var(--ink-soft, #4b4b4b);
-  max-width: 60ch;
-  margin-bottom: 2rem;
+  grid-column: 7 / -1 !important;
+  font-size: var(--step-lead);
+  line-height: 1.55;
+  color: var(--on-dark-2);
+  max-width: 44ch;
+
+  @media (max-width: 860px) {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+.visionWrap {
+  margin-top: clamp(4rem, 10vh, 8rem);
+  border-top: 1px solid color-mix(in oklch, var(--on-dark) 18%, transparent);
+  padding-top: 2rem;
+  overflow: clip;
+}
+
+// Moves only with the reader's scroll (no autoplay, WCAG 2.2.2).
+@keyframes vision-slide {
+  from {
+    transform: translateX(8%);
+  }
+  to {
+    transform: translateX(-28%);
+  }
 }
 
 .vision {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--navy, #00205b);
-  max-width: 60ch;
-  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(2.6rem, 8vw, 8rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  padding-left: var(--gutter);
+  color: color-mix(in oklch, var(--on-dark) 92%, transparent);
+
+  @media (max-width: 860px) {
+    white-space: normal;
+    font-size: var(--step-2);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+  @supports (animation-timeline: view()) {
+    .vision {
+      animation: vision-slide linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@media (min-width: 861px) {
+  @supports not (animation-timeline: view()) {
+    .vision {
+      white-space: normal;
+      font-size: var(--step-1);
+      padding-right: var(--gutter);
+    }
+  }
 }

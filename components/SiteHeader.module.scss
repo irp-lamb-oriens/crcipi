@@ -1,130 +1,260 @@
 .header {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: var(--paper, #ffffff);
-  color: var(--ink, #101010);
-  border-bottom: 1px solid var(--line, #e5e5e5);
+  z-index: 100;
+  height: var(--header-h);
+  color: var(--ink);
+  background: color-mix(in oklch, var(--paper) 0%, transparent);
+  border-bottom: 1px solid transparent;
+  transition:
+    transform var(--dur-m) var(--ease-out),
+    background-color var(--dur-s) var(--ease-out),
+    border-color var(--dur-s) var(--ease-out);
+}
+
+.scrolled {
+  background: color-mix(in oklch, var(--paper) 86%, transparent);
+  border-bottom-color: var(--line);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+}
+
+.hidden {
+  transform: translateY(-100%);
+}
+
+// While the menu is open the bar pins to the top of the viewport, above the
+// panel, wherever the page was scrolled to.
+.menuOpen {
+  position: fixed;
+  inset: 0 0 auto;
+  background: var(--paper);
+  border-bottom-color: var(--line);
 }
 
 .inner {
-  max-width: 1400px;
+  height: 100%;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0.9rem clamp(1.25rem, 4vw, 3rem);
+  padding: 0 var(--gutter);
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
 }
 
 .logo {
   display: flex;
-  align-items: center;
-  color: var(--ink, #101010);
-  text-decoration: none;
-
-  &:hover {
-    color: var(--ink, #101010);
-  }
+  flex: none;
+  border-radius: 2px;
 }
 
 .logoImage {
   width: auto;
-  height: 2.5rem;
-  object-fit: contain;
-  align-self: flex-start;
+  height: 30px;
 }
 
+// --- Desktop nav --------------------------------------------------------
 .nav {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: auto;
+  margin-inline: auto;
+
+  ul {
+    list-style: none;
+    display: flex;
+    gap: clamp(0.25rem, 1.2vw, 1.25rem);
+  }
 }
 
 .navLink {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ink, #101010);
+  position: relative;
+  display: inline-flex;
+  padding: 0.5rem 0.35rem;
+  font-size: 0.9375rem;
+  color: var(--ink-2);
   text-decoration: none;
-  padding: 0.25rem 0;
   white-space: nowrap;
+  transition: color var(--dur-s) var(--ease-out);
 
-  &:hover {
-    color: var(--red, #a7302f);
+  // Hairline draws in from the left on hover; stays on the current page.
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0.35rem;
+    right: 0.35rem;
+    bottom: 0.25rem;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--dur-m) var(--ease-out);
+  }
+
+  &:hover,
+  &[aria-current="page"] {
+    color: var(--ink);
+  }
+
+  &:hover::after,
+  &[aria-current="page"]::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 1.4vw, 1.25rem);
+  margin-left: auto;
+}
+
+.nav + .actions {
+  margin-left: 0;
+}
+
+.member {
+  display: inline-flex;
 }
 
 .cta {
-  display: inline-flex;
+  min-height: 42px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9375rem;
+}
+
+// --- Menu toggle (mobile/tablet) ------------------------------------------
+.toggle {
+  display: none;
   align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.4rem;
-  border-radius: 60px;
-  background: var(--red, #a7302f);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 400;
-  text-decoration: none;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background: #8f2a29;
-    color: #fff;
-  }
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  border: none;
+  background: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
 }
 
-@media (max-width: 1320px) {
-  .nav {
-    gap: 1rem;
-  }
+.burger {
+  position: relative;
+  width: 22px;
+  height: 10px;
 
-  .navLink {
-    font-size: 0.92rem;
-  }
-}
-
-@media (max-width: 820px) {
-  .nav {
-    gap: 1rem;
-  }
-
-  .navLink {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .inner {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .nav {
-    order: 3;
+  i {
+    position: absolute;
+    left: 0;
     width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
-    gap: 1.1rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    white-space: nowrap;
-    border-top: 1px solid var(--line, #e5e5e5);
-    padding-top: 0.75rem;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--dur-m) var(--ease-out), top var(--dur-m) var(--ease-out);
   }
 
-  .actions {
-    margin-left: auto;
-    gap: 0.5rem;
+  i:first-child {
+    top: 0;
   }
 
+  i:last-child {
+    top: calc(100% - 1.5px);
+  }
+}
+
+.burgerOpen {
+  i:first-child {
+    top: 4px;
+    transform: rotate(45deg);
+  }
+
+  i:last-child {
+    top: 4px;
+    transform: rotate(-45deg);
+  }
+}
+
+@media (max-width: 1080px) {
+  .nav,
+  .member,
   .cta {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    display: none;
   }
+
+  .toggle {
+    display: inline-flex;
+  }
+}
+
+// --- Full-screen panel -------------------------------------------------------
+.panel {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: calc(var(--header-h) + clamp(1.5rem, 5vh, 3rem)) var(--gutter) max(2rem, env(safe-area-inset-bottom));
+  background: var(--paper);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.panelList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+
+  li {
+    border-bottom: 1px solid var(--line);
+    overflow: clip;
+  }
+}
+
+@keyframes panel-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.panelLink {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8.5vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+
+  &[aria-current="page"] {
+    font-style: italic;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panelOpen .panelLink {
+    animation: panel-rise var(--dur-m) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--stagger));
+  }
+}
+
+.panelIndex {
+  font-family: var(--font-text);
+  font-size: var(--step-micro);
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  min-width: 2ch;
+}
+
+.panelFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }

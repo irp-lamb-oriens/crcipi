@@ -1,86 +1,113 @@
 .hero {
-  background: var(--paper, #ffffff);
-  color: var(--ink, #101010);
-  padding: clamp(4rem, 10vw, 8rem) 0 clamp(3.5rem, 8vw, 6rem);
-  border-bottom: 1px solid var(--line, #e5e5e5);
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100svh - var(--header-h));
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(3rem, 10vh, 7rem) 0 clamp(2.5rem, 6vh, 4rem);
+}
+
+// The 12-column grid, shown faintly: the page's scaffolding made visible.
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  background:
+    linear-gradient(to right, var(--line) 1px, transparent 1px) left / calc((100% - 2 * var(--gutter)) / 12) 100% repeat-x content-box;
+  opacity: 0.55;
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
+
+  @media (max-width: 720px) {
+    background-size: calc((100% - 2 * var(--gutter)) / 4) 100%;
+  }
 }
 
 .inner {
-  max-width: 1400px;
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 4vh, 3rem);
 }
 
-.eyebrow {
-  font-size: 1rem;
-  font-weight: 800;
+.kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 1.5rem;
+  color: var(--ink-3);
+  max-width: 42ch;
+}
+
+.index {
+  color: var(--ink);
 }
 
 .headline {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--ink, #101010);
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7.6vw, 8.6rem);
+  line-height: 0.94;
+  letter-spacing: -0.025em;
   max-width: 16ch;
-  margin-bottom: 1.75rem;
+  color: var(--ink);
+}
+
+.foot {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  align-items: end;
+  gap: 2rem clamp(2rem, 6vw, 6rem);
+  padding-top: clamp(1.5rem, 3vh, 2rem);
+  border-top: 1px solid var(--line-strong);
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .body {
-  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
-  line-height: 1.55;
-  color: var(--ink-soft, #7e7e7e);
-  max-width: 60ch;
-  margin-bottom: 2.25rem;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 46ch;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.primary {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.85rem 2rem;
-  border-radius: 60px;
-  background: var(--red, #a7302f);
-  color: #fff;
-  font-weight: 400;
-  font-size: 1.125rem;
-  text-decoration: none;
-  transition: background-color 0.15s ease;
+  gap: 1rem 1.75rem;
+  justify-self: end;
 
-  &:hover {
-    background: #8f2a29;
-    color: #fff;
+  @media (max-width: 860px) {
+    justify-self: start;
   }
 }
 
 .secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.85rem 2rem;
-  border-radius: 60px;
-  background: transparent;
-  color: var(--ink, #101010);
-  border: 1px solid var(--ink, #101010);
-  font-weight: 400;
-  font-size: 1.125rem;
-  text-decoration: none;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
 
-  &:hover {
-    background: var(--ink, #101010);
-    color: #fff;
+.seal {
+  position: absolute;
+  top: clamp(-2rem, -4vh, -1rem);
+  right: var(--gutter);
+
+  @media (max-width: 860px) {
+    position: static;
+    width: 96px;
+    order: -1;
   }
 }

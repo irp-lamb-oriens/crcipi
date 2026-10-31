@@ -2,6 +2,7 @@
 
 import EditableList from "@/components/cms/EditableList";
 import EditableText from "@/components/cms/EditableText";
+import { useCms } from "@/components/cms/CmsProvider";
 import type { Initiative } from "@/content/types";
 import styles from "./Initiatives.module.scss";
 
@@ -13,22 +14,26 @@ interface Props {
   items: Initiative[];
 }
 
-export default function Initiatives({
-  eyebrow,
-  heading,
-  exampleLabel,
-  memberValueLabel,
-  items,
-}: Props) {
+// An index, not a wall of text: eight numbered titles that open in place.
+// Native <details> gives keyboard and screen-reader behaviour for free.
+// In CMS edit mode every entry is open so all fields can be edited.
+export default function Initiatives({ eyebrow, heading, exampleLabel, memberValueLabel }: Props) {
+  const { editMode } = useCms();
+
   return (
-    <section className={styles.section}>
+    <section className={styles.section} aria-labelledby="initiatives-title">
       <div className={styles.inner}>
-        <EditableText path="home.initiatives.eyebrow" as="p" className={styles.eyebrow}>
-          {eyebrow}
-        </EditableText>
-        <EditableText path="home.initiatives.heading" as="h2" className={styles.heading}>
-          {heading}
-        </EditableText>
+        <header className={styles.head}>
+          <p className={styles.kicker}>
+            <span>04</span>
+            <EditableText path="home.initiatives.eyebrow" as="span">
+              {eyebrow}
+            </EditableText>
+          </p>
+          <EditableText path="home.initiatives.heading" as="h2" className={styles.heading} id="initiatives-title">
+            {heading}
+          </EditableText>
+        </header>
 
         <EditableList
           path="home.initiatives.items"
@@ -42,35 +47,34 @@ export default function Initiatives({
           addLabel="Add initiative"
           className={styles.list}
           renderItem={(item, index, controls) => (
-            <article key={index} className={styles.item}>
-              <div className={styles.index} aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </div>
-              <div className={styles.content}>
+            <details key={index} className={styles.item} open={editMode || undefined}>
+              <summary className={styles.summary}>
+                <span className={styles.index} aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <h3 className={styles.title}>
                   <EditableText path={`home.initiatives.items.${index}.title`} as="span">
                     {String(item.title ?? "")}
                   </EditableText>
                 </h3>
-                <p className={styles.body}>
-                  <EditableText path={`home.initiatives.items.${index}.body`} as="span">
-                    {String(item.body ?? "")}
-                  </EditableText>
-                </p>
-                <div className={styles.example}>
-                  <span className={styles.exampleLabel}>
+                <span className={styles.icon} aria-hidden="true" />
+              </summary>
+              <div className={styles.content}>
+                <EditableText path={`home.initiatives.items.${index}.body`} as="p" className={styles.body}>
+                  {String(item.body ?? "")}
+                </EditableText>
+                <aside className={styles.example}>
+                  <span className={styles.label}>
                     <EditableText path="home.initiatives.exampleLabel" as="span">
                       {exampleLabel}
                     </EditableText>
                   </span>
-                  <p className={styles.exampleText}>
-                    <EditableText path={`home.initiatives.items.${index}.example`} as="span">
-                      {String(item.example ?? "")}
-                    </EditableText>
-                  </p>
-                </div>
-                <p className={styles.memberValue}>
-                  <span className={styles.memberLabel}>
+                  <EditableText path={`home.initiatives.items.${index}.example`} as="p">
+                    {String(item.example ?? "")}
+                  </EditableText>
+                </aside>
+                <p className={styles.value}>
+                  <span className={styles.label}>
                     <EditableText path="home.initiatives.memberValueLabel" as="span">
                       {memberValueLabel}
                     </EditableText>
@@ -81,7 +85,7 @@ export default function Initiatives({
                 </p>
               </div>
               {controls}
-            </article>
+            </details>
           )}
         />
       </div>

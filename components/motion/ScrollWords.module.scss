@@ -1,0 +1,25 @@
+
+.word {
+  display: inline;
+}
+
+@keyframes word-light {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .word {
+      display: inline-block;
+      white-space: pre;
+      animation: word-light linear both;
+      animation-timeline: view();
+      animation-range: cover 18% cover 42%;
+    }
+  }
+}
