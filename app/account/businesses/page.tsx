@@ -6,6 +6,7 @@ import ConsoleGate from "@/components/console/ConsoleGate";
 import ModuleGuide from "@/components/console/ModuleGuide";
 import FileUpload from "@/components/console/FileUpload";
 import StatusBadge from "@/components/console/StatusBadge";
+import SimilarListings, { type ListingMatch } from "@/components/SimilarListings";
 import { useSession } from "@/components/console/useSession";
 import {
   PROVIDER_CATEGORIES,
@@ -91,6 +92,7 @@ export default function BusinessesPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<{ kind: "notice" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [similar, setSimilar] = useState<ListingMatch[] | null>(null);
   // Guards against a double-click firing two saves before the button disables.
   const inFlight = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -137,6 +139,7 @@ export default function BusinessesPage() {
   }
 
   function startNew() {
+    setSimilar(null);
     setEditingId(null);
     setForm(EMPTY);
     setSaved(EMPTY);
@@ -155,8 +158,8 @@ export default function BusinessesPage() {
     });
   }
 
-  async function save(event: React.FormEvent) {
-    event.preventDefault();
+  async function save(event?: React.FormEvent, confirmDistinct = false) {
+    event?.preventDefault();
     if (inFlight.current) return;
     inFlight.current = true;
     setBusy(true);
@@ -167,12 +170,21 @@ export default function BusinessesPage() {
         method: creating ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
         // Empty strings are sent as-is: the server removes fields left empty.
-        body: JSON.stringify(form),
+        body: JSON.stringify(creating ? { ...form, confirmDistinct } : form),
       });
       const body = (await res.json().catch(() => null)) as {
+        error?: string;
         errors?: Record<string, string>;
         provider?: { id: string; name: string };
+        matches?: ListingMatch[];
       } | null;
+
+      // Looks like a business that's already listed: let the member decide.
+      if (res.status === 409 && body?.error === "similar" && body.matches) {
+        setSimilar(body.matches);
+        return;
+      }
+      setSimilar(null);
 
       if (res.status === 409 && body?.provider) {
         const list = await load();
@@ -423,7 +435,23 @@ export default function BusinessesPage() {
                 {err("logoUrl")}
               </fieldset>
 
-              <div className={styles.actions}>
+              {similar ? (
+                <SimilarListings
+                  matches={similar}
+                  busy={busy}
+                  onOpenMine={async (id) => {
+                    setSimilar(null);
+                    const list = await load();
+                    const mine = list.find((p) => p.id === id);
+                    if (mine) open(mine);
+                    setMessage({ kind: "notice", text: "Opened your existing listing." });
+                  }}
+                  onConfirmDistinct={() => void save(undefined, true)}
+                  onCancel={() => setSimilar(null)}
+                />
+              ) : null}
+
+              <div className={styles.actions} hidden={!!similar}>
                 <button type="submit" className={styles.primary} disabled={busy || (!dirty && editingId !== null)}>
                   {busy ? "Saving…" : editingId === null ? "Publish business" : "Save changes"}
                 </button>

@@ -18,6 +18,7 @@ type Member = {
   verified: boolean;
   kycStatus: string;
   ownerEmail: string | null;
+  owner: "member" | "none" | "missing" | "test" | "seeded";
   score: number;
   pillars: Record<Pillar, number>;
   replyHours: number | null;
@@ -26,7 +27,16 @@ type Member = {
   reviews: number;
   lastActivity: number;
 };
-type Summary = { total: number; verified: number; waiting: number; medianScore: number | null };
+type Summary = { total: number; verified: number; waiting: number; medianScore: number | null; unclaimed: number };
+
+// Why a listing counts as unclaimed (a placeholder), in plain words.
+const OWNER_LABEL: Record<Member["owner"], string> = {
+  member: "",
+  none: "Unclaimed · no manager",
+  missing: "Unclaimed · manager's account no longer exists",
+  test: "Unclaimed · held by a test account",
+  seeded: "Placeholder · example data",
+};
 
 const PILLARS: { key: Pillar; short: string }[] = [
   { key: "legal", short: "Legal" },
@@ -37,7 +47,7 @@ const PILLARS: { key: Pillar; short: string }[] = [
 ];
 
 type Sort = "score" | "waiting" | "name" | "activity";
-type Filter = "all" | "verified" | "unverified" | "attention" | "hidden";
+type Filter = "all" | "verified" | "unverified" | "attention" | "unclaimed" | "hidden";
 
 function daysAgo(t0: number) {
   const d = Math.floor((Date.now() - t0) / 86_400_000);
@@ -75,6 +85,7 @@ export default function AdminMembers() {
             (filter === "all" ||
               (filter === "verified" && m.verified) ||
               (filter === "unverified" && !m.verified) ||
+              (filter === "unclaimed" && m.owner !== "member") ||
               (filter === "attention" && (m.leads.waiting > 0 || m.score < 40)))
       )
       .filter((m) => !q || m.name.toLowerCase().includes(q) || (m.ownerEmail ?? "").includes(q))
@@ -154,6 +165,7 @@ export default function AdminMembers() {
                 ["attention", "Needs attention"],
                 ["verified", "Verified"],
                 ["unverified", "Not verified"],
+                ["unclaimed", `Unclaimed${summary ? ` (${summary.unclaimed})` : ""}`],
                 ["hidden", "Hidden"],
               ] as [Filter, string][]
             ).map(([key, label]) => (
@@ -187,9 +199,10 @@ export default function AdminMembers() {
                   </a>
                   <p className={t.meta}>
                     {PROVIDER_CATEGORY_LABELS[m.category].en}
-                    {m.ownerEmail ? ` · ${m.ownerEmail}` : " · no manager"}
+                    {m.owner === "member" && m.ownerEmail ? ` · ${m.ownerEmail}` : ""}
                     {m.verified ? <span className={t.sealed}> · ✓ Seal</span> : ` · ${m.kycStatus === "none" ? "not started" : m.kycStatus}`}
                   </p>
+                  {m.owner !== "member" ? <p className={t.unclaimed}>{OWNER_LABEL[m.owner]}{m.ownerEmail ? ` (${m.ownerEmail})` : ""}</p> : null}
                 </div>
 
                 <div className={t.score} aria-label={`Trust score ${m.score} out of 100`}>

@@ -7,6 +7,7 @@ import { EMPTY_KYC, LEGAL_ID_TYPES, type LegalIdType } from "@/lib/kycOptions";
 import { findProviderByLegalId, LANGUAGES } from "@/lib/onboarding";
 import { createOwnedProvider, validateProviderInput } from "@/lib/providers";
 import { recordEvent } from "@/lib/stats";
+import { findSimilarListings } from "@/lib/providerMatch";
 
 // POST /api/member/onboarding/company
 // { legalIdType, legalId, legalName?, name, category, location, languages[],
@@ -52,6 +53,11 @@ export async function POST(request: NextRequest) {
       provider: { id: existing.id, name: existing.name },
       mine: existing.ownerId === user.userId,
     });
+  }
+
+  if (body.confirmDistinct !== true) {
+    const matches = await findSimilarListings(result.data, user.userId);
+    if (matches.length > 0) return fail("similar", 409, { matches });
   }
 
   const outcome = await createOwnedProvider(result.data, user.userId);

@@ -10,7 +10,7 @@ import inbox from "./page.module.scss";
 
 type Kyc = { id: string; name: string; ownerEmail: string | null; legalName: string; documents: number; since: number };
 type ArticleItem = { id: string; title: string; authorName: string; providerName: string | null; reasons: string[]; since: number };
-type Access = { id: string; providerId: string; providerName: string; name: string; email: string; note: string; ownerEmail: string | null; since: number };
+type Access = { id: string; providerId: string; providerName: string; name: string; email: string; note: string; ownerEmail: string | null; owner: "member" | "none" | "missing" | "test" | "seeded"; since: number };
 type Stale = { providerId: string; providerName: string; ownerEmail: string | null; count: number; since: number };
 type Data = { kyc: Kyc[] | null; articles: ArticleItem[] | null; access: Access[] | null; staleLeads: Stale[] | null };
 
@@ -43,7 +43,7 @@ export default function AdminReviews() {
 
   async function decide(item: Access, decision: "approve" | "decline") {
     // Approving moves a managed business to someone else: ask once, inline.
-    if (decision === "approve" && item.ownerEmail && confirming !== item.id) {
+    if (decision === "approve" && item.owner === "member" && confirming !== item.id) {
       setConfirming(item.id);
       return;
     }
@@ -139,7 +139,15 @@ export default function AdminReviews() {
                       <p className={inbox.meta}>
                         {r.email}
                         {r.note ? ` · “${r.note}”` : ""} ·{" "}
-                        {r.ownerEmail ? `currently managed by ${r.ownerEmail}` : "no current manager"}
+                        {r.owner === "member"
+                          ? `currently managed by ${r.ownerEmail}`
+                          : r.owner === "seeded"
+                            ? "placeholder listing (example data): a claim fills it"
+                            : r.owner === "test"
+                              ? `held by a test account (${r.ownerEmail}): safe to reassign`
+                              : r.owner === "missing"
+                                ? "its manager's account no longer exists"
+                                : "no current manager"}
                       </p>
                     </div>
                     <span className={inbox.age}>{age(r.since)}</span>

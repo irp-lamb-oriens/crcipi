@@ -5,6 +5,7 @@ import { getKyc } from "@/lib/kyc";
 import { listAllLeads, RESPONSE_TARGET_HOURS } from "@/lib/leads";
 import { listAccessRequests } from "@/lib/onboarding";
 import { listProviders } from "@/lib/providers";
+import { ownerState } from "@/lib/providerMatch";
 
 // GET /api/admin/reviews — one inbox for everything waiting on a person at
 // the Chamber. Each section is included only when the admin holds the
@@ -22,6 +23,7 @@ export async function GET() {
 
   const [providers, users] = await Promise.all([listProviders(), listUsers()]);
   const emailById = new Map(users.map((u) => [u.id, u.email]));
+  const userMap = new Map(users.map((u) => [u.id, u]));
   const byId = new Map(providers.map((p) => [p.id, p]));
 
   const kyc = can.kyc
@@ -66,6 +68,7 @@ export async function GET() {
           email: r.email,
           note: r.note,
           ownerEmail: provider?.ownerId ? (emailById.get(provider.ownerId) ?? null) : null,
+          owner: provider ? ownerState(provider, userMap) : "none",
           since: r.createdAt,
         };
       })

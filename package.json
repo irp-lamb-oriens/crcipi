@@ -11,6 +11,7 @@
     "seed:providers": "node scripts/seed-providers.mjs",
     "approve:providers": "node scripts/approve-all-providers.mjs",
     "repair:providers": "node scripts/repair-providers.mjs",
+    "audit:providers": "node scripts/audit-providers.mjs",
     "check:moderation": "NODE_OPTIONS=--conditions=react-server npx tsx scripts/checks/moderation.check.ts",
     "check:e2e": "node scripts/checks/platform.e2e.mjs"
   },

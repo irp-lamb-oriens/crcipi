@@ -7,6 +7,7 @@ import {
   validateProviderInput,
 } from "@/lib/providers";
 import { recordEvent } from "@/lib/stats";
+import { findSimilarListings } from "@/lib/providerMatch";
 
 // GET  /api/member/providers — list the signed-in member's own providers.
 // POST /api/member/providers — create a provider owned by the member.
@@ -69,6 +70,16 @@ export async function POST(request: NextRequest) {
   if (!isOwnMediaPath(result.data.logoUrl, user.userId)) {
     return NextResponse.json({ ok: false, errors: { logoUrl: "invalid" } }, { status: 422 });
   }
+  // Already listed? Warn before creating a copy, unless the member has seen
+  // the warning and confirmed theirs is a different business.
+  const body = (raw ?? {}) as Record<string, unknown>;
+  if (body.confirmDistinct !== true) {
+    const matches = await findSimilarListings(result.data, user.userId);
+    if (matches.length > 0) {
+      return NextResponse.json({ ok: false, error: "similar", matches }, { status: 409 });
+    }
+  }
+
   try {
     const outcome = await createOwnedProvider({ ...result.data, featured: false }, user.userId);
     if (!outcome.created) {

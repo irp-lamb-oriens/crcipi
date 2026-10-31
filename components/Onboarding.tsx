@@ -7,6 +7,7 @@ import type { Locale } from "@/content/types";
 import { PROVIDER_CATEGORIES, PROVIDER_CATEGORY_LABELS } from "@/lib/providerCategories";
 import { useSession } from "@/components/console/useSession";
 import OtpInput from "./OtpInput";
+import SimilarListings, { type ListingMatch } from "./SimilarListings";
 import styles from "./Onboarding.module.scss";
 
 type Stage = "account" | "code" | "company" | "exists" | "profile" | "done";
@@ -174,6 +175,8 @@ export default function Onboarding({ locale }: { locale: Locale }) {
   const [banner, setBanner] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const lastProfile = useRef<Record<string, unknown> | null>(null);
+  const [similar, setSimilar] = useState<ListingMatch[] | null>(null);
   const codeRef = useRef<HTMLInputElement>(null);
 
   // Already signed in (or just verified): skip straight to the company.
@@ -301,19 +304,34 @@ export default function Onboarding({ locale }: { locale: Locale }) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadsEmail)) errs.leadsEmail = t.errors.leadsEmail;
     setErrors(errs);
     if (Object.keys(errs).length) return;
+    lastProfile.current = {
+      legalIdType: idType,
+      legalId: legalId.replace(/\D/g, ""),
+      legalName: form.get("legalName"),
+      name: tradeName,
+      category,
+      location: form.get("location"),
+      languages: langs,
+      email: leadsEmail,
+      description,
+      locale,
+    };
+    await submitProfile(false);
+  }
+
+  // Sends the company; with confirmDistinct after the member has seen the
+  // "already listed?" warning and said theirs is a different business.
+  async function submitProfile(confirmDistinct: boolean) {
+    if (!lastProfile.current) return;
     await guard(async () => {
       const { res, data } = await post("/api/member/onboarding/company", {
-        legalIdType: idType,
-        legalId: legalId.replace(/\D/g, ""),
-        legalName: form.get("legalName"),
-        name: tradeName,
-        category,
-        location: form.get("location"),
-        languages: langs,
-        email: leadsEmail,
-        description,
-        locale,
+        ...lastProfile.current,
+        confirmDistinct,
       });
+      if (res.status === 409 && data.error === "similar") {
+        return setSimilar(data.matches as ListingMatch[]);
+      }
+      setSimilar(null);
       if (res.status === 409) {
         setFound({ ...(data.provider as { id: string; name: string }), mine: data.mine === true });
         return setStage("exists");
@@ -519,7 +537,17 @@ export default function Onboarding({ locale }: { locale: Locale }) {
                 aria-invalid={errors.description ? true : undefined}
                 aria-describedby={[errors.description ? `${uid}-description-e` : "", `${uid}-d-h`].filter(Boolean).join(" ")} />
             </Field>
-            <button type="submit" className={`btn btn--primary ${styles.submit}`} disabled={busy}>
+            {similar ? (
+              <SimilarListings
+                matches={similar}
+                locale={locale}
+                busy={busy}
+                onOpenMine={(id) => router.push(`/account/businesses?provider=${id}`)}
+                onConfirmDistinct={() => void submitProfile(true)}
+                onCancel={() => setSimilar(null)}
+              />
+            ) : null}
+            <button type="submit" hidden={!!similar} className={`btn btn--primary ${styles.submit}`} disabled={busy}>
               {t.finish} <span className="btn__arrow" aria-hidden="true">→</span>
             </button>
           </form>

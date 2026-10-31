@@ -5,6 +5,7 @@ import { listLiveJobs } from "@/lib/jobs";
 import { listAllLeads, RESPONSE_TARGET_HOURS } from "@/lib/leads";
 import { listProviders } from "@/lib/providers";
 import { computeTrustScore, PILLARS, storeTrustSnapshot } from "@/lib/trustScore";
+import { ownerState } from "@/lib/providerMatch";
 
 // GET /api/admin/members — every company with its health: trust score per
 // pillar, reply time, lead flow and last activity. Requires providers.manage.
@@ -21,6 +22,7 @@ export async function GET() {
     listLiveJobs(),
   ]);
   const emailById = new Map(users.map((u) => [u.id, u.email]));
+  const userMap = new Map(users.map((u) => [u.id, u]));
   const group = <T extends { providerId: string | null }>(list: T[]) => {
     const m = new Map<string, T[]>();
     for (const item of list) {
@@ -53,6 +55,8 @@ export async function GET() {
       verified: p.verified,
       kycStatus: p.kycStatus,
       ownerEmail: p.ownerId ? (emailById.get(p.ownerId) ?? null) : null,
+      // none | missing | test | seeded = unclaimed/placeholder; member = real.
+      owner: ownerState(p, userMap),
       score: score.total,
       pillars: Object.fromEntries(PILLARS.map((k) => [k, score.pillars[k].score])),
       replyHours: p.responseSample > 0 ? p.responseHoursMedian : null,
@@ -73,6 +77,7 @@ export async function GET() {
     summary: {
       total: listed.length,
       verified: listed.filter((p) => p.verified).length,
+      unclaimed: members.filter((m) => m.approved && m.owner !== "member").length,
       waiting: members.reduce((n, m) => n + m.leads.waiting, 0),
       medianScore: (() => {
         const s = members.filter((m) => m.approved).map((m) => m.score).sort((a, b) => a - b);

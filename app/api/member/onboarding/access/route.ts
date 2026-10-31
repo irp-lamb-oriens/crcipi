@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
         subject: `Access request: ${user.name} → ${provider.name}`,
         heading: `${user.name} asks to manage ${provider.name}`,
         lines: [
-          `${user.email} entered this company's legal id during onboarding.`,
+          provider.ownerId
+            ? `${user.email} says they manage this business.`
+            : `${user.email} wants to claim this listing. It has no manager yet (it may be a placeholder added by the Chamber or seed data).`,
           req.note ? `Note: ${req.note}` : "",
           "Approve or decline it in the review inbox.",
         ].filter(Boolean),
