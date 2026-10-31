@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHash } from "crypto";
+
 import { db } from "@/lib/firebaseAdmin";
 import type { ProviderCategory } from "@/lib/providerCategories";
 import {
@@ -96,6 +98,14 @@ const ID_RULES: Record<LegalIdType, { pattern: RegExp; digitsOnly: boolean }> = 
   dimex: { pattern: /^\d{11,12}$/, digitsOnly: true },
   passport: { pattern: /^[A-Z0-9]{5,20}$/, digitsOnly: false },
 };
+
+export function legalIdKey(type: LegalIdType, raw: string): string {
+  return createHash("sha256").update(`${type}:${normalizeLegalId(type, raw)}`).digest("hex");
+}
+
+export function isValidLegalId(type: LegalIdType, raw: string): boolean {
+  return ID_RULES[type].pattern.test(normalizeLegalId(type, raw));
+}
 
 export function normalizeLegalId(type: LegalIdType, raw: string): string {
   const upper = raw.toUpperCase().replace(/[\s-]/g, "");
@@ -243,7 +253,17 @@ export async function saveKyc(
       reviewNote: submit ? null : previous.reviewNote,
       updatedAt: now,
     });
-    tx.set(providerRef, { kycStatus: nextStatus, verified }, { merge: true });
+    tx.set(
+      providerRef,
+      {
+        kycStatus: nextStatus,
+        verified,
+        // Hashed legal id: lets onboarding find "this company is already
+        // registered" without the id itself ever leaving the private record.
+        legalIdKey: data.legalId ? legalIdKey(data.legalIdType, data.legalId) : null,
+      },
+      { merge: true }
+    );
   });
 
   return getKyc(providerId);

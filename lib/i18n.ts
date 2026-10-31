@@ -3,7 +3,7 @@ import type { Locale } from "@/content/types";
 // Maps each page key to its path in each locale.
 // Used by the language switcher to preserve the equivalent page.
 const pagePaths: Record<
-  "home" | "about" | "join" | "directory" | "jobs" | "blog" | "privacy" | "terms",
+  "home" | "about" | "join" | "directory" | "jobs" | "blog" | "privacy" | "terms" | "register",
   Record<Locale, string>
 > = {
   home: { en: "/en", es: "/es" },
@@ -14,6 +14,7 @@ const pagePaths: Record<
   blog: { en: "/en/blog", es: "/es/blog" },
   privacy: { en: "/en/privacy", es: "/es/privacidad" },
   terms: { en: "/en/terms", es: "/es/terminos" },
+  register: { en: "/en/register", es: "/es/registro" },
 };
 
 export type PageKey = keyof typeof pagePaths;

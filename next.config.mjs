@@ -9,6 +9,7 @@ const nextConfig = {
       { source: "/es/empleos/:path*", destination: "/es/jobs/:path*" },
       { source: "/es/privacidad", destination: "/es/privacy" },
       { source: "/es/terminos", destination: "/es/terms" },
+      { source: "/es/registro", destination: "/es/register" },
     ];
   },
 };

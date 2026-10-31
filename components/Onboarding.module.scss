@@ -1,0 +1,359 @@
+// Onboarding as a registry form: three numbered tabs across the top like
+// the dividers of a dossier, one sheet below that changes per step, and a
+// rubber stamp ("Registrada") to finish.
+
+.wrap {
+  width: min(100%, 640px);
+  margin: 0 auto;
+}
+
+.tabs {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: -1px;
+}
+
+.tab {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  border-bottom-color: var(--line-strong);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  font-size: var(--step-small);
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color var(--dur-s) var(--ease-out);
+
+  @media (max-width: 480px) {
+    padding: 0.8rem 0.7rem;
+
+    .tabNum {
+      display: none;
+    }
+  }
+}
+
+.tabNum {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step-micro);
+  letter-spacing: 0.1em;
+}
+
+.tabNow {
+  border-color: var(--line-strong);
+  border-bottom-color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.tabDone {
+  color: var(--trust);
+
+  &::before {
+    content: "✓";
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.sheet {
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border: 1px solid var(--line-strong);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--paper);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: sheet-in var(--dur-m) var(--ease-out);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  outline: none;
+}
+
+.lead {
+  color: var(--ink-2);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.meta {
+  font-size: var(--step-small);
+  color: var(--ink-3);
+}
+
+.banner {
+  margin-bottom: 1.25rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: var(--step-small);
+}
+
+.field,
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: none;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 0.2rem;
+}
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 0;
+  border: none;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  font-size: 1.0625rem;
+  color: var(--ink);
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+
+  &[aria-invalid="true"] {
+    border-bottom-color: var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+}
+
+select.input {
+  appearance: none;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23555' stroke-width='1.5'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E")
+    no-repeat right 0.25rem center;
+  padding-right: 1.5rem;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+  line-height: 1.55;
+}
+
+// The legal id reads like a document number.
+.idInput {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  font-size: var(--step-micro);
+  color: var(--ink-3);
+}
+
+.error {
+  font-size: var(--step-small);
+  color: var(--accent);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+
+  @media (max-width: 560px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 52px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--dur-s) var(--ease-out), background-color var(--dur-s) var(--ease-out);
+
+  & + & {
+    margin-top: 0.5rem;
+  }
+
+  input {
+    accent-color: var(--ink);
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: none;
+  }
+
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+.optionOn {
+  border-color: var(--ink);
+  background: var(--paper-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: var(--step-small);
+  color: var(--ink);
+
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+.chipOn,
+.chipOn:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-dark);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: var(--step-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+
+  input {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    accent-color: var(--ink);
+  }
+}
+
+.submit {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+
+  @media (max-width: 560px) {
+    align-self: stretch;
+    justify-content: center;
+  }
+}
+
+.link {
+  align-self: flex-start;
+  padding: 0.25rem 0;
+  border: none;
+  background: none;
+  font-size: var(--step-small);
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.alt {
+  font-size: var(--step-small);
+  color: var(--ink-3);
+}
+
+.found {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--trust);
+  border-radius: var(--radius);
+  background: var(--trust-soft);
+  color: var(--trust);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+}
+
+.success {
+  color: var(--good);
+}
+
+// --- Done: the registry stamp --------------------------------------------------
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-16deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-7deg);
+  }
+  100% {
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+.done {
+  align-items: flex-start;
+}
+
+.stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.7rem 1.4rem;
+  border: 2px solid var(--trust);
+  outline: 1px solid var(--trust);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+  color: var(--trust);
+  transform: rotate(-8deg);
+  font-size: var(--step-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: stamp var(--dur-l) var(--ease-out) both;
+  }
+}

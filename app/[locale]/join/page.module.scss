@@ -50,3 +50,16 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
 }
+
+.companyNote {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-strong);
+  font-size: var(--step-small);
+  color: var(--ink-2);
+
+  a {
+    color: var(--ink);
+    font-weight: 500;
+  }
+}

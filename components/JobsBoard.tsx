@@ -176,7 +176,7 @@ export default function JobsBoard({ locale, jobs, copy }: { locale: Locale; jobs
             <h2 className={styles.promoTitle}>{copy.board.postHeading}</h2>
             <p>{copy.board.postBody}</p>
           </div>
-          <Link href="/account/jobs" className="btn btn--ghost">
+          <Link href={locale === "en" ? "/en/register" : "/es/registro"} className="btn btn--ghost">
             {copy.board.postCta}
             <span className="btn__arrow" aria-hidden="true">→</span>
           </Link>

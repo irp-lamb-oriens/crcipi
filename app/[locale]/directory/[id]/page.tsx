@@ -124,6 +124,17 @@ export default async function ProviderProfilePage({ params }: Props) {
     ],
     [copy.memberSince, provider.memberSince ? dateFmt.format(provider.memberSince) : "—"],
     ...(provider.location ? ([[locale === "en" ? "Based in" : "Ubicación", provider.location]] as [string, string][]) : []),
+    ...(provider.languages.length
+      ? ([
+          [
+            locale === "en" ? "Languages" : "Idiomas",
+            provider.languages
+              .map((code) => new Intl.DisplayNames([locale], { type: "language" }).of(code) ?? code)
+              .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
+              .join(" · "),
+          ],
+        ] as [string, string][])
+      : []),
   ];
 
   return (

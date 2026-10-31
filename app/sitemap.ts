@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
 import { listPublished } from "@/lib/articles";
 import { listLiveJobs } from "@/lib/jobs";
+import { listProviders } from "@/lib/providers";
 
 // Rendered per request so new jobs and articles are discoverable right away.
 export const dynamic = "force-dynamic";
@@ -34,10 +35,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Dynamic entries are best effort: a data outage must not break the sitemap.
-  const [jobs, articles] = await Promise.all([
+  const [jobs, articles, providers] = await Promise.all([
     listLiveJobs().catch(() => []),
     listPublished().catch(() => []),
+    listProviders({ approvedOnly: true }).catch(() => []),
   ]);
+
+  for (const provider of providers) {
+    for (const base of ["/en/directory", "/es/directorio"]) {
+      pages.push({
+        url: `${site.domain}${base}/${provider.id}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: provider.verified ? 0.7 : 0.5,
+      });
+    }
+  }
 
   for (const job of jobs) {
     for (const base of ["/en/jobs", "/es/empleos"]) {

@@ -31,7 +31,7 @@ const T = {
     resent: "A new code is on its way.",
     other: "Use a different email",
     noAccount: "No account yet?",
-    join: "Join CR-CIPI",
+    join: "Register your company",
     errInvalidEmail: "Enter a valid email address.",
     errWrong: "That code doesn't match. Check the latest email and try again.",
     errExpired: "That code expired. Send a new one.",
@@ -57,7 +57,7 @@ const T = {
     resent: "Le enviamos un código nuevo.",
     other: "Usar otro correo",
     noAccount: "¿Aún no tiene cuenta?",
-    join: "Únase a CR-CIPI",
+    join: "Registre su empresa",
     errInvalidEmail: "Ingrese un correo válido.",
     errWrong: "El código no coincide. Revise el correo más reciente e intente de nuevo.",
     errExpired: "El código venció. Solicite uno nuevo.",
@@ -115,7 +115,7 @@ export default function SignInPage() {
         return false;
       }
       if (data.needsSignup) {
-        router.push(lang === "es" ? "/es/unete" : "/en/join");
+        router.push(`${lang === "es" ? "/es/registro" : "/en/register"}?email=${encodeURIComponent(email)}`);
         return false;
       }
       setCooldown(RESEND_SECONDS);
@@ -226,7 +226,7 @@ export default function SignInPage() {
                 <span className="btn__arrow" aria-hidden="true">→</span>
               </button>
               <p className={styles.alt}>
-                {t.noAccount} <Link href={lang === "es" ? "/es/unete" : "/en/join"}>{t.join}</Link>
+                {t.noAccount} <Link href={lang === "es" ? "/es/registro" : "/en/register"}>{t.join}</Link>
               </p>
             </form>
           ) : (

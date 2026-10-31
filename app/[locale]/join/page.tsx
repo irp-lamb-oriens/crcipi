@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { isLocale } from "@/content";
@@ -66,6 +67,13 @@ export default async function JoinPage({ params }: Props) {
               {content.join.form.heading}
             </h2>
             <p className={styles.formIntro}>{content.join.form.intro}</p>
+            <p className={styles.companyNote}>
+              {locale === "en" ? "Representing a company or practice? " : "¿Representa a una empresa o despacho? "}
+              <Link href={locale === "en" ? "/en/register" : "/es/registro"}>
+                {locale === "en" ? "Register it in the directory instead" : "Regístrela en el directorio"}
+                <span aria-hidden="true"> →</span>
+              </Link>
+            </p>
             <FoundingGoals
               eyebrow={content.join.goals.eyebrow}
               heading={content.join.goals.heading}

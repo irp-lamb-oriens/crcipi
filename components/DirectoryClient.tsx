@@ -122,6 +122,17 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
             ))}
           </ol>
         )}
+        <aside className={styles.listYours}>
+          <p>
+            {locale === "en"
+              ? "Serve international residents and investors?"
+              : "¿Atiende a residentes e inversionistas internacionales?"}
+          </p>
+          <Link href={locale === "en" ? "/en/register" : "/es/registro"} className="btn btn--ghost">
+            {locale === "en" ? "List your company" : "Inscriba su empresa"}
+            <span className="btn__arrow" aria-hidden="true">→</span>
+          </Link>
+        </aside>
       </div>
     </section>
   );

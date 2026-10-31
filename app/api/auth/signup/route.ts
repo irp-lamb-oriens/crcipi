@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createLoginCode, createUser, getUserByEmail } from "@/lib/auth";
 import { sendLoginCode } from "@/lib/mailer";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
+import { recordEvent } from "@/lib/stats";
 
 // POST /api/auth/signup
 // Creates a member account (if it does not exist) and sends a login code.
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
   const existing = await getUserByEmail(email);
   if (!existing) {
     await createUser({ email, name, role: "member" });
+    recordEvent("member_signup");
   }
 
   try {

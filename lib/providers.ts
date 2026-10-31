@@ -51,6 +51,8 @@ export interface Provider {
   // until the provider has answered at least one.
   responseHoursMedian: number | null;
   responseSample: number;
+  // Languages the business serves clients in (ISO 639-1), set at onboarding.
+  languages: string[];
 }
 
 export interface ProviderRating {
@@ -95,6 +97,7 @@ function toProvider(id: string, d: Record<string, unknown>): Provider {
     responseHoursMedian:
       typeof d.responseHoursMedian === "number" ? d.responseHoursMedian : null,
     responseSample: Number(d.responseSample ?? 0),
+    languages: Array.isArray(d.languages) ? (d.languages as unknown[]).map(String).slice(0, 10) : [],
   };
 }
 
@@ -316,6 +319,7 @@ export async function createProvider(
     kycStatus: "none",
     responseHoursMedian: null,
     responseSample: 0,
+    languages: [],
   };
   await docRef.set(provider);
   return { id: docRef.id, ...provider };
