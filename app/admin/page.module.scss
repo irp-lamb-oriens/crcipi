@@ -1,109 +1,297 @@
-// Admin sign-in page.
-
 .main {
-  min-height: 100dvh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  background: var(--paper);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// --- Brand side --------------------------------------------------------------
+.side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--ink);
+  color: var(--on-dark);
+  overflow: clip;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.home {
+  align-self: flex-start;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper);
+  border-radius: var(--radius);
+}
+
+.logo {
+  width: auto;
+  height: 28px;
+}
+
+.seal {
+  width: clamp(220px, 28vw, 380px) !important;
+  align-self: center;
+  transform: rotate(-12deg);
+}
+
+@keyframes press {
+  from {
+    opacity: 0;
+    transform: rotate(-30deg) scale(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .seal {
+    animation: press var(--dur-l) var(--ease-out) both;
+  }
+}
+
+.sideText {
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1.2;
+  color: var(--on-dark);
+}
+
+// --- Form side ---------------------------------------------------------------
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.back {
+  font-size: var(--step-small);
+  color: var(--ink-2);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.lang {
+  display: flex;
+  gap: 0.25rem;
+
+  button {
+    min-width: 40px;
+    min-height: 36px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: none;
+    font-size: var(--step-micro);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+
+  button[aria-pressed="true"] {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+}
+
+.body {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
-  background: #f8fafc;
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-}
-
-.card {
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px -20px rgba(2, 6, 23, 0.12);
-}
-
-.title {
-  margin: 0 0 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #0f172a;
+  padding: clamp(2rem, 8vh, 5rem) 0;
 }
 
 .form {
+  width: min(100%, 440px);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .form {
+    animation: in var(--dur-m) var(--ease-out);
+  }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin-bottom: 0.75rem;
+  color: var(--ink-2);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #334155;
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--ink-2);
 }
 
 .input {
   width: 100%;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 1rem;
-  color: #0f172a;
-  background: #ffffff;
-  outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.input:focus {
-  border-color: #0b6cff;
-  box-shadow: 0 0 0 3px rgba(11, 108, 255, 0.14);
-}
-
-.button {
-  margin-top: 0.5rem;
-  padding: 0.7rem 1rem;
+  min-height: 56px;
+  padding: 0.75rem 0;
   border: none;
-  border-radius: 10px;
-  background: #0f172a;
-  color: #ffffff;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 150ms ease;
+  border-bottom: 1px solid var(--line-strong);
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+
+  &[aria-invalid="true"] {
+    border-bottom-color: var(--accent);
+  }
 }
 
-.button:hover:not(:disabled) {
-  background: #1e293b;
+// One real input stretched invisibly over six drawn slots.
+.otp {
+  position: relative;
 }
 
-.button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.link {
-  background: none;
+.otpInput {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
   border: none;
-  padding: 0;
-  color: #0b6cff;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px; // prevents iOS zoom
+  letter-spacing: 2.5em;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::selection {
+    background: transparent;
+  }
 }
 
-.link:hover {
-  text-decoration: underline;
+.slots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
-.notice {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: #475569;
-  line-height: 1.5;
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  transition: border-color var(--dur-s) var(--ease-out), transform var(--dur-s) var(--ease-out);
+}
+
+.filled {
+  border-color: var(--ink);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.otp:focus-within .caret {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--trust) 18%, transparent);
+
+  &::after {
+    content: "";
+    width: 1.5px;
+    height: 40%;
+    background: var(--ink);
+    animation: blink 1s steps(2) infinite;
+  }
+}
+
+.bad {
+  border-color: var(--accent);
 }
 
 .error {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: #dc2626;
-  font-weight: 500;
+  font-size: var(--step-small);
+  color: var(--accent);
+}
+
+.notice {
+  font-size: var(--step-small);
+  color: var(--good);
+}
+
+.submit {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.linkBtn {
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: var(--step-small);
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:disabled {
+    color: var(--ink-3);
+    text-decoration: none;
+    cursor: default;
+  }
+}
+
+.alt {
+  margin-top: 0.5rem;
+  font-size: var(--step-small);
+  color: var(--ink-2);
 }
