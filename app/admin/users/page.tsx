@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   ADMIN_PERMISSIONS,
+  IMPLIED_PERMISSIONS,
+  PERMISSION_LABELS,
   type AdminPermission,
 } from "@/lib/permissions";
 import styles from "./page.module.scss";
@@ -42,13 +44,6 @@ type Overview = {
   viewer: Viewer;
 };
 
-const PERMISSION_LABELS: Record<AdminPermission, string> = {
-  "content.manage": "Manage content",
-  "providers.manage": "Manage providers",
-  "ratings.moderate": "Moderate reviews",
-  "users.manage": "Manage users",
-  "permissions.manage": "Manage permissions",
-};
 
 export default function AdminUsersPage() {
   const [role, setRole] = useState<string | null | undefined>(undefined);
@@ -317,7 +312,16 @@ export default function AdminUsersPage() {
                                 void updateUser(admin.id, { permissions: next });
                               }}
                             />
-                            <span>{PERMISSION_LABELS[permission]}</span>
+                            <span>
+                              {PERMISSION_LABELS[permission]}
+                              {!admin.permissions.includes(permission) &&
+                              IMPLIED_PERMISSIONS[permission] &&
+                              admin.permissions.includes(IMPLIED_PERMISSIONS[permission]!) ? (
+                                <em className={styles.hint}>
+                                  {" "}(inherited from {PERMISSION_LABELS[IMPLIED_PERMISSIONS[permission]!]})
+                                </em>
+                              ) : null}
+                            </span>
                           </label>
                         ))}
                       </fieldset>

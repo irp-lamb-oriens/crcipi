@@ -1,0 +1,76 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "./useSession";
+import styles from "./Console.module.scss";
+
+type Area = "admin" | "member";
+
+const LINKS: Record<Area, { href: string; label: string }[]> = {
+  admin: [
+    { href: "/admin/dashboard", label: "Overview" },
+    { href: "/admin/providers", label: "Providers" },
+    { href: "/admin/verification", label: "Verification" },
+    { href: "/admin/jobs", label: "Jobs" },
+    { href: "/admin/articles", label: "Articles" },
+    { href: "/admin/users", label: "Users" },
+  ],
+  member: [
+    { href: "/account", label: "Overview" },
+    { href: "/account/businesses", label: "My businesses" },
+    { href: "/account/verification", label: "Verification" },
+    { href: "/account/jobs", label: "Jobs" },
+    { href: "/account/articles", label: "Articles" },
+  ],
+};
+
+// Top bar shared by every console page. Renders only for the role that owns
+// the area, so the sign-in page (/admin) and gated pages stay chrome-free for
+// everyone else.
+export default function ConsoleNav({ area }: { area: Area }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const session = useSession();
+
+  if (session.status !== area) return null;
+
+  async function signOut() {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    router.replace("/");
+  }
+
+  return (
+    <div className={styles.bar}>
+      <div className={styles.barInner}>
+        <span className={styles.brand}>
+          CR-CIPI<span>{area === "admin" ? "Admin" : "Members"}</span>
+        </span>
+        <nav className={styles.navLinks} aria-label="Console">
+          {LINKS[area].map((link) => {
+            const active =
+              link.href === "/account"
+                ? pathname === "/account"
+                : pathname === link.href || pathname.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className={styles.barActions}>
+          <Link href="/en">View site</Link>
+          <button type="button" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/firebaseAdmin";
 import {
   ADMIN_PERMISSIONS,
+  permissionGranted,
   type AdminPermission,
   type UserRole,
   type UserStatus,
@@ -421,7 +422,9 @@ export function hasPermission(
   user: Pick<SessionUser, "role" | "permissions"> | null,
   permission: AdminPermission
 ): boolean {
-  return !!user && user.role === "admin" && user.permissions.includes(permission);
+  return (
+    !!user && user.role === "admin" && permissionGranted(user.permissions, permission)
+  );
 }
 
 export async function requireSessionUser(): Promise<SessionUser | null> {
