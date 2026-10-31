@@ -1,35 +1,37 @@
 .section {
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-  background: var(--paper-soft, #f7f7f5);
-  border-bottom: 1px solid var(--line, #e5e5e5);
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: var(--section-pad) 0;
+  overflow: clip;
+}
+
+.watermark {
+  position: absolute !important;
+  z-index: -1;
+  right: -8vw;
+  top: 50%;
+  width: min(70vw, 760px) !important;
+  translate: 0 -50%;
+  opacity: 0.07;
 }
 
 .inner {
-  max-width: 1200px;
+  width: 100%;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 0.75rem;
-}
-
-.heading {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  font-weight: 800;
-  margin-bottom: 1rem;
-}
-
-.body {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--ink-soft, #4b4b4b);
-  max-width: 52ch;
+.statement {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
 }

@@ -1,45 +1,83 @@
 .hero {
-  padding: clamp(4rem, 10vw, 7rem) 0 clamp(3rem, 7vw, 5rem);
-  background: var(--paper, #ffffff);
-  color: var(--ink, #101010);
-  border-bottom: 1px solid var(--line, #e5e5e5);
+  padding: clamp(3.5rem, 12vh, 8rem) 0 clamp(3rem, 8vh, 5.5rem);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ink {
+  background: var(--ink);
+  color: var(--on-dark);
+  border-bottom: none;
+
+  :global(.eyebrow) {
+    color: var(--on-dark-2);
+  }
+
+  .body {
+    color: var(--on-dark-2);
+  }
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vh, 2.75rem);
 }
 
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 1rem;
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.aside {
+  flex: none;
 }
 
 .heading {
-  font-size: clamp(2rem, 5vw, 3.75rem);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--ink, #101010);
-  max-width: 18ch;
-  margin-bottom: 1.25rem;
+  font-family: var(--font-display);
+  font-size: var(--step-hero);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  max-width: 14ch;
 }
 
 .body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  gap: 1rem 2.5rem;
   max-width: 62ch;
+  margin-left: auto;
+  font-size: var(--step-lead);
+  line-height: 1.55;
+  color: var(--ink-2);
 
-  p {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--ink-soft, #7e7e7e);
+  @media (max-width: 860px) {
+    margin-left: 0;
   }
+}
+
+// Long intros split into two columns on wide screens, lead paragraph first.
+.multi {
+  max-width: none;
+  width: min(100%, 980px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  font-size: var(--step-body);
+
+  p:first-child {
+    grid-column: 1 / -1;
+    font-size: var(--step-lead);
+    color: var(--ink);
+    max-width: 52ch;
+  }
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ink .multi p:first-child {
+  color: var(--on-dark);
 }

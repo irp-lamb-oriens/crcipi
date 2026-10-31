@@ -10,26 +10,32 @@ interface Props {
   positioning: string;
 }
 
+// Defined by negation: each "not" is struck through as it scrolls into view,
+// then the positive statement lands in italic. The strike is decoration;
+// the words stay fully legible and are read normally by screen readers.
 export default function WhatWeAreNot({ eyebrow, heading, items, positioning }: Props) {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} aria-labelledby="not-title">
       <div className={styles.inner}>
-        <EditableText path="about.not.eyebrow" as="p" className={styles.eyebrow}>
-          {eyebrow}
-        </EditableText>
-        <EditableText path="about.not.heading" as="h2" className={styles.heading}>
-          {heading}
-        </EditableText>
+        <div className={styles.head}>
+          <EditableText path="about.not.eyebrow" as="p" className="eyebrow">
+            {eyebrow}
+          </EditableText>
+          <EditableText path="about.not.heading" as="h2" className={styles.heading} id="not-title">
+            {heading}
+          </EditableText>
+        </div>
         <ul className={styles.list}>
           {items.map((item, i) => (
             <li key={i} className={styles.item}>
-              <EditableText path={`about.not.items.${i}`} as="span">
+              <span className={styles.x} aria-hidden="true">✕</span>
+              <EditableText path={`about.not.items.${i}`} as="span" className={styles.text}>
                 {item}
               </EditableText>
             </li>
           ))}
         </ul>
-        <EditableText path="about.not.positioning" as="p" className={styles.positioning}>
+        <EditableText path="about.not.positioning" as="p" className={`${styles.positioning} reveal`}>
           {positioning}
         </EditableText>
       </div>

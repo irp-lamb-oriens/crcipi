@@ -27,8 +27,9 @@ export default function Seal({
   return (
     <span
       className={`${styles.seal} ${styles[size]} ${styles[tone.replace("-", "")]} ${spin ? styles.spin : ""} ${className ?? ""}`}
-      role="img"
-      aria-label={label}
+      role={label ? "img" : undefined}
+      aria-label={label || undefined}
+      aria-hidden={label ? undefined : true}
     >
       <svg viewBox="0 0 200 200" aria-hidden="true">
         <defs>

@@ -1,67 +1,101 @@
 .section {
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-  background: var(--paper, #ffffff);
+  padding: var(--section-pad) 0;
+  background: var(--paper-2);
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
 }
 
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--red, #a7302f);
-  margin-bottom: 0.75rem;
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
 }
 
 .heading {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  font-weight: 800;
-  margin-bottom: 2.5rem;
-  max-width: 24ch;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.list {
-  list-style: none;
-  border-top: 1px solid var(--line, #e5e5e5);
-}
-
-.item {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
+.stack {
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
-  border-bottom: 1px solid var(--line, #e5e5e5);
-  padding: 1.5rem 0;
+}
 
-  &:hover {
-    background: var(--paper-soft, #f7f7f5);
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  grid-template-rows: auto 1fr;
+  gap: 1.5rem clamp(2rem, 6vw, 6rem);
+  min-height: clamp(260px, 46vh, 420px);
+  padding: 1.15rem clamp(1.75rem, 4vw, 3.5rem) clamp(1.75rem, 4vw, 3.5rem);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 -1px 0 var(--paper), 0 24px 48px -32px color-mix(in oklch, var(--ink) 35%, transparent);
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    min-height: 0;
   }
 }
 
-.index {
-  font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
-  font-size: 0.8rem;
-  color: var(--ink-faint, #6f6f6f);
-  padding-top: 0.25rem;
-  text-align: center;
+// Every other page carries the trust colour, like alternating visa pages.
+.card:nth-child(even) {
+  background: var(--trust);
+  color: var(--on-dark);
+  border-color: var(--trust);
+
+  .tab,
+  .description {
+    color: var(--on-dark-2);
+  }
+}
+
+@media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
+  .stack:not(.flat) .card {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem + var(--i) * 3.25rem);
+    margin-bottom: 18vh;
+  }
+
+  .stack:not(.flat) .card:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Sits in the top 52px so it stays readable on a covered card.
+.tab {
+  grid-column: 1 / -1;
+  padding-bottom: clamp(2rem, 8vh, 6rem);
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
 }
 
 .title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-  color: var(--ink, #101010);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  align-self: end;
 }
 
 .description {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--ink-soft, #4b4b4b);
-  max-width: 56ch;
+  align-self: end;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 40ch;
 }
