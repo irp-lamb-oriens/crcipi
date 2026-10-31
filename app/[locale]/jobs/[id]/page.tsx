@@ -157,7 +157,7 @@ export default async function JobDetailPage({ params }: Props) {
             </p>
           </article>
 
-          <JobApplyForm jobId={job.id} locale={locale} copy={copy.apply} />
+          <JobApplyForm jobId={job.id} locale={locale} copy={copy.apply} privacyLabel={content.nav.privacy} />
         </div>
       </div>
     </section>

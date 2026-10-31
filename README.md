@@ -18,7 +18,12 @@ Bilingual institutional website for the Costa Rica Chamber of International Priv
 | Join | `/en/join` | `/es/unete` |
 | Member directory | `/en/directory` | `/es/directorio` |
 | Admin sign-in | `/admin` | `/admin` |
-| Provider management | `/admin/providers` | `/admin/providers` |
+| Job board | `/en/jobs` | `/es/empleos` |
+| Member articles | `/en/blog` | `/es/blog` |
+| Privacy policy | `/en/privacy` | `/es/privacidad` |
+| Terms of use | `/en/terms` | `/es/terminos` |
+| Member dashboard | `/account` (+ `/businesses`, `/verification`, `/jobs`, `/articles`) | same |
+| Admin dashboard | `/admin/dashboard` (+ `/providers`, `/verification`, `/jobs`, `/articles`, `/users`) | same |
 
 ## Editing content (CMS)
 
@@ -60,6 +65,55 @@ Seed example providers (idempotent; build the real directory from the admin UI):
 node scripts/seed-providers.mjs   # or: npm run seed:providers
 ```
 
+## Platform features
+
+### Trusted-provider verification (KYC)
+
+Members submit legal name, ID (cédula jurídica / física, DIMEX, passport), legal
+representative, year founded, headcount, licenses and documents. Regulated
+categories must include their registration: real estate → SUGEF (Ley 8204, art.
+15 bis), law → Colegio de Abogados, accounting → Colegio de Contadores,
+insurance → SUGESE (`REQUIRED_REGULATOR` in `lib/kycOptions.ts`). Verified
+providers get a badge and a "Verified only" directory filter. Legal data lives in
+`providers/{id}/private/kyc`; the provider doc only carries `verified` +
+`kycStatus`.
+
+### Job board
+
+`jobs/{id}` + `jobs/{id}/applications/{id}`. Members publish 60-day postings
+under a listed business; applicants apply with an optional CV; employers get an
+email and manage a pipeline (new → reviewed → shortlisted → rejected/hired).
+Detail pages emit schema.org `JobPosting` for Google job search.
+
+### Member articles with AI review
+
+`articles/{id}`. On submit, `lib/moderation.ts` asks Claude (Anthropic API) for a
+strict JSON verdict against the editorial policy (relevant to the community; no
+political, religious, anti–Costa Rica, spam or misleading content). Clear passes
+publish, clear violations come back with reasons, anything else — including any
+AI error or a missing API key — goes to `/admin/articles`. The AI can never
+publish by failing.
+
+### Uploads
+
+`/api/member/uploads` uploads on file selection (no extra click). Files are
+validated by magic bytes and size (5 MB, Netlify's body limit is ~6 MB). Private
+files (`private/...`) are opened only through 10-minute signed URLs; public
+images (`public/...`) are streamed by `/api/media/...`.
+
+### Metrics
+
+`lib/stats.ts` keeps one counter document per day (`stats/daily/days/{date}`)
+for the admin funnels: sign-ups → businesses → KYC → verified, job views →
+applications, directory visits → reviews, articles submitted → published → read.
+
+### Checks
+
+```bash
+npm run check:moderation   # AI output parser guardrails
+npm run check:e2e          # full round-trip, emulators only (see file header)
+```
+
 ## Auth
 
 Email-code (passwordless) auth:
@@ -84,6 +138,8 @@ Copy `.env.example` to `.env` and set:
 
 - `FIREBASE_SERVICE_ACCOUNT` — minified `serviceAccountKey.json`, or place `serviceAccountKey.json` in the project root.
 - `SMTP_USER` / `SMTP_PASS` (Gmail App Password), `SMTP_HOST`, `SMTP_PORT`.
+- `FIREBASE_STORAGE_BUCKET` — enables uploads (KYC documents, CVs, covers).
+- `ANTHROPIC_API_KEY` (and optional `ANTHROPIC_MODEL`) — enables AI article review.
 
 ## Commands
 

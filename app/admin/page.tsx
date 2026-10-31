@@ -24,7 +24,7 @@ export default function SignInPage() {
       .then((res) => res.json())
       .then((data: { authed: boolean; role: string | null }) => {
         if (!data.authed) return;
-        router.replace(data.role === "admin" ? "/admin/providers" : "/account");
+        router.replace(data.role === "admin" ? "/admin/dashboard" : "/account");
       })
       .catch(() => {});
   }, [router]);
@@ -81,7 +81,7 @@ export default function SignInPage() {
         setBusy(false);
         return;
       }
-      router.replace(data.role === "admin" ? "/admin/providers" : "/account");
+      router.replace(data.role === "admin" ? "/admin/dashboard" : "/account");
     } catch {
       setError("Network error. Try again.");
       setBusy(false);

@@ -3,6 +3,7 @@ import { validateSubmission } from "@/lib/validators";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { createUser, getUserByEmail } from "@/lib/auth";
+import { recordEvent } from "@/lib/stats";
 import { sendInternalNotification, sendVolunteerConfirmation } from "./email";
 
 // POST /api/submit
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
           name: `${data.firstName} ${data.lastName}`.trim(),
           role: "member",
         });
+        recordEvent("member_signup");
       }
     } catch (error) {
       console.error("CR-CIPI volunteer account creation failed for", data.email, error);

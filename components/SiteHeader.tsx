@@ -16,6 +16,8 @@ interface Props {
 export default function SiteHeader({ locale }: Props) {
   const joinPath = locale === "en" ? "/en/join" : "/es/unete";
   const directoryPath = locale === "en" ? "/en/directory" : "/es/directorio";
+  const jobsPath = locale === "en" ? "/en/jobs" : "/es/empleos";
+  const blogPath = `/${locale}/blog`;
   const homePath = locale === "en" ? "/en" : "/es";
 
   return (
@@ -45,6 +47,12 @@ export default function SiteHeader({ locale }: Props) {
           </Link>
           <Link href={directoryPath} className={styles.navLink}>
             <EditableText path="nav.directory" as="span" />
+          </Link>
+          <Link href={jobsPath} className={styles.navLink}>
+            <EditableText path="nav.jobs" as="span" />
+          </Link>
+          <Link href={blogPath} className={styles.navLink}>
+            <EditableText path="nav.blog" as="span" />
           </Link>
         </nav>
 

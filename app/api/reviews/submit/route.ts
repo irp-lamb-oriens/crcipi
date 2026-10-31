@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalizeReviewerEmail, submitReview } from "@/lib/reviews";
+import { recordEvent } from "@/lib/stats";
 import { getProvider } from "@/lib/providers";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
   // prior rating when editing), so we return those canonical values directly.
   const count = result.count;
   const sum = result.sum;
+  if (!result.alreadyReviewed) recordEvent("review_submitted");
 
   return NextResponse.json({
     ok: true,

@@ -17,6 +17,9 @@ export default function SiteFooter({ locale }: Props) {
   const aboutPath = locale === "en" ? "/en/about" : "/es/quienes-somos";
   const joinPath = locale === "en" ? "/en/join" : "/es/unete";
   const directoryPath = locale === "en" ? "/en/directory" : "/es/directorio";
+  const jobsPath = locale === "en" ? "/en/jobs" : "/es/empleos";
+  const privacyPath = locale === "en" ? "/en/privacy" : "/es/privacidad";
+  const termsPath = locale === "en" ? "/en/terms" : "/es/terminos";
   const otherLocale = locale === "en" ? "es" : "en";
   const otherHome = otherLocale === "en" ? "/en" : "/es";
 
@@ -46,6 +49,12 @@ export default function SiteFooter({ locale }: Props) {
             </Link>
             <Link href={directoryPath}>
               <EditableText path="nav.directory" as="span" />
+            </Link>
+            <Link href={jobsPath}>
+              <EditableText path="nav.jobs" as="span" />
+            </Link>
+            <Link href={`/${locale}/blog`}>
+              <EditableText path="nav.blog" as="span" />
             </Link>
           </nav>
 
@@ -82,6 +91,14 @@ export default function SiteFooter({ locale }: Props) {
           <span>
             © {new Date().getFullYear()} {site.name}.{" "}
             <EditableText path="footer.rights" as="span" />
+          </span>
+          <span className={styles.legalLinks}>
+            <Link href={privacyPath}>
+              <EditableText path="nav.privacy" as="span" />
+            </Link>
+            <Link href={termsPath}>
+              <EditableText path="nav.terms" as="span" />
+            </Link>
           </span>
           <Link href={otherHome} className={styles.langLink}>
             {otherLocale === "en" ? "English" : "Español"}

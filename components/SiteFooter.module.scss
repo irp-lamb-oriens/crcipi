@@ -139,3 +139,17 @@
     gap: 1.75rem;
   }
 }
+.legalLinks {
+  display: inline-flex;
+  gap: 1.25rem;
+  margin-left: auto;
+
+  a {
+    font-size: 0.85rem;
+    color: var(--ink-soft, #7e7e7e);
+
+    &:hover {
+      color: var(--red, #a7302f);
+    }
+  }
+}

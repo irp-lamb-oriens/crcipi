@@ -2,14 +2,16 @@
   "name": "crcipi",
   "version": "1.0.0",
   "private": true,
-  "description": "CR-CIPI — Costa Rican Chamber of International Private Investment. Bilingual institutional website.",
+  "description": "CR-CIPI \u2014 Costa Rican Chamber of International Private Investment. Bilingual institutional website.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "seed:providers": "node scripts/seed-providers.mjs",
-    "approve:providers": "node scripts/approve-all-providers.mjs"
+    "approve:providers": "node scripts/approve-all-providers.mjs",
+    "check:moderation": "NODE_OPTIONS=--conditions=react-server npx tsx scripts/checks/moderation.check.ts",
+    "check:e2e": "node scripts/checks/platform.e2e.mjs"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0",

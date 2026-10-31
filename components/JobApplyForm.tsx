@@ -9,10 +9,12 @@ export default function JobApplyForm({
   jobId,
   locale,
   copy,
+  privacyLabel,
 }: {
   jobId: string;
   locale: Locale;
   copy: JobsContent["apply"];
+  privacyLabel: string;
 }) {
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +94,9 @@ export default function JobApplyForm({
           <input type="checkbox" name="consent" required />
           <span>
             {copy.consent}{" "}
-            <Link href={locale === "en" ? "/en/privacy" : "/es/privacidad"}>↗</Link>
+            <Link href={locale === "en" ? "/en/privacy" : "/es/privacidad"} target="_blank">
+              {privacyLabel}
+            </Link>
           </span>
         </label>
         {error ? <p className={styles.error} role="alert">{error}</p> : null}

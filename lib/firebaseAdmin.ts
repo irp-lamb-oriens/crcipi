@@ -56,3 +56,14 @@ function getApp() {
 
 export const adminApp = getApp();
 export const db = getFirestore(adminApp);
+
+// Optional fields are modeled as `undefined` across the validators, and
+// Firestore rejects `undefined` by default. This bit twice (dreams.md
+// 2026-08-11, and member provider creation without a website), so drop
+// undefined fields at the client level for every write path at once.
+// settings() throws if called twice (dev hot reload), which is harmless.
+try {
+  db.settings({ ignoreUndefinedProperties: true });
+} catch {
+  // Already configured for this instance.
+}

@@ -112,7 +112,7 @@ export default function AccountPage() {
 
   // This dashboard is the member surface. Admins belong in the admin console.
   useEffect(() => {
-    if (authed && role === "admin") router.replace("/admin/providers");
+    if (authed && role === "admin") router.replace("/admin/dashboard");
   }, [authed, role, router]);
 
   function set<K extends keyof ProviderForm>(key: K, value: ProviderForm[K]) {

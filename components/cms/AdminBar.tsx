@@ -40,6 +40,12 @@ export default function AdminBar() {
   // gets no CMS chrome at all. Sign-in lives in the site header instead.
   if (!authed) return null;
 
+  const dashboardLink = (
+    <a className={styles.link} href="/admin/dashboard">
+      Dashboard
+    </a>
+  );
+
   const providersLink = (
     <a className={styles.link} href="/admin/providers">
       Providers
@@ -59,6 +65,7 @@ export default function AdminBar() {
         {email ? <span className={styles.email}>{email}</span> : null}
       </span>
 
+      {dashboardLink}
       {providersLink}
       {usersLink}
 
