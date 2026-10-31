@@ -3,26 +3,37 @@ import type { Locale } from "@/content/types";
 // Maps each page key to its path in each locale.
 // Used by the language switcher to preserve the equivalent page.
 const pagePaths: Record<
-  "home" | "about" | "join" | "directory",
+  "home" | "about" | "join" | "directory" | "jobs" | "blog" | "privacy" | "terms",
   Record<Locale, string>
 > = {
   home: { en: "/en", es: "/es" },
   about: { en: "/en/about", es: "/es/quienes-somos" },
   join: { en: "/en/join", es: "/es/unete" },
   directory: { en: "/en/directory", es: "/es/directorio" },
+  jobs: { en: "/en/jobs", es: "/es/empleos" },
+  blog: { en: "/en/blog", es: "/es/blog" },
+  privacy: { en: "/en/privacy", es: "/es/privacidad" },
+  terms: { en: "/en/terms", es: "/es/terminos" },
 };
 
 export type PageKey = keyof typeof pagePaths;
 
+// Pages with detail routes keep their trailing id/slug across locales
+// (e.g. /en/jobs/abc123 -> /es/empleos/abc123).
+const DETAIL_PAGES: PageKey[] = ["directory", "jobs", "blog"];
+
+export function pagePath(key: PageKey, locale: Locale): string {
+  return pagePaths[key][locale];
+}
+
 export function getPageKey(pathname: string): PageKey {
-  if (pathname.includes("/about") || pathname.includes("/quienes-somos")) {
-    return "about";
-  }
-  if (pathname.includes("/join") || pathname.includes("/unete")) {
-    return "join";
-  }
-  if (pathname.includes("/directory") || pathname.includes("/directorio")) {
-    return "directory";
+  const withoutLocale = pathname.replace(/^\/(en|es)(?=\/|$)/, "");
+  const first = withoutLocale.split("/")[1] ?? "";
+  for (const key of Object.keys(pagePaths) as PageKey[]) {
+    if (key === "home") continue;
+    const segments = [pagePaths[key].en, pagePaths[key].es].map((p) => p.split("/")[2]);
+    // Also accept the internal (rewritten) English segment under /es.
+    if (segments.includes(first) || first === key) return key;
   }
   return "home";
 }
@@ -30,14 +41,11 @@ export function getPageKey(pathname: string): PageKey {
 export function getLocalizedPath(pathname: string, targetLocale: Locale): string {
   const key = getPageKey(pathname);
   const base = pagePaths[key][targetLocale];
-  if (key !== "directory") return base;
+  if (!DETAIL_PAGES.includes(key)) return base;
 
-  // Directory detail pages preserve the trailing provider id across locales
-  // (e.g. /en/directory/abc123 -> /es/directorio/abc123).
-  const withoutLocale = pathname.replace(/^\/(en|es)/, "");
-  const segment = withoutLocale.includes("/directorio") ? "/directorio" : "/directory";
-  const rest = withoutLocale.slice(segment.length);
-  return base + (rest.startsWith("/") ? rest : "");
+  const segments = pathname.replace(/^\/(en|es)/, "").split("/").filter(Boolean);
+  const rest = segments.slice(1).join("/");
+  return rest ? `${base}/${rest}` : base;
 }
 
 export function getAlternateLocale(current: Locale): Locale {

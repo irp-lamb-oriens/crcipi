@@ -14,6 +14,10 @@ export const es: PageContent = {
     about: "Quiénes Somos",
     join: "Únete",
     directory: "Directorio de Miembros",
+    jobs: "Empleos",
+    blog: "Artículos",
+    privacy: "Privacidad",
+    terms: "Términos",
     volunteer: "Voluntariado",
   },
   announcement: {
@@ -366,6 +370,203 @@ export const es: PageContent = {
         generic: "Algo salió mal. Inténtelo de nuevo.",
       },
     },
+  },
+  jobs: {
+    meta: {
+      title: "Empleos en empresas miembro de CR-CIPI | CR-CIPI",
+      description:
+        "Puestos abiertos en firmas miembro que atienden a residentes e inversionistas internacionales en Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Bolsa de empleo",
+      heading: "Trabaje con las firmas que atienden la inversión internacional",
+      body: ["Puestos publicados directamente por empresas miembro de CR-CIPI. Aplique en un paso; su solicitud llega directo al empleador."],
+    },
+    board: {
+      search: "Buscar empleos",
+      searchPlaceholder: "Puesto, empresa o ubicación",
+      allTypes: "Todos los tipos",
+      allModes: "Cualquier modalidad",
+      empty: "No hay puestos que coincidan. Vuelva pronto.",
+      posted: "Publicado",
+      view: "Ver puesto",
+      postHeading: "¿Está contratando?",
+      postBody: "Las empresas miembro publican vacantes gratis desde su panel.",
+      postCta: "Publicar un empleo",
+    },
+    detail: {
+      back: "Todos los empleos",
+      about: "Sobre el puesto",
+      requirements: "Requisitos",
+      salary: "Salario",
+      location: "Ubicación",
+      type: "Tipo",
+      mode: "Modalidad",
+      company: "Empresa",
+      verified: "Proveedor verificado",
+      expires: "Abierto hasta",
+    },
+    apply: {
+      heading: "Aplicar",
+      intro: "Su solicitud se envía al empleador. CR-CIPI no la vende ni la comparte con nadie más.",
+      name: "Nombre completo",
+      email: "Correo electrónico",
+      phone: "Teléfono (opcional)",
+      linkedin: "LinkedIn (opcional)",
+      message: "Por qué es la persona indicada",
+      messageHint: "Unas frases sobre su experiencia. Mínimo 20 caracteres.",
+      cv: "Currículum (opcional)",
+      cvHint: "PDF, JPG o PNG. Máximo 5 MB.",
+      consent: "Acepto que CR-CIPI comparta mi solicitud con este empleador, según la política de privacidad.",
+      submit: "Enviar solicitud",
+      submitting: "Enviando…",
+      success: "Solicitud enviada. El empleador le contactará directamente. Le enviamos una confirmación por correo.",
+      errorRequired: "Complete los campos obligatorios.",
+      errorMessage: "Cuéntele un poco más al empleador (mínimo 20 caracteres).",
+      errorEmail: "Ingrese un correo válido.",
+      errorCv: "No podemos usar ese archivo. Suba un PDF, JPG o PNG de menos de 5 MB.",
+      errorRateLimited: "Demasiadas solicitudes desde esta conexión. Intente más tarde.",
+      errorGeneric: "Algo salió mal. Intente de nuevo.",
+    },
+  },
+  blog: {
+    meta: {
+      title: "Artículos de miembros de CR-CIPI | CR-CIPI",
+      description:
+        "Artículos prácticos de profesionales que ayudan a personas y familias internacionales a vivir, invertir y hacer negocios en Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Conocimiento de miembros",
+      heading: "Conocimiento práctico para invertir en Costa Rica",
+      body: ["Artículos escritos por profesionales miembros de CR-CIPI. Cada artículo se revisa por relevancia y neutralidad antes de publicarse."],
+    },
+    list: {
+      all: "Todos",
+      empty: "Aún no hay artículos.",
+      readMore: "Leer artículo",
+      by: "Por",
+      minutes: "min de lectura",
+      writeHeading: "¿Es miembro?",
+      writeBody: "Comparta su conocimiento con la comunidad internacional. Los artículos se revisan en minutos.",
+      writeCta: "Escribir un artículo",
+    },
+    article: {
+      back: "Todos los artículos",
+      by: "Por",
+      published: "Publicado",
+      disclaimer:
+        "Este artículo refleja la opinión de su autor y es solo informativo. No constituye asesoría legal, tributaria ni de inversión.",
+      related: "Más artículos",
+    },
+  },
+  privacy: {
+    meta: {
+      title: "Política de Privacidad | CR-CIPI",
+      description: "Cómo CR-CIPI recopila, usa y protege datos personales conforme a la Ley 8968 de Costa Rica.",
+    },
+    eyebrow: "Legal",
+    heading: "Política de Privacidad",
+    updated: "Última actualización: 31 de octubre de 2026",
+    intro:
+      "CR-CIPI respeta su privacidad. Esta política explica qué datos personales recopilamos, para qué, y los derechos que le otorga la Ley N.° 8968 de Protección de la Persona frente al Tratamiento de sus Datos Personales y su reglamento.",
+    sections: [
+      {
+        heading: "1. Responsable",
+        paragraphs: [
+          "La iniciativa CR-CIPI (Cámara Costarricense de Inversión Privada Internacional) es responsable de la base de datos aquí descrita. Contacto: info@crcipi.org.",
+        ],
+      },
+      {
+        heading: "2. Datos que recopilamos",
+        paragraphs: [
+          "Formulario de voluntariado y membresía: nombre, correo, teléfono, empresa, profesión, LinkedIn, áreas de experiencia y los motivos que comparte.",
+          "Cuentas de miembro: correo, nombre y las fichas de empresa que publica.",
+          "Verificación de empresas: razón social, cédula, representante legal, año de fundación, número de colaboradores, licencias y los documentos que adjunta.",
+          "Solicitudes de empleo: nombre, correo, teléfono, LinkedIn, mensaje y currículum, que se envían al empleador al que aplica.",
+          "Reseñas y artículos: su nombre, correo verificado y el contenido que envía.",
+          "Datos técnicos: dirección IP para control de abuso y seguridad, y conteos agregados de visitas. No usamos cookies publicitarias.",
+        ],
+      },
+      {
+        heading: "3. Para qué los usamos",
+        paragraphs: [
+          "Para operar la iniciativa y sus comités, administrar cuentas de miembros, verificar empresas antes de mostrar la insignia de Verificado, entregar solicitudes de empleo a los empleadores, moderar el contenido público, enviar los correos que usted solicita y proteger la plataforma.",
+          "Los artículos se revisan con un sistema automatizado de inteligencia artificial por relevancia y neutralidad. Un editor humano revisa todo artículo que el sistema rechace o no pueda decidir.",
+        ],
+      },
+      {
+        heading: "4. Quién los recibe",
+        paragraphs: [
+          "Los empleadores reciben las solicitudes que usted les envía. Los documentos de verificación solo los ven revisores autorizados de CR-CIPI. Usamos proveedores para alojar datos (Google Firebase), enviar correos y ejecutar la revisión automática; tratan los datos solo bajo nuestras instrucciones. Nunca vendemos datos personales.",
+        ],
+      },
+      {
+        heading: "5. Por cuánto tiempo",
+        paragraphs: [
+          "Conservamos los datos mientras su cuenta o ficha esté activa y el tiempo necesario para cumplir obligaciones legales. Puede eliminar sus empresas y empleos desde su panel en cualquier momento.",
+        ],
+      },
+      {
+        heading: "6. Sus derechos",
+        paragraphs: [
+          "Puede acceder, rectificar, actualizar o suprimir sus datos y revocar su consentimiento en cualquier momento escribiendo a info@crcipi.org. Si no está satisfecho con nuestra respuesta, puede acudir a la Agencia de Protección de Datos de los Habitantes (PRODHAB).",
+        ],
+      },
+      {
+        heading: "7. Seguridad",
+        paragraphs: [
+          "Los códigos de acceso se guardan cifrados con hash, los documentos se almacenan de forma privada y solo se abren mediante enlaces que vencen en minutos, y el acceso administrativo está limitado por permisos.",
+        ],
+      },
+    ],
+  },
+  terms: {
+    meta: {
+      title: "Términos de Uso | CR-CIPI",
+      description: "Reglas de uso del sitio de CR-CIPI, el directorio de miembros, la bolsa de empleo y los artículos.",
+    },
+    eyebrow: "Legal",
+    heading: "Términos de Uso",
+    updated: "Última actualización: 31 de octubre de 2026",
+    intro: "Al usar crcipi.org usted acepta estos términos. Si no está de acuerdo, por favor no use el sitio.",
+    sections: [
+      {
+        heading: "1. Qué es CR-CIPI",
+        paragraphs: [
+          "CR-CIPI es una iniciativa independiente del sector privado en formación. No brinda asesoría legal, tributaria, migratoria ni de inversión, y no vende productos de inversión.",
+        ],
+      },
+      {
+        heading: "2. Fichas de miembros e insignia de Verificado",
+        paragraphs: [
+          "Los miembros son responsables de la exactitud de sus fichas. La insignia de Verificado significa que CR-CIPI revisó los documentos aportados por el miembro en ese momento; no es una garantía, aval ni certificación de la calidad de sus servicios. Siempre haga su propia debida diligencia.",
+        ],
+      },
+      {
+        heading: "3. Bolsa de empleo",
+        paragraphs: [
+          "Los empleos los publican las empresas miembro, que son las únicas responsables de ellos y de sus decisiones de contratación. Las publicaciones deben describir puestos reales, cumplir la legislación laboral costarricense y no discriminar. Nunca pague por aplicar a un empleo.",
+        ],
+      },
+      {
+        heading: "4. Artículos y reseñas",
+        paragraphs: [
+          "Los miembros conservan la titularidad de sus artículos y otorgan a CR-CIPI una licencia gratuita para publicarlos y compartirlos. El contenido debe ser relevante para la comunidad y no puede ser político, religioso, difamatorio, discriminatorio, engañoso ni puramente publicitario. CR-CIPI puede rechazar, ajustar el formato o retirar contenido a su criterio.",
+        ],
+      },
+      {
+        heading: "5. Cuentas",
+        paragraphs: [
+          "Mantenga seguro el acceso a su correo: quien pueda leerlo puede ingresar con un código de un solo uso. Podemos suspender cuentas que incumplan estos términos.",
+        ],
+      },
+      {
+        heading: "6. Responsabilidad y ley aplicable",
+        paragraphs: [
+          "El sitio se ofrece tal cual. En la medida que lo permita la ley, CR-CIPI no es responsable de las relaciones entre usuarios, miembros y empleadores. Estos términos se rigen por las leyes de la República de Costa Rica.",
+        ],
+      },
+    ],
   },
   footer: {
     purpose:

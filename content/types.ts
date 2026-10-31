@@ -152,6 +152,93 @@ export interface DirectoryContent {
   };
 }
 
+export interface JobsContent {
+  meta: { title: string; description: string };
+  hero: { eyebrow: string; heading: string; body: string[] };
+  board: {
+    search: string;
+    searchPlaceholder: string;
+    allTypes: string;
+    allModes: string;
+    empty: string;
+    posted: string;
+    view: string;
+    postHeading: string;
+    postBody: string;
+    postCta: string;
+  };
+  detail: {
+    back: string;
+    about: string;
+    requirements: string;
+    salary: string;
+    location: string;
+    type: string;
+    mode: string;
+    company: string;
+    verified: string;
+    expires: string;
+  };
+  apply: {
+    heading: string;
+    intro: string;
+    name: string;
+    email: string;
+    phone: string;
+    linkedin: string;
+    message: string;
+    messageHint: string;
+    cv: string;
+    cvHint: string;
+    consent: string;
+    submit: string;
+    submitting: string;
+    success: string;
+    errorRequired: string;
+    errorMessage: string;
+    errorEmail: string;
+    errorCv: string;
+    errorRateLimited: string;
+    errorGeneric: string;
+  };
+}
+
+export interface BlogContent {
+  meta: { title: string; description: string };
+  hero: { eyebrow: string; heading: string; body: string[] };
+  list: {
+    all: string;
+    empty: string;
+    readMore: string;
+    by: string;
+    minutes: string;
+    writeHeading: string;
+    writeBody: string;
+    writeCta: string;
+  };
+  article: {
+    back: string;
+    by: string;
+    published: string;
+    disclaimer: string;
+    related: string;
+  };
+}
+
+export interface LegalSection {
+  heading: string;
+  paragraphs: string[];
+}
+
+export interface LegalContent {
+  meta: { title: string; description: string };
+  eyebrow: string;
+  heading: string;
+  updated: string;
+  intro: string;
+  sections: LegalSection[];
+}
+
 export interface PageContent {
   locale: Locale;
   lang: string;
@@ -165,6 +252,10 @@ export interface PageContent {
     about: string;
     join: string;
     directory: string;
+    jobs: string;
+    blog: string;
+    privacy: string;
+    terms: string;
     volunteer: string;
   };
   announcement: Announcement;
@@ -251,6 +342,10 @@ export interface PageContent {
     form: FormContent;
   };
   directory: DirectoryContent;
+  jobs: JobsContent;
+  blog: BlogContent;
+  privacy: LegalContent;
+  terms: LegalContent;
   footer: {
     purpose: string;
     contact: string;

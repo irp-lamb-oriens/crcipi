@@ -14,6 +14,10 @@ export const en: PageContent = {
     about: "About",
     join: "Join",
     directory: "Member Directory",
+    jobs: "Jobs",
+    blog: "Insights",
+    privacy: "Privacy",
+    terms: "Terms",
     volunteer: "Volunteer",
   },
   announcement: {
@@ -366,6 +370,204 @@ export const en: PageContent = {
         generic: "Something went wrong. Please try again.",
       },
     },
+  },
+  jobs: {
+    meta: {
+      title: "Jobs at CR-CIPI Member Companies | CR-CIPI",
+      description:
+        "Open positions at member firms serving international residents and investors in Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Job board",
+      heading: "Work with the firms serving international investment",
+      body: ["Open roles published directly by CR-CIPI member companies. Apply in one step; your application goes straight to the employer."],
+    },
+    board: {
+      search: "Search jobs",
+      searchPlaceholder: "Role, company or location",
+      allTypes: "All types",
+      allModes: "Any location",
+      empty: "No open positions match. Check back soon.",
+      posted: "Posted",
+      view: "View role",
+      postHeading: "Hiring?",
+      postBody: "Member companies post openings for free from their dashboard.",
+      postCta: "Post a job",
+    },
+    detail: {
+      back: "All jobs",
+      about: "About the role",
+      requirements: "Requirements",
+      salary: "Salary",
+      location: "Location",
+      type: "Type",
+      mode: "Work mode",
+      company: "Company",
+      verified: "Verified provider",
+      expires: "Open until",
+    },
+    apply: {
+      heading: "Apply",
+      intro: "Your application is sent to the employer. CR-CIPI does not sell or share it with anyone else.",
+      name: "Full name",
+      email: "Email",
+      phone: "Phone (optional)",
+      linkedin: "LinkedIn (optional)",
+      message: "Why you're a fit",
+      messageHint: "A few sentences about your experience. Minimum 20 characters.",
+      cv: "CV (optional)",
+      cvHint: "PDF, JPG or PNG. Max 5 MB.",
+      consent: "I agree that CR-CIPI shares my application with this employer, as described in the privacy policy.",
+      submit: "Send application",
+      submitting: "Sending…",
+      success: "Application sent. The employer will contact you directly. We emailed you a confirmation.",
+      errorRequired: "Complete the required fields.",
+      errorMessage: "Tell the employer a bit more (at least 20 characters).",
+      errorEmail: "Enter a valid email.",
+      errorCv: "That file can't be used. Upload a PDF, JPG or PNG under 5 MB.",
+      errorRateLimited: "Too many applications from this connection. Try again later.",
+      errorGeneric: "Something went wrong. Please try again.",
+    },
+  },
+  blog: {
+    meta: {
+      title: "Insights from CR-CIPI Members | CR-CIPI",
+      description:
+        "Practical articles from professionals who help international individuals and families live, invest and do business in Costa Rica.",
+    },
+    hero: {
+      eyebrow: "Member insights",
+      heading: "Practical knowledge for investing in Costa Rica",
+      body: ["Articles written by CR-CIPI member professionals. Every article is reviewed for relevance and neutrality before publication."],
+    },
+    list: {
+      all: "All",
+      empty: "No articles yet.",
+      readMore: "Read article",
+      by: "By",
+      minutes: "min read",
+      writeHeading: "Are you a member?",
+      writeBody: "Share what you know with the international community. Articles are reviewed within minutes.",
+      writeCta: "Write an article",
+    },
+    article: {
+      back: "All articles",
+      by: "By",
+      published: "Published",
+      disclaimer:
+        "This article reflects the author's views and is for general information only. It is not legal, tax or investment advice.",
+      related: "More insights",
+    },
+  },
+  privacy: {
+    meta: {
+      title: "Privacy Policy | CR-CIPI",
+      description: "How CR-CIPI collects, uses and protects personal data under Costa Rica's Law 8968.",
+    },
+    eyebrow: "Legal",
+    heading: "Privacy Policy",
+    updated: "Last updated: October 31, 2026",
+    intro:
+      "CR-CIPI respects your privacy. This policy explains what personal data we collect, why, and the rights you have under Costa Rica's Law No. 8968 on the Protection of Individuals with Regard to the Processing of their Personal Data and its regulations.",
+    sections: [
+      {
+        heading: "1. Who is responsible",
+        paragraphs: [
+          "The CR-CIPI initiative (Costa Rica Chamber of International Private Investment) is responsible for the database described here. Contact: info@crcipi.org.",
+        ],
+      },
+      {
+        heading: "2. Data we collect",
+        paragraphs: [
+          "Volunteer and membership form: name, email, phone, company, profession, LinkedIn, areas of expertise and the reasons you share.",
+          "Member accounts: email, name and the business listings you publish.",
+          "Business verification: legal name, legal ID, legal representative, year founded, headcount, licenses and the documents you upload.",
+          "Job applications: name, email, phone, LinkedIn, message and CV, which are sent to the employer you apply to.",
+          "Reviews and articles: your name, verified email and the content you submit.",
+          "Technical data: IP address for rate limiting and security, and aggregate page counts. We do not use advertising cookies.",
+        ],
+      },
+      {
+        heading: "3. Why we use it",
+        paragraphs: [
+          "To run the initiative and its committees, operate member accounts, verify businesses before showing a Verified badge, deliver job applications to employers, moderate public content, send the emails you request, and protect the platform from abuse.",
+          "Articles are screened by an automated AI reviewer for relevance and neutrality. A human editor reviews any article the system rejects or cannot decide on.",
+        ],
+      },
+      {
+        heading: "4. Who receives it",
+        paragraphs: [
+          "Employers receive the applications you send them. Verification documents are seen only by authorized CR-CIPI reviewers. We use service providers to host data (Google Firebase), send email and run the AI review; they process data only on our instructions. We never sell personal data.",
+        ],
+      },
+      {
+        heading: "5. How long we keep it",
+        paragraphs: [
+          "We keep data while your account or listing is active and for as long as needed to meet legal obligations. You can delete your businesses and job posts from your dashboard at any time.",
+        ],
+      },
+      {
+        heading: "6. Your rights",
+        paragraphs: [
+          "You can access, rectify, update or delete your data and withdraw consent at any time by writing to info@crcipi.org. If you are not satisfied with our answer, you may contact the Agencia de Protección de Datos de los Habitantes (PRODHAB).",
+        ],
+      },
+      {
+        heading: "7. Security",
+        paragraphs: [
+          "Login codes are stored hashed, documents are stored privately and opened only through links that expire within minutes, and administrator access is limited by role-based permissions.",
+        ],
+      },
+    ],
+  },
+  terms: {
+    meta: {
+      title: "Terms of Use | CR-CIPI",
+      description: "Rules for using the CR-CIPI website, member directory, job board and member articles.",
+    },
+    eyebrow: "Legal",
+    heading: "Terms of Use",
+    updated: "Last updated: October 31, 2026",
+    intro:
+      "By using crcipi.org you agree to these terms. If you don't agree, please don't use the site.",
+    sections: [
+      {
+        heading: "1. What CR-CIPI is",
+        paragraphs: [
+          "CR-CIPI is an independent private-sector initiative under development. It does not provide legal, tax, immigration or investment advice, and it does not sell investment products.",
+        ],
+      },
+      {
+        heading: "2. Member listings and the Verified badge",
+        paragraphs: [
+          "Members are responsible for the accuracy of their listings. The Verified badge means CR-CIPI reviewed the documents the member provided at that time; it is not a guarantee, endorsement or certification of the quality of their services. Always do your own due diligence.",
+        ],
+      },
+      {
+        heading: "3. Job board",
+        paragraphs: [
+          "Job posts are published by member companies, who are solely responsible for them and for their hiring decisions. Postings must describe real roles, comply with Costa Rican labor law and must not discriminate. Never pay to apply for a job.",
+        ],
+      },
+      {
+        heading: "4. Articles and reviews",
+        paragraphs: [
+          "Members keep ownership of their articles and grant CR-CIPI a free license to publish and share them. Content must be relevant to the community and must not be political, religious, defamatory, discriminatory, misleading or purely promotional. CR-CIPI may decline, edit for format, or remove content at its discretion.",
+        ],
+      },
+      {
+        heading: "5. Accounts",
+        paragraphs: [
+          "Keep access to your email secure; anyone who can read it can sign in with a one-time code. We may suspend accounts that break these terms.",
+        ],
+      },
+      {
+        heading: "6. Liability and law",
+        paragraphs: [
+          "The site is provided as is. To the extent permitted by law, CR-CIPI is not liable for dealings between users, members and employers. These terms are governed by the laws of the Republic of Costa Rica.",
+        ],
+      },
+    ],
   },
   footer: {
     purpose:
