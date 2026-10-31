@@ -8,6 +8,7 @@ import {
 
 export { PROVIDER_CATEGORIES, PROVIDER_CATEGORY_LABELS } from "@/lib/providerCategories";
 export type { ProviderCategory } from "@/lib/providerCategories";
+import { KYC_STATUSES, type KycStatus } from "@/lib/kycOptions";
 
 // ============================================================
 // CR-CIPI Member Provider Directory
@@ -43,6 +44,9 @@ export interface Provider {
   memberSince: number;
   ratingsCount: number;
   ratingsSum: number;
+  // Public outcome of the KYC review (details live in lib/kyc.ts).
+  verified: boolean;
+  kycStatus: KycStatus;
 }
 
 export interface ProviderRating {
@@ -80,6 +84,10 @@ function toProvider(id: string, d: Record<string, unknown>): Provider {
     memberSince: Number(d.memberSince ?? 0),
     ratingsCount: Number(d.ratingsCount ?? 0),
     ratingsSum: Number(d.ratingsSum ?? 0),
+    verified: d.verified === true,
+    kycStatus: (KYC_STATUSES as readonly unknown[]).includes(d.kycStatus)
+      ? (d.kycStatus as KycStatus)
+      : "none",
   };
 }
 
@@ -297,6 +305,8 @@ export async function createProvider(
     memberSince: Date.now(),
     ratingsCount: 0,
     ratingsSum: 0,
+    verified: false,
+    kycStatus: "none",
   };
   await docRef.set(provider);
   return { id: docRef.id, ...provider };
@@ -314,6 +324,9 @@ export async function updateProvider(
 }
 
 export async function deleteProvider(id: string): Promise<void> {
+  // Firestore does not cascade: remove the private KYC record explicitly so
+  // no legal data is orphaned after a business is deleted.
+  await providersCol().doc(id).collection("private").doc("kyc").delete();
   await providersCol().doc(id).delete();
 }
 

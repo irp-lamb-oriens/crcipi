@@ -5,6 +5,7 @@ import {
   listProvidersByOwner,
   validateProviderInput,
 } from "@/lib/providers";
+import { recordEvent } from "@/lib/stats";
 
 // GET  /api/member/providers — list the signed-in member's own providers.
 // POST /api/member/providers — create a provider owned by the member.
@@ -34,6 +35,10 @@ export async function GET() {
     featured: provider.featured,
     approved: provider.approved,
     memberSince: provider.memberSince,
+    verified: provider.verified,
+    kycStatus: provider.kycStatus,
+    ratingsCount: provider.ratingsCount,
+    ratingsSum: provider.ratingsSum,
   }));
 
   return NextResponse.json({ ok: true, providers: summary });
@@ -66,6 +71,7 @@ export async function POST(request: NextRequest) {
       ownerId: user.userId,
       approved: true,
     });
+    recordEvent("provider_created");
     return NextResponse.json({ ok: true, provider }, { status: 201 });
   } catch (error) {
     console.error("Failed to create member provider:", error);

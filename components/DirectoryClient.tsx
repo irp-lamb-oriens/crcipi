@@ -19,6 +19,7 @@ export interface DirectoryProvider {
   location: string | null;
   logoUrl: string | null;
   featured: boolean;
+  verified: boolean;
   website: string | null;
   email: string | null;
   phone: string | null;
@@ -35,6 +36,7 @@ interface Props {
 export default function DirectoryClient({ locale, providers, copy }: Props) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState<ProviderCategory | "all">("all");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   const normalized = query.trim().toLowerCase();
 
@@ -42,6 +44,7 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
     return providers.filter((provider) => {
       const inCategory = active === "all" || provider.category === active;
       if (!inCategory) return false;
+      if (verifiedOnly && !provider.verified) return false;
       if (!normalized) return true;
       const categoryLabel = PROVIDER_CATEGORY_LABELS[provider.category][locale];
       return (
@@ -51,7 +54,7 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
         (provider.location ?? "").toLowerCase().includes(normalized)
       );
     });
-  }, [providers, active, normalized, locale]);
+  }, [providers, active, verifiedOnly, normalized, locale]);
 
   return (
     <section className={styles.section} aria-label={copy.hero.heading}>
@@ -90,6 +93,11 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
               label={copy.filters.all}
               selected={active === "all"}
               onClick={() => setActive("all")}
+            />
+            <FilterPill
+              label={`✓ ${copy.filters.verifiedOnly}`}
+              selected={verifiedOnly}
+              onClick={() => setVerifiedOnly((value) => !value)}
             />
             {PROVIDER_CATEGORIES.map((category) => (
               <FilterPill
@@ -181,6 +189,11 @@ function ProviderCard({
           <h3 className={styles.name}>{provider.name}</h3>
           <div className={styles.meta}>
             <span className={styles.category}>{categoryLabel}</span>
+            {provider.verified ? (
+              <span className={styles.verified} title={copy.card.verifiedHint}>
+                ✓ {copy.card.verified}
+              </span>
+            ) : null}
             {provider.featured ? (
               <span className={styles.featured}>{copy.card.featured}</span>
             ) : null}

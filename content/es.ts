@@ -326,9 +326,12 @@ export const es: PageContent = {
       search: "Buscar",
       searchPlaceholder: "Buscar por nombre o categoría",
       noResults: "Ningún proveedor coincide con su búsqueda.",
+      verifiedOnly: "Solo verificados",
     },
     card: {
       featured: "Destacado",
+      verified: "Verificado",
+      verifiedHint: "CR-CIPI revisó el registro legal y las licencias de esta empresa.",
       reviews: "reseñas",
       noReviews: "Sin reseñas todavía",
       visit: "Visitar",

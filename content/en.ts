@@ -326,9 +326,12 @@ export const en: PageContent = {
       search: "Search",
       searchPlaceholder: "Search by name or category",
       noResults: "No providers match your search.",
+      verifiedOnly: "Verified only",
     },
     card: {
       featured: "Featured",
+      verified: "Verified",
+      verifiedHint: "CR-CIPI checked this business's legal registration and licenses.",
       reviews: "reviews",
       noReviews: "No reviews yet",
       visit: "Visit",

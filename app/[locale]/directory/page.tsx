@@ -4,6 +4,7 @@ import { isLocale } from "@/content";
 import { getLiveContent } from "@/lib/contentStore";
 import { buildPageMetadata } from "@/lib/metadata";
 import { listProviders, averageRating } from "@/lib/providers";
+import { recordEvent } from "@/lib/stats";
 import PageHero from "@/components/PageHero";
 import DirectoryClient, {
   type DirectoryProvider,
@@ -32,6 +33,7 @@ export default async function DirectoryPage({ params }: Props) {
   if (!isLocale(locale)) notFound();
   const content = await getLiveContent(locale);
   const providers = await listProviders({ approvedOnly: true });
+  recordEvent("directory_view");
 
   const items: DirectoryProvider[] = providers.map((provider) => ({
     id: provider.id,
@@ -41,6 +43,7 @@ export default async function DirectoryPage({ params }: Props) {
     location: provider.location ?? null,
     logoUrl: provider.logoUrl ?? null,
     featured: provider.featured,
+    verified: provider.verified,
     website: provider.website ?? null,
     email: provider.email ?? null,
     phone: provider.phone ?? null,

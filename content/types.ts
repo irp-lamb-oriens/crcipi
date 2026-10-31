@@ -110,9 +110,12 @@ export interface DirectoryContent {
     search: string;
     searchPlaceholder: string;
     noResults: string;
+    verifiedOnly: string;
   };
   card: {
     featured: string;
+    verified: string;
+    verifiedHint: string;
     reviews: string;
     noReviews: string;
     visit: string;
