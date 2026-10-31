@@ -1,0 +1,197 @@
+// Reading mode: one centred measure, a drop cap, and a reading-progress
+// hairline under the header (CSS scroll-driven; absent where unsupported).
+.page {
+  --measure: 46rem;
+  padding: clamp(2.5rem, 7vh, 5rem) var(--gutter) var(--section-pad);
+}
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  height: 2px;
+  background: var(--ink);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+@keyframes read {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress {
+    animation: read linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  .progress {
+    display: none;
+  }
+}
+
+.head {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.back {
+  font-size: var(--step-small);
+  color: var(--ink-2);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.dek {
+  max-width: 52ch;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem 1rem;
+  margin-top: 0.5rem;
+  font-size: var(--step-small);
+  text-align: left;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--trust);
+  color: var(--on-dark);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+.firm {
+  display: block;
+  color: var(--ink-2);
+}
+
+.meta {
+  color: var(--ink-3);
+}
+
+.cover {
+  width: 100%;
+  max-width: 1200px;
+  margin: clamp(2rem, 5vw, 3.5rem) auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+// The logo's flag stripes as a section break when there is no cover.
+.rule {
+  width: 96px;
+  margin: clamp(2.5rem, 6vw, 4rem) auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  i {
+    height: 3px;
+    background: var(--trust);
+  }
+
+  i:nth-child(2) {
+    height: 5px;
+    background: var(--accent);
+  }
+}
+
+.prose {
+  max-width: var(--measure);
+  margin: 0 auto;
+  font-size: 1.1875rem;
+  line-height: 1.75;
+  color: var(--ink);
+
+  p,
+  ul {
+    margin-bottom: 1.4rem;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+  }
+
+  li + li {
+    margin-top: 0.4rem;
+  }
+
+  h2,
+  h3 {
+    margin: 2.75rem 0 1rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: var(--step-3);
+  }
+
+  h3 {
+    font-size: 1.45rem;
+  }
+
+  > p:first-of-type::first-letter {
+    float: left;
+    margin: 0.08em 0.12em 0 0;
+    font-family: var(--font-display);
+    font-size: 4.6em;
+    line-height: 0.8;
+    color: var(--trust);
+  }
+}
+
+.foot {
+  max-width: var(--measure);
+  margin: 3rem auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.disclaimer {
+  width: 100%;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line-strong);
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--ink-2);
+}

@@ -9,7 +9,7 @@ import { ARTICLE_CATEGORY_LABELS } from "@/lib/articleOptions";
 import { getPublishedBySlug, recordArticleView } from "@/lib/articles";
 import { recordEvent } from "@/lib/stats";
 import RichText from "@/components/RichText";
-import styles from "@/components/Listing.module.scss";
+import styles from "./page.module.scss";
 
 export const dynamic = "force-dynamic";
 
@@ -65,31 +65,50 @@ export default async function ArticlePage({ params }: Props) {
   }).replace(/</g, "\\u003c");
 
   return (
-    <section className={styles.section}>
+    <article className={styles.page} lang={article.language}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld }} />
-      <div className={`${styles.inner} ${styles.narrow}`}>
-        <Link href={`/${locale}/blog`} className={styles.back}>← {copy.back}</Link>
-        <article lang={article.language}>
-          <p className={styles.eyebrow}>{ARTICLE_CATEGORY_LABELS[article.category][locale]}</p>
-          <h1 className={styles.rowTitle} style={{ fontSize: "clamp(1.9rem, 4.5vw, 3rem)", lineHeight: 1.1, marginBottom: "1rem" }}>
-            {article.title}
-          </h1>
-          <div className={styles.byline}>
-            <span>
-              {copy.by} <strong>{article.authorName}</strong>
-              {article.providerName ? `, ${article.providerName}` : ""}
-            </span>
-            <span>{copy.published} {published}</span>
-            <span>{article.readingMinutes} {content.blog.list.minutes}</span>
-          </div>
-          {article.coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={article.coverUrl} alt="" className={styles.articleCover} />
-          ) : null}
-          <RichText text={article.body} className={styles.prose} />
-          <p className={styles.disclaimer}>{copy.disclaimer}</p>
-        </article>
-      </div>
-    </section>
+      <div className={styles.progress} aria-hidden="true" />
+      <header className={styles.head}>
+        <Link href={`/${locale}/blog`} className={styles.back}>
+          ← {copy.back}
+        </Link>
+        <p className="eyebrow">{ARTICLE_CATEGORY_LABELS[article.category][locale]}</p>
+        <h1 className={styles.title}>
+          <span className="lineMask">
+            <span>{article.title}</span>
+          </span>
+        </h1>
+        <p className={styles.dek}>{article.excerpt}</p>
+        <div className={styles.byline}>
+          <span className={styles.avatar} aria-hidden="true">
+            {article.authorName.slice(0, 1).toUpperCase()}
+          </span>
+          <span>
+            <strong>{article.authorName}</strong>
+            {article.providerName ? <span className={styles.firm}>{article.providerName}</span> : null}
+          </span>
+          <span className={styles.meta}>
+            {copy.published} {published} · {article.readingMinutes} {content.blog.list.minutes}
+          </span>
+        </div>
+      </header>
+      {article.coverUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={article.coverUrl} alt="" className={styles.cover} />
+      ) : (
+        <div className={styles.rule} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+      )}
+      <RichText text={article.body} className={styles.prose} />
+      <footer className={styles.foot}>
+        <p className={styles.disclaimer}>{copy.disclaimer}</p>
+        <Link href={`/${locale}/blog`} className="btn btn--ghost">
+          ← {copy.back}
+        </Link>
+      </footer>
+    </article>
   );
 }
