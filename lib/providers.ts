@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHash } from "crypto";
+import { FieldValue } from "firebase-admin/firestore";
 import { db } from "@/lib/firebaseAdmin";
 import {
   PROVIDER_CATEGORIES,
@@ -252,6 +254,11 @@ export type ProviderValidation =
   | { ok: true; data: ProviderInput }
   | { ok: false; errors: Record<string, string> };
 
+// Files uploaded through /api/member/uploads are served from here.
+export function isMediaPath(value: string): boolean {
+  return /^\/api\/media\/public\/[A-Za-z0-9/_.-]+$/.test(value) && !value.includes("..");
+}
+
 function normalizeUrl(value: string): string {
   if (!value || /^https?:\/\//i.test(value)) return value;
   return `https://${value}`;
@@ -267,7 +274,11 @@ export function validateProviderInput(raw: unknown): ProviderValidation {
   const email = String(body.email ?? "").trim().slice(0, 254);
   const phone = String(body.phone ?? "").trim().slice(0, 60);
   const location = String(body.location ?? "").trim().slice(0, 160);
-  const logoUrl = normalizeUrl(String(body.logoUrl ?? "").trim().slice(0, 500));
+  // A logo is either an absolute URL or a file uploaded to our own storage
+  // (/api/media/public/...). Relative media paths must not get "https://"
+  // glued on, which used to turn them into broken "https:///api/..." links.
+  const rawLogo = String(body.logoUrl ?? "").trim().slice(0, 500);
+  const logoUrl = isMediaPath(rawLogo) ? rawLogo : normalizeUrl(rawLogo);
   const featured = body.featured === true;
 
   const errors: Record<string, string> = {};
@@ -281,7 +292,7 @@ export function validateProviderInput(raw: unknown): ProviderValidation {
   if (website && !/^https?:\/\/.+/.test(website)) {
     errors.website = "invalid";
   }
-  if (logoUrl && !/^https?:\/\/.+/.test(logoUrl)) {
+  if (logoUrl && !isMediaPath(logoUrl) && !/^https?:\/\/.+/.test(logoUrl)) {
     errors.logoUrl = "invalid";
   }
 
@@ -338,6 +349,94 @@ export async function updateProvider(
     Object.entries(patch).filter(([, value]) => value !== undefined)
   );
   await providersCol().doc(id).set(clean, { merge: true });
+}
+
+// Optional listing fields: when an edit leaves one empty it must be removed,
+// not silently kept. updateProvider() merges and skips undefined, which is
+// right for partial patches but wrong for a full form save.
+const OPTIONAL_FIELDS = ["website", "email", "phone", "location", "logoUrl"] as const;
+
+// Saves a complete, validated listing form. Every editable field is written;
+// optional ones left empty are deleted. Fields owned by other flows
+// (owner, approval, verification, ratings, languages, trust) are untouched.
+export async function saveProviderForm(
+  id: string,
+  input: ProviderInput,
+  extra: { approved?: boolean; featured?: boolean } = {}
+): Promise<void> {
+  const data: Record<string, unknown> = {
+    name: input.name,
+    category: input.category,
+    descriptionEn: input.descriptionEn,
+    descriptionEs: input.descriptionEs,
+    featured: extra.featured ?? input.featured,
+    updatedAt: Date.now(),
+  };
+  for (const key of OPTIONAL_FIELDS) {
+    data[key] = input[key] ? input[key] : FieldValue.delete();
+  }
+  if (extra.approved !== undefined) data.approved = extra.approved;
+  await providersCol().doc(id).set(data, { merge: true });
+}
+
+// Same owner, same name (ignoring case, accents and spacing): treated as the
+// same business, so a double-click or a re-submit can't create a copy.
+export function nameKey(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function nameLockRef(ownerId: string, name: string) {
+  const id = createHash("sha256").update(`${ownerId}:${nameKey(name)}`).digest("hex");
+  return db.collection("providerNameLocks").doc(id);
+}
+
+export type CreateOwnedResult =
+  | { created: true; provider: Provider }
+  | { created: false; existing: Provider };
+
+// Creates a member's business at most once per (owner, name). The lock doc is
+// claimed with create(), which is atomic, so two simultaneous submissions
+// cannot both win. A lock that points at a business since deleted, renamed
+// or moved to another owner is stale and gets replaced.
+export async function createOwnedProvider(
+  input: ProviderInput,
+  ownerId: string
+): Promise<CreateOwnedResult> {
+  const lock = nameLockRef(ownerId, input.name);
+  const ref = providersCol().doc();
+  try {
+    await lock.create({ providerId: ref.id, ownerId, createdAt: Date.now() });
+  } catch {
+    const held = (await lock.get()).data() as { providerId?: string } | undefined;
+    const existing = held?.providerId ? await getProvider(held.providerId) : null;
+    if (existing && existing.ownerId === ownerId && nameKey(existing.name) === nameKey(input.name)) {
+      return { created: false, existing };
+    }
+    await lock.set({ providerId: ref.id, ownerId, createdAt: Date.now() });
+  }
+  const provider: Omit<Provider, "id"> = {
+    ...input,
+    featured: false,
+    ownerId,
+    approved: true,
+    memberSince: Date.now(),
+    ratingsCount: 0,
+    ratingsSum: 0,
+    verified: false,
+    kycStatus: "none",
+    responseHoursMedian: null,
+    responseSample: 0,
+    languages: [],
+    trustScore: null,
+  };
+  const clean = Object.fromEntries(Object.entries(provider).filter(([, v]) => v !== undefined));
+  await ref.set(clean);
+  return { created: true, provider: { id: ref.id, ...provider } };
 }
 
 export async function deleteProvider(id: string): Promise<void> {

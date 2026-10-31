@@ -1,14 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ConsoleGate from "@/components/console/ConsoleGate";
 import ModuleGuide from "@/components/console/ModuleGuide";
-import { useRouter } from "next/navigation";
+import FileUpload from "@/components/console/FileUpload";
+import StatusBadge from "@/components/console/StatusBadge";
+import { useSession } from "@/components/console/useSession";
 import {
   PROVIDER_CATEGORIES,
   PROVIDER_CATEGORY_LABELS,
   type ProviderCategory,
 } from "@/lib/providerCategories";
-import styles from "./page.module.scss";
+import styles from "@/components/console/Console.module.scss";
+import biz from "./page.module.scss";
 
 type OwnProvider = {
   id: string;
@@ -21,14 +26,14 @@ type OwnProvider = {
   phone?: string;
   location?: string;
   logoUrl?: string;
-  featured: boolean;
   approved: boolean;
+  verified: boolean;
   memberSince: number;
 };
 
-type ProviderForm = {
+type Form = {
   name: string;
-  category: ProviderCategory;
+  category: ProviderCategory | "";
   descriptionEn: string;
   descriptionEs: string;
   website: string;
@@ -38,9 +43,9 @@ type ProviderForm = {
   logoUrl: string;
 };
 
-const EMPTY_FORM: ProviderForm = {
+const EMPTY: Form = {
   name: "",
-  category: "other",
+  category: "",
   descriptionEn: "",
   descriptionEs: "",
   website: "",
@@ -50,75 +55,99 @@ const EMPTY_FORM: ProviderForm = {
   logoUrl: "",
 };
 
-export default function AccountPage() {
-  const router = useRouter();
-  const [authed, setAuthed] = useState<boolean | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [providers, setProviders] = useState<OwnProvider[]>([]);
-  const [form, setForm] = useState<ProviderForm>(EMPTY_FORM);
+const MESSAGES: Record<string, Record<string, string>> = {
+  name: { required: "Enter the business name." },
+  category: { invalid: "Choose a category." },
+  descriptionEn: { required: "Write the English description." },
+  descriptionEs: { required: "Write the Spanish description." },
+  email: { invalid: "Enter a valid email address." },
+  website: { invalid: "Enter a valid web address, e.g. yourfirm.cr" },
+  logoUrl: { invalid: "Upload an image or paste a link that starts with https://" },
+};
+
+function toForm(p: OwnProvider): Form {
+  return {
+    name: p.name,
+    category: p.category,
+    descriptionEn: p.descriptionEn,
+    descriptionEs: p.descriptionEs,
+    website: p.website ?? "",
+    email: p.email ?? "",
+    phone: p.phone ?? "",
+    location: p.location ?? "",
+    logoUrl: p.logoUrl ?? "",
+  };
+}
+
+// "My businesses": the member's listings. Saving keeps you on the business you
+// saved (it never resets to an empty "Add" form), fields you empty are really
+// removed, and the same business can't be created twice.
+export default function BusinessesPage() {
+  const session = useSession();
+  const [providers, setProviders] = useState<OwnProvider[] | null>(null);
+  const [form, setForm] = useState<Form>(EMPTY);
+  const [saved, setSaved] = useState<Form>(EMPTY);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState<{ kind: "notice" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [notice, setNotice] = useState<string | null>(null);
-  const [selectedReviews, setSelectedReviews] = useState<
-    {
-      id: string;
-      rating: number;
-      reviewerName: string;
-      reviewerEmail: string | null;
-      comment: string;
-      createdAt: number;
-    }[]
-  >([]);
+  // Guards against a double-click firing two saves before the button disables.
+  const inFlight = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const loadReviews = useCallback(async (providerId: string) => {
-    const res = await fetch(`/api/member/providers/${providerId}/reviews`);
+  const load = useCallback(async (): Promise<OwnProvider[]> => {
+    const res = await fetch("/api/member/providers", { cache: "no-store" });
     if (!res.ok) {
-      setSelectedReviews([]);
-      return;
+      setProviders([]);
+      setMessage({ kind: "error", text: "Couldn't load your businesses. Refresh to try again." });
+      return [];
     }
-    const data = await res.json();
-    setSelectedReviews((data.reviews as never[]) ?? []);
-  }, []);
-
-  const loadProviders = useCallback(async () => {
-    const res = await fetch("/api/member/providers");
-    if (!res.ok) return;
-    const data = await res.json();
-    setProviders((data.providers as OwnProvider[]) ?? []);
-  }, []);
-
-  const [role, setRole] = useState<string | null>(null);
-
-  const loadMe = useCallback(async () => {
-    const res = await fetch("/api/auth/me");
-    const data = await res.json();
-    setAuthed(data.authed === true);
-    setEmail(data.email ?? null);
-    setRole(data.authed ? (data.role ?? null) : null);
-    return data.authed === true;
+    const list = ((await res.json()).providers as OwnProvider[]) ?? [];
+    setProviders(list);
+    return list;
   }, []);
 
   useEffect(() => {
-    void (async () => {
-      const ok = await loadMe();
-      if (ok) void loadProviders();
-    })();
-  }, [loadMe, loadProviders]);
+    if (session.status !== "member") return;
+    void load().then((list) => {
+      // Open the first business straight away: most members have one.
+      const wanted = new URLSearchParams(window.location.search).get("provider");
+      const first = list.find((p) => p.id === wanted) ?? list[0];
+      if (first) open(first);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.status, load]);
 
+  const dirty = JSON.stringify(form) !== JSON.stringify(saved);
+
+  // Warn before leaving with unsaved edits.
   useEffect(() => {
-    if (authed === false) router.replace("/admin");
-  }, [authed, router]);
+    if (!dirty) return;
+    const onLeave = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", onLeave);
+    return () => window.removeEventListener("beforeunload", onLeave);
+  }, [dirty]);
 
-  // This dashboard is the member surface. Admins belong in the admin console.
-  useEffect(() => {
-    if (authed && role === "admin") router.replace("/admin/dashboard");
-  }, [authed, role, router]);
+  function open(p: OwnProvider) {
+    const f = toForm(p);
+    setEditingId(p.id);
+    setForm(f);
+    setSaved(f);
+    setErrors({});
+  }
 
-  function set<K extends keyof ProviderForm>(key: K, value: ProviderForm[K]) {
+  function startNew() {
+    setEditingId(null);
+    setForm(EMPTY);
+    setSaved(EMPTY);
+    setErrors({});
+    setMessage(null);
+    requestAnimationFrame(() => formRef.current?.querySelector<HTMLInputElement>("input")?.focus());
+  }
+
+  function set<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setFieldErrors((prev) => {
+    setErrors((prev) => {
       if (!(key in prev)) return prev;
       const next = { ...prev };
       delete next[key];
@@ -126,169 +155,144 @@ export default function AccountPage() {
     });
   }
 
-  function fieldError(key: keyof ProviderForm): string | null {
-    const code = fieldErrors[key];
-    if (!code) return null;
-    if (code === "required") return "This field is required.";
-    if (key === "email") return "Enter a valid email address.";
-    if (key === "website" || key === "logoUrl") return "Enter a valid URL.";
-    if (code === "invalid") return "Enter a valid value.";
-    return code;
-  }
-
-  function startNew() {
-    setForm(EMPTY_FORM);
-    setEditingId(null);
-    setError(null);
-    setFieldErrors({});
-    setSelectedReviews([]);
-  }
-
-  function startEdit(provider: OwnProvider) {
-    setEditingId(provider.id);
-    setForm({
-      name: provider.name,
-      category: provider.category,
-      descriptionEn: provider.descriptionEn,
-      descriptionEs: provider.descriptionEs,
-      website: provider.website ?? "",
-      email: provider.email ?? "",
-      phone: provider.phone ?? "",
-      location: provider.location ?? "",
-      logoUrl: provider.logoUrl ?? "",
-    });
-    setError(null);
-    setFieldErrors({});
-    void loadReviews(provider.id);
-  }
-
-  async function save() {
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
-    setError(null);
-    setNotice(null);
+    setMessage(null);
     try {
-      const payload = {
-        ...form,
-        website: form.website || undefined,
-        email: form.email || undefined,
-        phone: form.phone || undefined,
-        location: form.location || undefined,
-        logoUrl: form.logoUrl || undefined,
-      };
-      const path =
-        editingId === null
-          ? "/api/member/providers"
-          : `/api/member/providers/${editingId}`;
-      const res = await fetch(path, {
-        method: editingId === null ? "POST" : "PATCH",
+      const creating = editingId === null;
+      const res = await fetch(creating ? "/api/member/providers" : `/api/member/providers/${editingId}`, {
+        method: creating ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        // Empty strings are sent as-is: the server removes fields left empty.
+        body: JSON.stringify(form),
       });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as {
-          errors?: Record<string, string>;
-        } | null;
-        const errors = body?.errors;
-        if (errors && Object.keys(errors).length > 0) {
-          setFieldErrors(errors);
-          setError(null);
-        } else {
-          setError("Save failed. Check the fields and try again.");
-        }
+      const body = (await res.json().catch(() => null)) as {
+        errors?: Record<string, string>;
+        provider?: { id: string; name: string };
+      } | null;
+
+      if (res.status === 409 && body?.provider) {
+        const list = await load();
+        const existing = list.find((p) => p.id === body.provider!.id);
+        if (existing) open(existing);
+        setMessage({
+          kind: "notice",
+          text: `You already have “${body.provider.name}”. It's open below so you can edit it instead of creating a copy.`,
+        });
         return;
       }
-      setFieldErrors({});
-      setNotice(editingId === null ? "Your business is live." : "Your business was saved.");
-      startNew();
-      void loadProviders();
+      if (res.status === 422 && body?.errors) {
+        setErrors(body.errors);
+        setMessage({ kind: "error", text: "Some fields need attention." });
+        requestAnimationFrame(() =>
+          formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
+        );
+        return;
+      }
+      if (!res.ok) {
+        setMessage({ kind: "error", text: "Save failed. Your changes are still here; try again." });
+        return;
+      }
+
+      const list = await load();
+      const id = creating ? body?.provider?.id : editingId;
+      const fresh = list.find((p) => p.id === id);
+      if (fresh) open(fresh);
+      setMessage({
+        kind: "notice",
+        text: creating ? `“${form.name}” is live in the directory.` : "Changes saved.",
+      });
     } catch {
-      setError("Save failed. Try again.");
+      setMessage({ kind: "error", text: "Save failed. Check your connection; your changes are still here." });
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }
 
-  async function remove(id: string) {
-    if (!window.confirm("Delete this business? This cannot be undone.")) return;
-    await fetch(`/api/member/providers/${id}`, { method: "DELETE" });
-    if (editingId === id) startNew();
-    void loadProviders();
+  async function remove(p: OwnProvider) {
+    if (!window.confirm(`Delete “${p.name}”? Its profile, reviews and verification are removed. This cannot be undone.`)) return;
+    const res = await fetch(`/api/member/providers/${p.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      setMessage({ kind: "error", text: "Delete failed. Try again." });
+      return;
+    }
+    const list = await load();
+    if (editingId === p.id) (list[0] ? open(list[0]) : startNew());
+    setMessage({ kind: "notice", text: `“${p.name}” was deleted.` });
   }
 
-  async function signOut() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/");
-  }
+  const gate = <ConsoleGate session={session} role="member" />;
+  if (session.status !== "member") return gate;
 
-  if (authed === null) {
+  const current = providers?.find((p) => p.id === editingId) ?? null;
+  const err = (key: keyof Form) => {
+    const code = errors[key];
+    if (!code) return null;
     return (
-      <main className={styles.main}>
-        <p className={styles.hint}>Loading…</p>
-      </main>
+      <p className={styles.fieldError} id={`err-${key}`}>
+        {MESSAGES[key]?.[code] ?? "Check this field."}
+      </p>
     );
-  }
+  };
+  const inv = (key: keyof Form) =>
+    errors[key] ? { "aria-invalid": true as const, "aria-describedby": `err-${key}` } : {};
 
   return (
-    <main className={styles.main}>
+    <main className={styles.page}>
       <div className={styles.shell}>
         <header className={styles.header}>
           <div>
-            <h1 className={styles.title}>My business</h1>
-            <p className={styles.subtitle}>
-              {email ? <>Signed in as <strong>{email}</strong>. </> : null}
-              Add your business or update your listing.
-            </p>
+            <p className={styles.eyebrow}>Directory listing</p>
+            <h1 className={styles.title}>My businesses</h1>
+            <p className={styles.subtitle}>What investors see on your public profile. Changes go live when you save.</p>
           </div>
-          <div className={styles.headerActions}>
+          <div className={styles.actions}>
             <ModuleGuide area="member" id="businesses" />
-            <a className={styles.back} href="/en/directory">
-              View directory
-            </a>
-            <button type="button" className={styles.link} onClick={() => void signOut()}>
-              Sign out
-            </button>
           </div>
         </header>
 
-        <div className={styles.columns}>
-          <section className={styles.listPane}>
-            <div className={styles.listHead}>
-              <h2 className={styles.paneTitle}>My businesses</h2>
-              <button type="button" className={styles.primary} onClick={startNew}>
-                Add business
+        {message ? (
+          <p className={styles[message.kind]} role={message.kind === "error" ? "alert" : "status"}>
+            {message.text}
+          </p>
+        ) : null}
+
+        <div className={biz.columns}>
+          <section className={styles.card} aria-labelledby="list-title">
+            <div className={styles.cardHead}>
+              <h2 id="list-title" className={styles.cardTitle}>Your listings</h2>
+              <button type="button" className={styles.small} onClick={startNew}>
+                + Add
               </button>
             </div>
-
-            {providers.length === 0 ? (
-              <p className={styles.hint}>No businesses yet. Add your first one.</p>
+            {providers === null ? (
+              <p className={styles.hint}>Loading…</p>
+            ) : providers.length === 0 ? (
+              <p className={styles.empty}>No businesses yet. Fill in the form to list your first one.</p>
             ) : (
-              <ul className={styles.list}>
-                {providers.map((provider) => (
-                  <li key={provider.id} className={styles.row}>
+              <ul className={biz.list}>
+                {providers.map((p) => (
+                  <li key={p.id}>
                     <button
                       type="button"
-                      className={styles.rowMain}
-                      onClick={() => startEdit(provider)}
+                      className={`${biz.item} ${p.id === editingId ? biz.itemOn : ""}`}
+                      aria-current={p.id === editingId ? "true" : undefined}
+                      onClick={() => {
+                        if (dirty && !window.confirm("Discard your unsaved changes?")) return;
+                        open(p);
+                        setMessage(null);
+                      }}
                     >
-                      <span className={styles.rowName}>
-                        {provider.name}
-                        {!provider.approved ? (
-                          <span className={styles.badgeMuted}>Pending review</span>
-                        ) : (
-                          <span className={styles.badgeLive}>Live</span>
-                        )}
+                      <span className={biz.itemName}>{p.name}</span>
+                      <span className={biz.itemMeta}>
+                        {PROVIDER_CATEGORY_LABELS[p.category].en}
+                        {p.verified ? " · ✓ Verified" : ""}
                       </span>
-                      <span className={styles.rowMeta}>
-                        {PROVIDER_CATEGORY_LABELS[provider.category].en} /{" "}
-                        {PROVIDER_CATEGORY_LABELS[provider.category].es}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.danger}
-                      onClick={() => void remove(provider.id)}
-                    >
-                      Delete
+                      <StatusBadge tone={p.approved ? "good" : "warn"}>{p.approved ? "Live" : "Hidden"}</StatusBadge>
                     </button>
                   </li>
                 ))}
@@ -296,183 +300,148 @@ export default function AccountPage() {
             )}
           </section>
 
-          <section className={styles.formPane}>
-            <h2 className={styles.paneTitle}>
-              {editingId === null ? "Add business" : "Edit business"}
-            </h2>
-
-            {notice ? <p className={styles.notice}>{notice}</p> : null}
-            {error ? <p className={styles.error}>{error}</p> : null}
-
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-name">Business name</label>
-              <input
-                id="m-name"
-                className={styles.input}
-                value={form.name}
-                onChange={(e) => set("name", e.target.value)}
-              />
-              {fieldError("name") ? (
-                <p className={styles.fieldError}>{fieldError("name")}</p>
+          <section className={styles.card} aria-labelledby="form-title">
+            <div className={styles.cardHead}>
+              <h2 id="form-title" className={styles.cardTitle}>
+                {editingId === null ? "New business" : form.name || "Edit business"}
+              </h2>
+              {current?.approved ? (
+                <Link href={`/en/directory/${current.id}`} target="_blank" className={styles.small}>
+                  View public profile ↗
+                </Link>
               ) : null}
             </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-category">Category</label>
-              <select
-                id="m-category"
-                className={styles.input}
-                value={form.category}
-                onChange={(e) => set("category", e.target.value as ProviderCategory)}
-              >
-                {PROVIDER_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {PROVIDER_CATEGORY_LABELS[category].en} /{" "}
-                    {PROVIDER_CATEGORY_LABELS[category].es}
-                  </option>
-                ))}
-              </select>
-              {fieldError("category") ? (
-                <p className={styles.fieldError}>{fieldError("category")}</p>
-              ) : null}
-            </div>
+            {current && !current.approved ? (
+              <p className={styles.warn}>
+                CR-CIPI has hidden this listing from the directory. Write to the Chamber if you think this is a mistake.
+              </p>
+            ) : null}
+            {current?.verified ? (
+              <p className={styles.hint} style={{ marginBottom: "1rem" }}>
+                This business is verified. Keep the name matching your legal registration.
+              </p>
+            ) : null}
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-desc-en">
-                Description (English)
-              </label>
-              <textarea
-                id="m-desc-en"
-                className={styles.input}
-                rows={3}
-                value={form.descriptionEn}
-                onChange={(e) => set("descriptionEn", e.target.value)}
-              />
-              {fieldError("descriptionEn") ? (
-                <p className={styles.fieldError}>{fieldError("descriptionEn")}</p>
-              ) : null}
-            </div>
+            <form ref={formRef} className={styles.form} onSubmit={save} noValidate>
+              <div className={styles.fieldRow}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-name">Business name</label>
+                  <input id="b-name" className={styles.input} value={form.name} autoComplete="organization"
+                    onChange={(e) => set("name", e.target.value)} {...inv("name")} />
+                  {err("name")}
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-category">Category</label>
+                  <select id="b-category" className={styles.input} value={form.category}
+                    onChange={(e) => set("category", e.target.value as ProviderCategory)} {...inv("category")}>
+                    <option value="" disabled>Choose a category…</option>
+                    {PROVIDER_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {PROVIDER_CATEGORY_LABELS[c].en} / {PROVIDER_CATEGORY_LABELS[c].es}
+                      </option>
+                    ))}
+                  </select>
+                  {err("category")}
+                </div>
+              </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-desc-es">
-                Description (Español)
-              </label>
-              <textarea
-                id="m-desc-es"
-                className={styles.input}
-                rows={3}
-                value={form.descriptionEs}
-                onChange={(e) => set("descriptionEs", e.target.value)}
-              />
-              {fieldError("descriptionEs") ? (
-                <p className={styles.fieldError}>{fieldError("descriptionEs")}</p>
-              ) : null}
-            </div>
+              <div className={styles.fieldRow}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-en">Description (English)</label>
+                  <textarea id="b-en" className={styles.input} rows={5} value={form.descriptionEn}
+                    onChange={(e) => set("descriptionEn", e.target.value)} {...inv("descriptionEn")} />
+                  {err("descriptionEn")}
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-es">Descripción (Español)</label>
+                  <textarea id="b-es" className={styles.input} rows={5} value={form.descriptionEs}
+                    onChange={(e) => set("descriptionEs", e.target.value)} {...inv("descriptionEs")} />
+                  {err("descriptionEs")}
+                </div>
+              </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-website">Website</label>
-              <input
-                id="m-website"
-                className={styles.input}
-                value={form.website}
-                onChange={(e) => set("website", e.target.value)}
-                placeholder="https://"
-              />
-              {fieldError("website") ? (
-                <p className={styles.fieldError}>{fieldError("website")}</p>
-              ) : null}
-            </div>
+              <div className={styles.fieldRow}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-web">Website</label>
+                  <input id="b-web" className={styles.input} value={form.website} inputMode="url" placeholder="yourfirm.cr"
+                    onChange={(e) => set("website", e.target.value)} {...inv("website")} />
+                  {err("website")}
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-email">Email for consultation requests</label>
+                  <input id="b-email" className={styles.input} type="email" value={form.email}
+                    onChange={(e) => set("email", e.target.value)} {...inv("email")} />
+                  {err("email")}
+                </div>
+              </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-email">Email</label>
-              <input
-                id="m-email"
-                className={styles.input}
-                value={form.email}
-                onChange={(e) => set("email", e.target.value)}
-              />
-              {fieldError("email") ? (
-                <p className={styles.fieldError}>{fieldError("email")}</p>
-              ) : null}
-            </div>
+              <div className={styles.fieldRow}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-phone">Phone</label>
+                  <input id="b-phone" className={styles.input} type="tel" value={form.phone} autoComplete="tel"
+                    onChange={(e) => set("phone", e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="b-loc">Location</label>
+                  <input id="b-loc" className={styles.input} value={form.location} placeholder="Escazú, San José"
+                    onChange={(e) => set("location", e.target.value)} />
+                </div>
+              </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-phone">Phone</label>
-              <input
-                id="m-phone"
-                className={styles.input}
-                value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
-              />
-            </div>
+              <fieldset className={`${styles.field} ${biz.logo}`}>
+                <legend className={styles.label}>Logo</legend>
+                <div className={biz.logoRow}>
+                  <span className={biz.preview} aria-hidden="true">
+                    {form.logoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={form.logoUrl} alt="" />
+                    ) : (
+                      <span>{form.name.slice(0, 1).toUpperCase() || "?"}</span>
+                    )}
+                  </span>
+                  <div className={biz.logoControls}>
+                    <FileUpload kind="image" label="Upload a logo (JPG, PNG or WebP, max 5 MB)"
+                      accept="image/png,image/jpeg,image/webp"
+                      onUploaded={(file) => file.url && set("logoUrl", file.url)} />
+                    {form.logoUrl.startsWith("/api/media/") ? (
+                      <p className={styles.help}>Uploaded image in use.</p>
+                    ) : (
+                      <>
+                        <label className={styles.help} htmlFor="b-logo">…or paste a link</label>
+                        <input id="b-logo" className={styles.input} value={form.logoUrl} placeholder="https://"
+                          onChange={(e) => set("logoUrl", e.target.value)} {...inv("logoUrl")} />
+                      </>
+                    )}
+                    {form.logoUrl ? (
+                      <button type="button" className={styles.small} onClick={() => set("logoUrl", "")}>
+                        Remove logo
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+                {err("logoUrl")}
+              </fieldset>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-location">Location</label>
-              <input
-                id="m-location"
-                className={styles.input}
-                value={form.location}
-                onChange={(e) => set("location", e.target.value)}
-              />
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="m-logo">Logo URL</label>
-              <input
-                id="m-logo"
-                className={styles.input}
-                value={form.logoUrl}
-                onChange={(e) => set("logoUrl", e.target.value)}
-                placeholder="https://"
-              />
-              {fieldError("logoUrl") ? (
-                <p className={styles.fieldError}>{fieldError("logoUrl")}</p>
-              ) : null}
-            </div>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.primary}
-                onClick={() => void save()}
-                disabled={busy}
-              >
-                {busy ? "Saving…" : "Save business"}
-              </button>
-              {editingId !== null ? (
-                <button type="button" className={styles.ghost} onClick={startNew}>
-                  Cancel
+              <div className={styles.actions}>
+                <button type="submit" className={styles.primary} disabled={busy || (!dirty && editingId !== null)}>
+                  {busy ? "Saving…" : editingId === null ? "Publish business" : "Save changes"}
                 </button>
-              ) : null}
-            </div>
+                {dirty && editingId !== null ? (
+                  <button type="button" className={styles.ghost} onClick={() => setForm(saved)}>
+                    Undo changes
+                  </button>
+                ) : null}
+                {!dirty && editingId !== null ? <span className={styles.hint}>All changes saved.</span> : null}
+                {current ? (
+                  <button type="button" className={`${styles.danger} ${biz.delete}`} onClick={() => void remove(current)}>
+                    Delete business
+                  </button>
+                ) : null}
+              </div>
+            </form>
           </section>
         </div>
-
-        {editingId !== null && selectedReviews.length > 0 ? (
-          <section className={styles.reviewsPane}>
-            <h2 className={styles.paneTitle}>Reviews for your business</h2>
-            <p className={styles.hint}>Reviewer emails are visible only to you.</p>
-            <ul className={styles.reviewList}>
-              {selectedReviews.map((review) => (
-                <li key={review.id} className={styles.reviewRow}>
-                  <div className={styles.reviewHead}>
-                    <span className={styles.reviewName}>{review.reviewerName}</span>
-                    <span className={styles.reviewStars}>
-                      {"★".repeat(review.rating)}
-                      {"☆".repeat(5 - review.rating)}
-                    </span>
-                  </div>
-                  {review.reviewerEmail ? (
-                    <p className={styles.reviewEmail}>{review.reviewerEmail}</p>
-                  ) : null}
-                  {review.comment ? (
-                    <p className={styles.reviewComment}>{review.comment}</p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
       </div>
     </main>
   );

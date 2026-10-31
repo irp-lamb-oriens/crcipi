@@ -315,7 +315,7 @@ export default function Onboarding({ locale }: { locale: Locale }) {
         locale,
       });
       if (res.status === 409) {
-        setFound({ ...(data.provider as { id: string; name: string }), mine: false });
+        setFound({ ...(data.provider as { id: string; name: string }), mine: data.mine === true });
         return setStage("exists");
       }
       if (res.status === 422) {

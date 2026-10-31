@@ -3,7 +3,8 @@ import { getSessionUser } from "@/lib/auth";
 import {
   deleteProvider,
   getProvider,
-  updateProvider,
+  isMediaPath,
+  saveProviderForm,
   validateProviderInput,
 } from "@/lib/providers";
 
@@ -70,10 +71,16 @@ export async function PATCH(
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 422 });
   }
 
-  // Members can never set their own featured state or approval.
-  const patch = { ...result.data, featured: provider.featured };
+  // A relative logo must be one this member uploaded (or the one already set).
+  const logo = result.data.logoUrl;
+  if (logo && isMediaPath(logo) && logo !== provider.logoUrl && !logo.startsWith(`/api/media/public/images/${user.userId}/`)) {
+    return NextResponse.json({ ok: false, errors: { logoUrl: "invalid" } }, { status: 422 });
+  }
+
+  // Full form save: fields left empty are removed, not kept. Members can
+  // never set their own featured state or approval.
   try {
-    await updateProvider(id, patch);
+    await saveProviderForm(id, result.data, { featured: provider.featured });
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Failed to update member provider:", error);

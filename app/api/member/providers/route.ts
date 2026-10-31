@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import {
-  createProvider,
+  createOwnedProvider,
+  isMediaPath,
   listProvidersByOwner,
   validateProviderInput,
 } from "@/lib/providers";
@@ -63,18 +64,28 @@ export async function POST(request: NextRequest) {
   }
 
   // Members cannot self-feature. Ownership is pinned to the session user;
-  // new submissions go live right away.
-  const data = { ...result.data, featured: false };
-
+  // new submissions go live right away. Same owner + same name is the same
+  // business: a double-click or re-submit returns the existing one (409).
+  if (!isOwnMediaPath(result.data.logoUrl, user.userId)) {
+    return NextResponse.json({ ok: false, errors: { logoUrl: "invalid" } }, { status: 422 });
+  }
   try {
-    const provider = await createProvider(data, {
-      ownerId: user.userId,
-      approved: true,
-    });
+    const outcome = await createOwnedProvider({ ...result.data, featured: false }, user.userId);
+    if (!outcome.created) {
+      return NextResponse.json(
+        { ok: false, error: "duplicate", provider: { id: outcome.existing.id, name: outcome.existing.name } },
+        { status: 409 }
+      );
+    }
     recordEvent("provider_created");
-    return NextResponse.json({ ok: true, provider }, { status: 201 });
+    return NextResponse.json({ ok: true, provider: outcome.provider }, { status: 201 });
   } catch (error) {
     console.error("Failed to create member provider:", error);
     return NextResponse.json({ ok: false, error: "storage_failed" }, { status: 500 });
   }
+}
+// A relative logo path from our storage must be one this member uploaded.
+function isOwnMediaPath(logoUrl: string | undefined, userId: string): boolean {
+  if (!logoUrl || !isMediaPath(logoUrl)) return true;
+  return logoUrl.startsWith(`/api/media/public/images/${userId}/`);
 }

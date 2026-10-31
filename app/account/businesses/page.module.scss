@@ -1,1 +1,112 @@
-@use "../../../styles/legacy-console";
+// My businesses: listings on the left, the open listing's form on the right.
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name badge"
+    "meta badge";
+  align-items: center;
+  gap: 0.15rem 0.75rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  transition: background-color var(--dur-s) var(--ease-out), border-color var(--dur-s) var(--ease-out);
+
+  > :last-child {
+    grid-area: badge;
+  }
+
+  &:hover {
+    background: var(--paper-2);
+  }
+}
+
+.itemOn,
+.itemOn:hover {
+  border-color: var(--ink);
+  background: var(--paper-2);
+}
+
+.itemName {
+  grid-area: name;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.itemMeta {
+  grid-area: meta;
+  font-size: var(--step-small);
+  color: var(--ink-2);
+}
+
+.logo {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.logoRow {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.preview {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--ink-3);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.logoControls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+
+  > button {
+    align-self: flex-start;
+  }
+}
+
+.delete {
+  margin-left: auto;
+}

@@ -5,7 +5,7 @@ import { fail, ok, readJson } from "@/lib/http";
 import { isValidLegalId, normalizeLegalId, saveKyc } from "@/lib/kyc";
 import { EMPTY_KYC, LEGAL_ID_TYPES, type LegalIdType } from "@/lib/kycOptions";
 import { findProviderByLegalId, LANGUAGES } from "@/lib/onboarding";
-import { createProvider, validateProviderInput } from "@/lib/providers";
+import { createOwnedProvider, validateProviderInput } from "@/lib/providers";
 import { recordEvent } from "@/lib/stats";
 
 // POST /api/member/onboarding/company
@@ -47,9 +47,18 @@ export async function POST(request: NextRequest) {
   if (Object.keys(errors).length > 0 || !result.ok) return fail("validation", 422, { errors });
 
   const existing = await findProviderByLegalId(type, legalId);
-  if (existing) return fail("exists", 409, { provider: { id: existing.id, name: existing.name } });
+  if (existing) {
+    return fail("exists", 409, {
+      provider: { id: existing.id, name: existing.name },
+      mine: existing.ownerId === user.userId,
+    });
+  }
 
-  const provider = await createProvider(result.data, { ownerId: user.userId, approved: true });
+  const outcome = await createOwnedProvider(result.data, user.userId);
+  if (!outcome.created) {
+    return fail("exists", 409, { provider: { id: outcome.existing.id, name: outcome.existing.name }, mine: true });
+  }
+  const provider = outcome.provider;
   await db.collection("providers").doc(provider.id).set({ languages, onboardedAt: Date.now() }, { merge: true });
   await saveKyc(
     provider.id,

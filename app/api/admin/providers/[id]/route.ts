@@ -4,6 +4,7 @@ import {
   deleteProvider,
   getProvider,
   listRatings,
+  saveProviderForm,
   updateProvider,
   validateProviderInput,
 } from "@/lib/providers";
@@ -58,7 +59,7 @@ export async function PATCH(
 
   if (validation.ok) {
     try {
-      await updateProvider(id, { ...validation.data, approved });
+      await saveProviderForm(id, validation.data, { approved });
       return NextResponse.json({ ok: true });
     } catch (error) {
       console.error("Failed to update provider:", error);
