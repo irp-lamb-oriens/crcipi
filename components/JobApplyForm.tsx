@@ -3,18 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { JobsContent, Locale } from "@/content/types";
-import styles from "./Listing.module.scss";
+import styles from "./JobApplyForm.module.scss";
 
 export default function JobApplyForm({
   jobId,
   locale,
   copy,
   privacyLabel,
+  pass,
 }: {
   jobId: string;
   locale: Locale;
   copy: JobsContent["apply"];
   privacyLabel: string;
+  /** Boarding-pass stub: what this application is for. */
+  pass: { role: string; company: string; destination: string };
 }) {
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +52,23 @@ export default function JobApplyForm({
   if (state === "sent") {
     return (
       <div className={styles.panel} id="apply">
+      <div className={styles.stub} aria-hidden="true">
+        <span className={styles.stubBrand}>CR-CIPI · {locale === "en" ? "Boarding pass" : "Pase de abordar"}</span>
+        <span className={styles.stubRoute}>
+          <span>
+            <small>{locale === "en" ? "From" : "Desde"}</small>
+            {locale === "en" ? "You" : "Usted"}
+          </span>
+          <span className={styles.stubPlane}>→</span>
+          <span>
+            <small>{locale === "en" ? "To" : "Hacia"}</small>
+            {pass.company}
+          </span>
+        </span>
+        <span className={styles.stubMeta}>
+          {pass.role} · {pass.destination}
+        </span>
+      </div>
         <h2 className={styles.panelTitle}>{copy.heading}</h2>
         <p className={styles.success} role="status" style={{ marginTop: "1rem" }}>{copy.success}</p>
       </div>
@@ -57,6 +77,23 @@ export default function JobApplyForm({
 
   return (
     <div className={styles.panel} id="apply">
+      <div className={styles.stub} aria-hidden="true">
+        <span className={styles.stubBrand}>CR-CIPI · {locale === "en" ? "Boarding pass" : "Pase de abordar"}</span>
+        <span className={styles.stubRoute}>
+          <span>
+            <small>{locale === "en" ? "From" : "Desde"}</small>
+            {locale === "en" ? "You" : "Usted"}
+          </span>
+          <span className={styles.stubPlane}>→</span>
+          <span>
+            <small>{locale === "en" ? "To" : "Hacia"}</small>
+            {pass.company}
+          </span>
+        </span>
+        <span className={styles.stubMeta}>
+          {pass.role} · {pass.destination}
+        </span>
+      </div>
       <h2 className={styles.panelTitle}>{copy.heading}</h2>
       <p className={styles.hint}>{copy.intro}</p>
       <form className={styles.form} onSubmit={(e) => void submit(e)} noValidate>
@@ -100,7 +137,7 @@ export default function JobApplyForm({
           </span>
         </label>
         {error ? <p className={styles.error} role="alert">{error}</p> : null}
-        <button type="submit" className="btn btn--primary" disabled={state === "sending"}>
+        <button type="submit" className={`btn btn--primary ${styles.submit}`} disabled={state === "sending"}>
           {state === "sending" ? copy.submitting : copy.submit}
         </button>
       </form>

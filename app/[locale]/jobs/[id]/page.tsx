@@ -11,7 +11,7 @@ import { getProvider } from "@/lib/providers";
 import { recordEvent } from "@/lib/stats";
 import JobApplyForm from "@/components/JobApplyForm";
 import RichText from "@/components/RichText";
-import styles from "@/components/Listing.module.scss";
+import styles from "./page.module.scss";
 
 export const dynamic = "force-dynamic";
 
@@ -101,65 +101,67 @@ export default async function JobDetailPage({ params }: Props) {
   // Escape "<" so the JSON-LD can never close its own script tag.
   const ld = JSON.stringify(jobPostingLd(job, provider.name, provider.website)).replace(/</g, "\\u003c");
 
+  const destination = job.location || WORK_MODE_LABELS[job.workMode][locale];
+  const facts: [string, string][] = [
+    [copy.detail.location, destination],
+    [copy.detail.type, EMPLOYMENT_TYPE_LABELS[job.employmentType][locale]],
+    [copy.detail.mode, WORK_MODE_LABELS[job.workMode][locale]],
+    ...(salary ? ([[copy.detail.salary, salary]] as [string, string][]) : []),
+    ...(job.expiresAt ? ([[copy.detail.expires, dateFmt.format(job.expiresAt)]] as [string, string][]) : []),
+  ];
+
   return (
-    <section className={styles.section}>
+    <article className={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld }} />
-      <div className={styles.inner}>
-        <Link href={locale === "en" ? "/en/jobs" : "/es/empleos"} className={styles.back}>
-          ← {copy.detail.back}
-        </Link>
-        <div className={styles.detailGrid}>
-          <article>
-            <p className={styles.eyebrow}>{provider.name}</p>
-            <h1 className={styles.rowTitle} style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", textTransform: "uppercase" }}>
-              {job.title}
-            </h1>
-            <dl className={styles.facts} style={{ marginTop: "1.5rem" }}>
-              <dt>{copy.detail.company}</dt>
-              <dd>
-                <Link href={directoryPath}>{provider.name}</Link>
-                {provider.verified ? (
-                  <span className={`${styles.tag} ${styles.tagVerified}`} style={{ marginLeft: "0.5rem" }}>
-                    ✓ {copy.detail.verified}
-                  </span>
-                ) : null}
-              </dd>
-              <dt>{copy.detail.location}</dt>
-              <dd>{job.location || WORK_MODE_LABELS[job.workMode][locale]}</dd>
-              <dt>{copy.detail.type}</dt>
-              <dd>{EMPLOYMENT_TYPE_LABELS[job.employmentType][locale]}</dd>
-              <dt>{copy.detail.mode}</dt>
-              <dd>{WORK_MODE_LABELS[job.workMode][locale]}</dd>
-              {salary ? (
-                <>
-                  <dt>{copy.detail.salary}</dt>
-                  <dd>{salary}</dd>
-                </>
-              ) : null}
-              {job.expiresAt ? (
-                <>
-                  <dt>{copy.detail.expires}</dt>
-                  <dd>{dateFmt.format(job.expiresAt)}</dd>
-                </>
-              ) : null}
-            </dl>
-
-            <h2 className={styles.h2}>{copy.detail.about}</h2>
-            <RichText text={job.description} className={styles.prose} />
-            {job.requirements ? (
-              <>
-                <h2 className={styles.h2}>{copy.detail.requirements}</h2>
-                <RichText text={job.requirements} className={styles.prose} />
-              </>
-            ) : null}
-            <p className={styles.hint}>
-              {site.name} · {copy.board.posted} {dateFmt.format(job.publishedAt ?? job.createdAt)}
-            </p>
-          </article>
-
-          <JobApplyForm jobId={job.id} locale={locale} copy={copy.apply} privacyLabel={content.nav.privacy} />
+      <header className={styles.head}>
+        <div className={styles.inner}>
+          <Link href={locale === "en" ? "/en/jobs" : "/es/empleos"} className={styles.back}>
+            ← {copy.detail.back}
+          </Link>
+          <p className="eyebrow">
+            <Link href={directoryPath} className={styles.company}>
+              {provider.name}
+            </Link>
+            {provider.verified ? <span className={styles.verified}>✓ {copy.detail.verified}</span> : null}
+          </p>
+          <h1 className={styles.title}>
+            <span className="lineMask">
+              <span>{job.title}</span>
+            </span>
+          </h1>
+          <dl className={styles.ticket}>
+            {facts.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
+      </header>
+
+      <div className={`${styles.inner} ${styles.body}`}>
+        <div className={styles.copy}>
+          <h2 className={styles.h2}>{copy.detail.about}</h2>
+          <RichText text={job.description} className={styles.prose} />
+          {job.requirements ? (
+            <>
+              <h2 className={styles.h2}>{copy.detail.requirements}</h2>
+              <RichText text={job.requirements} className={styles.prose} />
+            </>
+          ) : null}
+          <p className={styles.posted}>
+            {site.name} · {copy.board.posted} {dateFmt.format(job.publishedAt ?? job.createdAt)}
+          </p>
+        </div>
+        <JobApplyForm
+          jobId={job.id}
+          locale={locale}
+          copy={copy.apply}
+          privacyLabel={content.nav.privacy}
+          pass={{ role: job.title, company: provider.name, destination }}
+        />
       </div>
-    </section>
+    </article>
   );
 }

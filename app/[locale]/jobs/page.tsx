@@ -50,6 +50,7 @@ export default async function JobsPage({ params }: Props) {
       workMode: job.workMode,
       salary: formatSalary(job, locale),
       publishedAt: job.publishedAt ?? job.createdAt,
+      expiresAt: job.expiresAt,
     }));
 
   return (

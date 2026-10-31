@@ -1,0 +1,294 @@
+.section {
+  padding: clamp(2.5rem, 6vw, 4rem) 0 var(--section-pad);
+}
+
+.inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// --- Controls ----------------------------------------------------------------
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+
+  @media (max-width: 720px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+    .searchLabel {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.search,
+.select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+}
+
+// --- The board -----------------------------------------------------------------
+.board {
+  --board-fg: oklch(93% 0.06 85); // warm amber-white, like split-flap letters
+  --board-dim: oklch(70% 0.03 85);
+  background: var(--ink);
+  color: var(--board-fg);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  overflow: hidden;
+}
+
+.boardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--board-fg) 20%, transparent);
+}
+
+.boardTitle {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1;
+  color: var(--on-dark);
+}
+
+.boardCount {
+  font-size: var(--step-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--board-dim);
+}
+
+.empty {
+  padding: 3rem 0 1rem;
+  color: var(--board-dim);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: 1rem 0.75rem 0.6rem;
+    text-align: left;
+    font-size: var(--step-micro);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--board-dim);
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-left: 0;
+  }
+
+  td {
+    padding: 1.1rem 0.75rem;
+    border-top: 1px solid color-mix(in oklch, var(--board-fg) 12%, transparent);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+
+  tbody tr {
+    position: relative;
+    transform-origin: top;
+    transition: background-color var(--dur-s) var(--ease-out);
+  }
+
+  tbody tr:hover,
+  tbody tr:focus-within {
+    background: color-mix(in oklch, var(--board-fg) 7%, transparent);
+  }
+}
+
+// Split-flap: each row flips down into place once, staggered.
+@keyframes flap {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-80deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .table tbody tr {
+    animation: flap var(--dur-m) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 150ms);
+  }
+}
+
+.time {
+  width: 6.5rem;
+  font-size: var(--step-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--board-dim);
+  white-space: nowrap;
+}
+
+.role {
+  min-width: 0;
+}
+
+// The whole row is clickable through this link's stretched hit area.
+.rowLink {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    outline: 2px solid var(--on-dark);
+    outline-offset: -2px;
+  }
+}
+
+.title {
+  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--on-dark);
+}
+
+.company {
+  font-size: var(--step-small);
+  color: var(--board-dim);
+}
+
+.verified {
+  color: var(--on-dark);
+}
+
+.dest {
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.type {
+  font-size: var(--step-small);
+  color: var(--board-fg);
+
+  span {
+    display: block;
+    color: var(--board-dim);
+  }
+}
+
+.status {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid color-mix(in oklch, var(--board-fg) 35%, transparent);
+  border-radius: 2px;
+  font-size: var(--step-micro);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fresh {
+  background: var(--board-fg);
+  color: var(--ink);
+  border-color: var(--board-fg);
+}
+
+// "Last call" blinks once, then holds (no infinite motion).
+@keyframes call {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.closing {
+  color: var(--on-dark);
+  border-color: var(--on-dark);
+  animation: call 1.2s steps(2) 3;
+}
+
+// Phones: the board keeps its look but each row stacks.
+@media (max-width: 720px) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.4rem 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid color-mix(in oklch, var(--board-fg) 12%, transparent);
+  }
+
+  .table td {
+    padding: 0;
+    border: none;
+  }
+
+  .role {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .time {
+    width: auto;
+  }
+}
+
+// --- Promo -------------------------------------------------------------------
+.promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--line-strong);
+
+  p {
+    color: var(--ink-2);
+  }
+}
+
+.promoTitle {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1.1;
+}

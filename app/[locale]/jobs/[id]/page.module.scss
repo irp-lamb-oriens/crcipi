@@ -1,0 +1,139 @@
+.page {
+  padding-bottom: var(--section-pad);
+}
+
+.inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.head {
+  padding: clamp(2.5rem, 7vh, 5rem) 0 0;
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.back {
+  align-self: flex-start;
+  font-size: var(--step-small);
+  text-decoration: none;
+  color: var(--ink-2);
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.company {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.verified {
+  margin-left: 0.75rem;
+  color: var(--trust);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+// Facts set like the fields of a ticket.
+.ticket {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  border-block: 1px solid var(--ink);
+
+  div {
+    padding: 1rem 1.25rem 1.1rem 0;
+    border-right: 1px dashed var(--line-strong);
+    margin-right: 1.25rem;
+  }
+
+  div:last-child {
+    border-right: none;
+  }
+
+  dt {
+    font-size: var(--step-micro);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  dd {
+    margin-top: 0.3rem;
+    font-size: 1.05rem;
+  }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(320px, 4fr);
+  gap: 3rem clamp(2rem, 6vw, 6rem);
+  align-items: start;
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.h2 {
+  margin: 2.5rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1.1;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.prose {
+  max-width: 66ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--ink-2);
+
+  p,
+  ul {
+    margin-bottom: 1.1rem;
+  }
+
+  ul {
+    padding-left: 1.2rem;
+  }
+
+  h2,
+  h3 {
+    margin: 1.75rem 0 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+}
+
+.posted {
+  margin-top: 2rem;
+  font-size: var(--step-small);
+  color: var(--ink-3);
+}
