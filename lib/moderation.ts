@@ -48,8 +48,10 @@ export interface ModerationInput {
 
 const API_URL = "https://api.anthropic.com/v1/messages";
 const DEFAULT_MODEL = "claude-haiku-5-5";
-const TIMEOUT_MS = 25_000;
-const MAX_ATTEMPTS = 2;
+// Serverless functions (Netlify) time out at ~10s, so one bounded attempt;
+// a failure simply routes the article to a human editor.
+const TIMEOUT_MS = 8_000;
+const MAX_ATTEMPTS = 1;
 
 const POLICY = `You are the editorial reviewer for the CR-CIPI blog (Costa Rica Chamber of International Private Investment).
 CR-CIPI is an independent, non-partisan private-sector initiative. Its members are professionals and companies serving international individuals and families who live, retire, invest and do business in Costa Rica (law, immigration, real estate, banking, tax, insurance, relocation, healthcare, tourism, etc.).
