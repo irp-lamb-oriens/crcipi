@@ -125,7 +125,7 @@
 .navIndex {
   font-size: var(--step-micro);
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--on-dark) 45%, transparent);
+  color: var(--on-dark-2);
 }
 
 .sideFoot {

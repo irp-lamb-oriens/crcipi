@@ -32,7 +32,15 @@ international investors can arrive with confidence.
 | Legal | Reading mode: table of contents + progress |
 | 404 | Off the map: coordinates |
 | Sign in | One-input code entry |
-| Consoles | Calm, container-query dashboards in the same tokens |
+| Provider profile | Passport data page: labelled fields, stamp over the corner, machine-readable zone; letter-of-introduction contact form pinned beside it |
+| Register | Registry dossier: three numbered tabs over one sheet, legal id set like a document number, "Registrada" stamp to finish |
+| Consoles | Calm dashboards in the same tokens; ink side rail, numbered, six items max |
+| Leads inbox | Reply-time clocks on top, list / letter split, overdue in red |
+| Trust seal | Ink panel: score ring, five pillar bars, "raise your score" |
+| How it works | Side sheet (native dialog) with self-ticking checklist |
+| Reviews (admin) | Sorting-office lanes, oldest first |
+| Members (admin) | Ledger rows with a five-bar score glyph |
+| Monthly reports | Printed report: month in large serif, numbered chapters of figures, month-on-month change |
 
 ## Don'ts (what the old site did)
 
