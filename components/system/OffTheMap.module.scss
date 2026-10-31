@@ -1,0 +1,155 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100svh - var(--header-h));
+  display: flex;
+  align-items: center;
+  padding: clamp(3rem, 10vh, 6rem) 0;
+  overflow: clip;
+}
+
+// Graticule: the map grid we have wandered off.
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / 80px 80px,
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px) 0 0 / 80px 80px;
+  mask-image: radial-gradient(circle at 70% 45%, #000 0%, transparent 70%);
+  opacity: 0.8;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas:
+    "copy compass"
+    "copy routes";
+  gap: 2rem clamp(2rem, 6vw, 6rem);
+  align-items: end;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "compass" "copy" "routes";
+  }
+}
+
+.copy {
+  grid-area: copy;
+}
+
+.routes {
+  grid-area: routes;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-hero);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.body {
+  max-width: 46ch;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.coords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-strong);
+
+  dt {
+    font-size: var(--step-micro);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  dd {
+    margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+}
+
+.routes {
+  ul {
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+
+  li {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    line-height: 1.1;
+    text-decoration: none;
+    transition: padding var(--dur-m) var(--ease-out);
+
+    &:hover .arrow {
+      transform: translateX(6px);
+    }
+  }
+}
+
+.routesTitle {
+  margin-bottom: 1rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.n {
+  font-family: var(--font-text);
+  font-size: var(--step-micro);
+  color: var(--ink-3);
+  min-width: 2ch;
+}
+
+.arrow {
+  margin-left: auto;
+  font-family: var(--font-text);
+  font-size: 1rem;
+  transition: transform var(--dur-m) var(--ease-out);
+}
+
+// The seal, knocked askew: a compass that lost its north.
+.compass {
+  grid-area: compass;
+  justify-self: end;
+  transform: rotate(-24deg);
+
+  @media (max-width: 960px) {
+    justify-self: start;
+    width: 110px !important;
+  }
+}
