@@ -35,7 +35,11 @@ export default async function DirectoryPage({ params }: Props) {
   const providers = await listProviders({ approvedOnly: true });
   recordEvent("directory_view");
 
-  const items: DirectoryProvider[] = providers.map((provider) => ({
+  // Verified members lead the register; otherwise the store's order holds.
+  const ordered = [...providers].sort(
+    (a, b) => Number(b.featured) - Number(a.featured) || Number(b.verified) - Number(a.verified)
+  );
+  const items: DirectoryProvider[] = ordered.map((provider) => ({
     id: provider.id,
     name: provider.name,
     category: provider.category,

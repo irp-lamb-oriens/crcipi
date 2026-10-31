@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import type { DirectoryContent } from "@/content/types";
 import styles from "./ReviewModal.module.scss";
@@ -39,8 +40,26 @@ export default function ReviewModal({
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
 
+  // Modal contract: focus inside, Escape closes, page behind is inert and
+  // does not scroll, focus returns to the trigger on close.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
   useEffect(() => {
+    const trigger = document.activeElement as HTMLElement | null;
     nameRef.current?.focus();
+    const main = document.getElementById("main");
+    const header = document.querySelector<HTMLElement>("header");
+    [main, header].forEach((el) => el && (el.inert = true));
+    document.documentElement.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      [main, header].forEach((el) => el && (el.inert = false));
+      document.documentElement.style.overflow = "";
+      trigger?.focus();
+    };
   }, []);
 
   function advance(next: Step) {
@@ -167,7 +186,9 @@ export default function ReviewModal({
     }
   }
 
-  return (
+  // Portalled to <body> so no ancestor stacking context (sticky bars,
+  // isolated rows) can paint over it.
+  return createPortal(
     <div className={styles.overlay} onMouseDown={onClose}>
       <div
         className={styles.modal}
@@ -324,6 +345,7 @@ export default function ReviewModal({
           ) : null}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

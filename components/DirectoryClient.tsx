@@ -9,6 +9,7 @@ import {
   type ProviderCategory,
 } from "@/lib/providerCategories";
 import ReviewModal from "./ReviewModal";
+import Seal from "@/components/brand/Seal";
 import styles from "./DirectoryClient.module.scss";
 
 export interface DirectoryProvider {
@@ -56,25 +57,20 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
     });
   }, [providers, active, verifiedOnly, normalized, locale]);
 
+  const count = filtered.length;
+  const countLabel =
+    locale === "en"
+      ? `${count} ${count === 1 ? "member" : "members"}`
+      : `${count} ${count === 1 ? "miembro" : "miembros"}`;
+
   return (
     <section className={styles.section} aria-label={copy.hero.heading}>
-      <div className={styles.inner}>
-        <p className={styles.eyebrow}>{copy.filters.browse}</p>
-        <div className={styles.toolbar}>
+      {/* The register's reading bar: sticks under the header while browsing. */}
+      <div className={styles.bar}>
+        <div className={styles.barInner}>
           <label className={styles.searchLabel} htmlFor="directory-search">
-            <span className={styles.srOnly}>{copy.filters.search}</span>
-            <svg
-              className={styles.searchIcon}
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+            <span className="srOnly">{copy.filters.search}</span>
+            <svg className={styles.searchIcon} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
             </svg>
@@ -84,42 +80,45 @@ export default function DirectoryClient({ locale, providers, copy }: Props) {
               className={styles.search}
               placeholder={copy.filters.searchPlaceholder}
               value={query}
+              autoComplete="off"
               onChange={(e) => setQuery(e.target.value)}
             />
           </label>
-
-          <div className={styles.filters} role="group" aria-label={copy.filters.search}>
+          <p className={styles.count} aria-live="polite">
+            {countLabel}
+          </p>
+          <div className={styles.filters} role="group" aria-label={copy.filters.browse}>
+            <FilterPill label={copy.filters.all} selected={active === "all"} onClick={() => setActive("all")} />
             <FilterPill
-              label={copy.filters.all}
-              selected={active === "all"}
-              onClick={() => setActive("all")}
-            />
-            <FilterPill
-              label={`✓ ${copy.filters.verifiedOnly}`}
+              label={copy.filters.verifiedOnly}
               selected={verifiedOnly}
               onClick={() => setVerifiedOnly((value) => !value)}
+              verified
             />
+            <span className={styles.divider} aria-hidden="true" />
             {PROVIDER_CATEGORIES.map((category) => (
               <FilterPill
                 key={category}
                 label={PROVIDER_CATEGORY_LABELS[category][locale]}
                 selected={active === category}
-                onClick={() => setActive(category)}
+                onClick={() => setActive(active === category ? "all" : category)}
               />
             ))}
           </div>
         </div>
+      </div>
 
-        {filtered.length === 0 ? (
+      <div className={styles.inner}>
+        {count === 0 ? (
           <p className={styles.empty}>{copy.filters.noResults}</p>
         ) : (
-          <ul className={styles.grid}>
-            {filtered.map((provider) => (
-              <li key={provider.id} className={styles.item}>
-                <ProviderCard provider={provider} locale={locale} copy={copy} />
+          <ol className={styles.register}>
+            {filtered.map((provider, index) => (
+              <li key={provider.id} className={styles.entry}>
+                <ProviderCard provider={provider} locale={locale} copy={copy} index={index} />
               </li>
             ))}
-          </ul>
+          </ol>
         )}
       </div>
     </section>
@@ -130,15 +129,17 @@ function FilterPill({
   label,
   selected,
   onClick,
+  verified,
 }: {
   label: string;
   selected: boolean;
   onClick: () => void;
+  verified?: boolean;
 }) {
   return (
     <button
       type="button"
-      className={`${styles.pill} ${selected ? styles.pillActive : ""}`}
+      className={`${styles.pill} ${selected ? styles.pillActive : ""} ${verified ? styles.pillVerified : ""}`}
       aria-pressed={selected}
       onClick={onClick}
     >
@@ -151,16 +152,23 @@ function ProviderCard({
   provider,
   locale,
   copy,
+  index,
 }: {
   provider: DirectoryProvider;
   locale: Locale;
   copy: DirectoryContent;
+  index: number;
 }) {
   const [showReview, setShowReview] = useState(false);
   const [reviews, setReviews] = useState(provider.reviews);
   const [average, setAverage] = useState<number | null>(provider.rating);
-
   const categoryLabel = PROVIDER_CATEGORY_LABELS[provider.category][locale];
+  const monogram = provider.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 
   function handleSubmitted(nextAverage: number | null, nextCount: number) {
     setAverage(nextAverage);
@@ -168,99 +176,67 @@ function ProviderCard({
   }
 
   return (
-    <article className={styles.card}>
-      <div className={styles.cardHead}>
-        <div className={styles.avatar} aria-hidden="true">
-          {provider.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={provider.logoUrl} alt="" className={styles.logo} />
-          ) : (
-            <span className={styles.monogram}>
-              {provider.name
-                .split(/\s+/)
-                .slice(0, 2)
-                .map((part) => part[0])
-                .join("")
-                .toUpperCase()}
-            </span>
-          )}
-        </div>
-        <div className={styles.titleBlock}>
-          <h3 className={styles.name}>{provider.name}</h3>
-          <div className={styles.meta}>
-            <span className={styles.category}>{categoryLabel}</span>
-            {provider.verified ? (
-              <span className={styles.verified} title={copy.card.verifiedHint}>
-                ✓ {copy.card.verified}
-              </span>
-            ) : null}
-            {provider.featured ? (
-              <span className={styles.featured}>{copy.card.featured}</span>
-            ) : null}
-          </div>
-        </div>
-      </div>
+    <article className={styles.row} aria-labelledby={`provider-${provider.id}`}>
+      <span className={styles.folio} aria-hidden="true">
+        {String(index + 1).padStart(3, "0")}
+      </span>
 
-      <div className={styles.ratingRow}>
-        <Stars value={average ?? 0} />
-        {reviews > 0 ? (
-          <span className={styles.reviews}>
-            {average?.toFixed(1)} · {reviews} {copy.card.reviews}
-          </span>
+      <div className={styles.avatar} aria-hidden="true">
+        {provider.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={provider.logoUrl} alt="" className={styles.logo} loading="lazy" />
         ) : (
-          <span className={styles.reviews}>{copy.card.noReviews}</span>
+          <span className={styles.monogram}>{monogram}</span>
         )}
       </div>
 
-      <p className={styles.description}>{provider.description}</p>
+      <div className={styles.main}>
+        <h3 className={styles.name} id={`provider-${provider.id}`}>
+          {provider.name}
+        </h3>
+        <p className={styles.meta}>
+          <span>{categoryLabel}</span>
+          {provider.location ? <span>{provider.location}</span> : null}
+          {provider.featured ? <span className={styles.featured}>{copy.card.featured}</span> : null}
+        </p>
+        <p className={styles.description}>{provider.description}</p>
+      </div>
 
-      {(provider.location ||
-        provider.email ||
-        provider.phone ||
-        provider.website) && (
-        <dl className={styles.contact}>
-          {provider.location ? (
-            <div className={styles.contactRow}>
-              <dt className={styles.srOnly}>Location</dt>
-              <dd>{provider.location}</dd>
-            </div>
-          ) : null}
-          {provider.website ? (
-            <div className={styles.contactRow}>
-              <dt className={styles.srOnly}>Website</dt>
-              <dd>
-                <a href={provider.website} target="_blank" rel="noopener noreferrer">
-                  {copy.card.visit}
-                </a>
-              </dd>
-            </div>
-          ) : null}
-          {provider.email ? (
-            <div className={styles.contactRow}>
-              <dt className={styles.srOnly}>Email</dt>
-              <dd>
-                <a href={`mailto:${provider.email}`}>{provider.email}</a>
-              </dd>
-            </div>
-          ) : null}
-          {provider.phone ? (
-            <div className={styles.contactRow}>
-              <dt className={styles.srOnly}>Phone</dt>
-              <dd>
-                <a href={`tel:${provider.phone}`}>{provider.phone}</a>
-              </dd>
-            </div>
-          ) : null}
-        </dl>
-      )}
+      <div className={styles.trust}>
+        {provider.verified ? (
+          <span className={styles.stamp} title={copy.card.verifiedHint}>
+            <Seal id={`p-${provider.id}`} size="sm" spin={false} label={copy.card.verified} />
+            <span className={styles.stampLabel}>{copy.card.verified}</span>
+          </span>
+        ) : null}
+        <span className={styles.rating}>
+          <Stars value={average ?? 0} />
+          <span className={styles.reviews}>
+            {reviews > 0 ? `${average?.toFixed(1)} · ${reviews} ${copy.card.reviews}` : copy.card.noReviews}
+          </span>
+        </span>
+      </div>
 
-      <div className={styles.reviewToggle}>
-        <button
-          type="button"
-          className={styles.reviewButton}
-          onClick={() => setShowReview(true)}
-        >
+      <div className={styles.actions}>
+        {provider.website ? (
+          <a className={styles.action} href={provider.website} target="_blank" rel="noopener noreferrer">
+            {copy.card.visit} <span aria-hidden="true">↗</span>
+            <span className="srOnly"> {provider.name}</span>
+          </a>
+        ) : null}
+        {provider.email ? (
+          <a className={styles.action} href={`mailto:${provider.email}`}>
+            {provider.email}
+          </a>
+        ) : null}
+        {provider.phone ? (
+          <a className={styles.action} href={`tel:${provider.phone}`}>
+            {provider.phone}
+          </a>
+        ) : null}
+        <button type="button" className={styles.reviewButton} onClick={() => setShowReview(true)}>
           {copy.rating.heading}
+          <span className="srOnly"> {provider.name}</span>
         </button>
       </div>
 

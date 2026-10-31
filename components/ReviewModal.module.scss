@@ -1,302 +1,282 @@
+// Verified-review dialog: a paper sheet over a dimmed ink backdrop.
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+}
+
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background: rgba(10, 10, 10, 0.4);
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in oklch, var(--ink) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: backdrop-in var(--dur-s) var(--ease-out);
 }
 
 .modal {
   position: relative;
-  width: 100%;
-  max-width: 440px;
-  max-height: 90vh;
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 2rem);
   overflow-y: auto;
-  padding: 2rem 1.75rem;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid var(--line, #e5e5e5);
-  box-shadow: 0 30px 60px -25px rgba(0, 0, 0, 0.35);
-  animation: rise 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overscroll-behavior: contain;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 40px 80px -40px color-mix(in oklch, var(--ink) 60%, transparent);
+  animation: sheet-in var(--dur-m) var(--ease-out);
 }
 
 .close {
   position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 44px;
+  height: 44px;
   border: none;
-  border-radius: 6px;
-  background: none;
-  font-size: 1.4rem;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.5rem;
   line-height: 1;
-  color: var(--ink-soft, #7e7e7e);
-  cursor: pointer;
+  color: var(--ink-2);
 
   &:hover {
-    color: var(--red, #a7302f);
-    background: var(--paper-soft, #f7f7f5);
+    background: var(--paper-2);
+    color: var(--ink);
   }
 }
 
 .head {
-  padding-right: 2rem;
   margin-bottom: 1.5rem;
+  padding-right: 2.5rem;
 }
 
 .title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--ink, #101010);
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .provider {
-  margin: 0.25rem 0 0;
-  font-size: 0.85rem;
-  color: var(--ink-soft, #7e7e7e);
+  margin-top: 0.3rem;
+  font-size: var(--step-small);
+  color: var(--ink-2);
+}
+
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
 }
 
 .step {
-  animation-duration: 0.28s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  animation-fill-mode: both;
+  display: block;
 }
 
 .stepEnt {
-  animation-name: slideEnt;
+  animation: step-forward var(--dur-m) var(--ease-out);
 }
 
 .stepBack {
-  animation-name: slideBack;
+  animation: step-back var(--dur-m) var(--ease-out);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 1.1rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--ink, #101010);
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--ink-2);
 }
 
 .input {
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--line, #e5e5e5);
-  border-radius: 6px;
-  font-size: 0.95rem;
-  color: var(--ink, #101010);
-  background: #fff;
-  font-family: inherit;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 1rem;
 
   &::placeholder {
-    color: var(--ink-faint, #bebebe);
+    color: var(--ink-3);
   }
 
   &:focus {
-    outline: 2px solid var(--navy, #00205b);
-    outline-offset: 2px;
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--trust) 18%, transparent);
   }
 }
 
 .textarea {
+  min-height: 6rem;
   resize: vertical;
+  line-height: 1.55;
 }
 
 .note {
-  margin: 0;
-  font-size: 0.8rem;
+  font-size: var(--step-micro);
   line-height: 1.5;
-  color: var(--ink-soft, #7e7e7e);
+  color: var(--ink-3);
 }
 
 .error {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--red, #a7302f);
+  font-size: var(--step-small);
+  color: var(--accent);
 }
 
 .stars {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.25rem;
 }
 
 .star {
-  background: none;
+  width: 44px;
+  height: 44px;
   border: none;
-  padding: 0;
-  display: inline-flex;
-  color: var(--line, #e5e5e5);
-  transition: color 0.1s ease, transform 0.1s ease;
+  background: none;
+  color: var(--line-strong);
+  transition: color var(--dur-xs) var(--ease-out), transform var(--dur-xs) var(--ease-out);
 
   &:hover {
-    transform: translateY(-1px);
+    transform: scale(1.1);
+    color: var(--ink-2);
   }
 }
 
 .starOn {
-  color: var(--red, #a7302f);
+  color: var(--ink);
 }
 
 .primary {
-  align-self: flex-start;
-  padding: 0.7rem 1.5rem;
-  border-radius: 60px;
-  background: var(--red, #a7302f);
+  min-height: 48px;
+  padding: 0.75rem 1.4rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
   color: #fff;
-  font-size: 0.95rem;
-  font-weight: 400;
-  border: 1px solid var(--red, #a7302f);
-  cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color var(--dur-s) var(--ease-out), border-color var(--dur-s) var(--ease-out);
 
   &:hover {
-    background: #8f2a29;
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: scale(0.98);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 }
 
 .link {
   align-self: flex-start;
-  background: none;
   border: none;
-  padding: 0;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--navy, #00205b);
-  cursor: pointer;
+  background: none;
+  padding: 0.25rem 0;
+  font-size: var(--step-small);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  color: var(--ink-2);
 
   &:hover {
-    color: var(--red, #a7302f);
+    color: var(--ink);
   }
 }
 
 .already {
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--navy-soft, #eef1f7);
-  background: var(--navy-soft, #eef1f7);
-  border-radius: 6px;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--trust-soft);
+  color: var(--trust);
+  font-size: var(--step-small);
 }
 
 .alreadyTitle {
-  margin: 0;
-  font-weight: 700;
-  color: var(--navy, #00205b);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .success {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.75rem;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.5) rotate(-14deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-8deg);
+  }
 }
 
 .check {
-  width: 72px;
-  height: 72px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 50%;
-  background: #ecfdf3;
-  color: #047857;
-  animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1.5px solid var(--trust);
+  color: var(--trust);
+  transform: rotate(-8deg);
+  animation: stamp var(--dur-m) var(--ease-out) both;
 }
 
 .successTitle {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ink, #101010);
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 400;
 }
 
 .newsletter {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  width: 100%;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes slideEnt {
-  from {
-    opacity: 0;
-    transform: translateX(22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideBack {
-  from {
-    opacity: 0;
-    transform: translateX(-22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pop {
-  from {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step-small);
+  color: var(--ink-2);
 }
